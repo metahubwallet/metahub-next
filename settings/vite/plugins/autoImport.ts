@@ -11,6 +11,7 @@ export const autoImport = () => {
             // 自定义api
             {
                 '@/store': ['store'],
+                '@/common/utils/env': ['env'],
             },
         ],
         resolvers: [ElementPlusResolver()],
