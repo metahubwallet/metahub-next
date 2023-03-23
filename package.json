@@ -42,7 +42,7 @@
         "bignumber.js": "^9.1.1",
         "crypto-js": "^4.1.1",
         "element-plus": "^2.3.1",
-        "pinia": "^2.0.32",
+        "pinia": "^2.0.33",
         "vue": "^3.2.47",
         "vue-router": "^4.1.6",
         "webextension-polyfill": "^0.10.0"

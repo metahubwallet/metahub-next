@@ -9,7 +9,9 @@ export const autoImport = () => {
             'vue-router',
             'pinia',
             // 自定义api
-            {},
+            {
+                '@/store': ['store'],
+            },
         ],
         resolvers: [ElementPlusResolver()],
         // 声明文件位置

@@ -11,10 +11,7 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     ElButton: typeof import('element-plus/es')['ElButton']
     Home: typeof import('./../../src/components/Home.vue')['default']
-    'Home的副本': typeof import('./../../src/components/Home的副本.vue')['default']
-    Layout: typeof import('./../../src/components/Layout.vue')['default']
     Main: typeof import('./../../src/components/Main.vue')['default']
-    'Main的副本': typeof import('./../../src/components/Main的副本.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./../../src/components/Test.vue')['default']
