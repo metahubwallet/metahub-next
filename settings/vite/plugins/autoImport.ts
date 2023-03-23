@@ -1,4 +1,5 @@
 import AutoImport from 'unplugin-auto-import/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
 export const autoImport = () => {
     return AutoImport({
@@ -10,6 +11,7 @@ export const autoImport = () => {
             // 自定义api
             {},
         ],
+        resolvers: [ElementPlusResolver()],
         // 声明文件位置
         dts: 'settings/declare/auto-imports.d.ts',
     });
