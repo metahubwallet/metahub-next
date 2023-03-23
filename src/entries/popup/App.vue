@@ -1,12 +1,14 @@
+<script setup lang="ts">
+import Main from '@/components/Main.vue';
+const n = ref('123');
+</script>
+
 <template>
+    {{ n }}
     <main>
         <Main>Popup</Main>
     </main>
 </template>
-
-<script setup lang="ts">
-import Main from '@/components/Main.vue';
-</script>
 
 <style>
 main {
