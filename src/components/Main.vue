@@ -1,14 +1,14 @@
 <template>
-  <img :src="imageUrl" height="45" alt="" />
-  <h1>
-    <slot></slot>
-  </h1>
-  <button type="button" @click="increment">Clicks: {{ count }}</button>
+    <img :src="imageUrl" height="45" alt="" />
+    <h1>
+        <slot></slot>
+    </h1>
+    <button type="button" @click="increment">Clicks: {{ count }}</button>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import logo from "~/assets/logo.svg";
+import { ref } from 'vue';
+import logo from '@/assets/logo.svg';
 
 const imageUrl = new URL(logo, import.meta.url).href;
 
@@ -19,10 +19,10 @@ const increment = () => (count.value += 1);
 
 <style>
 h1 {
-  margin: 5px;
+    margin: 5px;
 }
 
 button {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 </style>
