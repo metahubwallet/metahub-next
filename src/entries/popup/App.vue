@@ -1,10 +1,11 @@
 <script setup lang="ts">
-const settingStore = store.setting();
+const nodeEnv = env.VITE_ENV;
+const type = typeof nodeEnv;
 </script>
 
 <template>
-    {{ settingStore.language }}
-    <el-button type="success" @click="settingStore.language = 'en'">Success</el-button>
+    {{ nodeEnv }}
+    {{ type }}
     <main>
         <Main>Popup</Main>
     </main>
