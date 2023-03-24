@@ -1,12 +1,10 @@
 <script setup lang="ts">
-const nodeEnv = env.VITE_ENV;
-const type = typeof nodeEnv;
+const apiTest = () => {
+    return api.cpu.setTime({ account: 'Tom' });
+};
 </script>
 
 <template>
-    {{ nodeEnv }}
-    {{ type }}
-    <main>
-        <Main>Popup</Main>
-    </main>
+    {{ apiTest() }}
+    <Main>Popup</Main>
 </template>
