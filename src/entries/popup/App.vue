@@ -52,8 +52,8 @@ const handleImportClick = (chainId: string) => {
 
 <template>
     <div id="app">
+        <!-- 是否需要解锁钱包 -->
         <div class="bg" v-if="isInit && !isLock">
-            <!-- 是否需要解锁钱包 -->
             <header class="app-header">
                 <div :class="{ '_effect--50': decline }" class="_effect">
                     <top-nav @change-account="showAccountSelector = true"></top-nav>
