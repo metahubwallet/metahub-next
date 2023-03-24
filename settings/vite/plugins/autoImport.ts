@@ -14,6 +14,7 @@ export const autoImport = () => {
                 '@/common/utils/env': ['env'],
                 '@/common/plugins/axios': ['http'],
                 '@/api': ['api'],
+                '@/common/plugins/validate': ['yup', 'useForms'],
             },
         ],
         resolvers: [ElementPlusResolver()],

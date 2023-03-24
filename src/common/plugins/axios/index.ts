@@ -33,6 +33,10 @@ http.interceptors.response.use(
             case 404:
                 alert('请求地址不存在');
                 break;
+            // 表单验证失败
+            case 422:
+                alert('表单验证失败');
+                break;
             // 其它错误
             default:
                 alert(message ?? '服务器出现问题，程序员正在努力抢救，请您稍后再试');
