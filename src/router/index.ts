@@ -5,11 +5,10 @@ import Test from '../components/Test.vue';
 
 const routes = [
     { path: '/', name: 'home', component: Home },
-    { path: '/test', name: 'test', component: Test }
-  ]
+    { path: '/test', name: 'test', component: Test },
+];
 
 export const router = createRouter({
-  history: createWebHashHistory(),
-  routes,
+    history: createWebHashHistory(),
+    routes,
 });
-
