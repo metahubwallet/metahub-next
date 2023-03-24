@@ -3,7 +3,6 @@ import { router } from '../../router';
 import App from './App.vue';
 
 import { setupPlugins } from '@/common/plugins';
-import 'element-plus/dist/index.css';
 
 const bootstrap = () => {
     const app = createApp(App);
