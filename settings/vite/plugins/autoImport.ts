@@ -12,6 +12,8 @@ export const autoImport = () => {
             {
                 '@/store': ['store'],
                 '@/common/utils/env': ['env'],
+                '@/common/plugins/axios': ['http'],
+                '@/api': ['api'],
             },
         ],
         resolvers: [ElementPlusResolver()],
