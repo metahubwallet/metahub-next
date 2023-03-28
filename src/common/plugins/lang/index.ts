@@ -1,3 +1,4 @@
+import { App } from 'vue';
 import { createI18n } from 'vue-i18n';
 import enLocale from './en';
 import zhLocale from './zh-CN';
@@ -11,6 +12,11 @@ const messages = {
 
 export const i18n = createI18n({
     messages,
-    globalInjection: true, //全局生效$t
-    locale: store.setting().language || 'zh-CN',
+    legacy: false,
+    globalInjection: true, // 全局生效$t
+    locale: localCache.get('language') || 'zh-CN',
 });
+
+export const setupI18n = (app: App) => {
+    app.use(i18n);
+};

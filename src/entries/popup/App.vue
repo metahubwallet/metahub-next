@@ -1,9 +1,17 @@
 <script setup lang="ts">
+import { NConfigProvider, GlobalThemeOverrides } from 'naive-ui';
 import '@/assets/css/common.scss';
 import '@/assets/css/app.scss';
-import Windows from '@/libs/windows';
-
+import Windows from '@/common/libs/windows';
 const router = useRouter();
+
+// 调整主题
+const themeOverrides: GlobalThemeOverrides = {
+    common: {
+        primaryColor: '#bf01fa',
+        primaryColorHover: '#bf01fa',
+    },
+};
 
 const decline = ref(false); // 是否激活子路由
 const showAccountSelector = ref(false);
@@ -51,37 +59,39 @@ const handleImportClick = (chainId: string) => {
 </script>
 
 <template>
-    <div id="app">
-        <!-- 是否需要解锁钱包 -->
-        <div class="bg" v-if="isInit && !isLock">
-            <header class="app-header">
-                <div :class="{ '_effect--50': decline }" class="_effect">
-                    <top-nav @change-account="showAccountSelector = true"></top-nav>
-                </div>
-            </header>
+    <n-config-provider :theme-overrides="themeOverrides">
+        <div id="app">
+            <!-- 是否需要解锁钱包  -->
+            <div class="bg" v-if="isInit && !isLock">
+                <header class="app-header">
+                    <div :class="{ '_effect--50': decline }" class="_effect">
+                        <top-nav @change-account="showAccountSelector = true"></top-nav>
+                    </div>
+                </header>
 
-            <section class="app-content">
-                <transition :name="transitionName">
-                    <keep-alive include="WalletIndex">
-                        <router-view class="child-view"></router-view>
-                    </keep-alive>
-                </transition>
-            </section>
+                <section class="app-content">
+                    <transition :name="transitionName">
+                        <keep-alive include="WalletIndex">
+                            <router-view class="child-view"></router-view>
+                        </keep-alive>
+                    </transition>
+                </section>
 
-            <account-selector
-                v-model="showAccountSelector"
-                @account-click="showAccountSelector = false"
-                @close-click="showAccountSelector = false"
-                @import-click="handleImportClick"
-            ></account-selector>
+                <account-selector
+                    v-model="showAccountSelector"
+                    @account-click="showAccountSelector = false"
+                    @close-click="showAccountSelector = false"
+                    @import-click="handleImportClick"
+                ></account-selector>
+            </div>
+            <div class="bg" v-else-if="isInit">
+                <password-unlock></password-unlock>
+            </div>
+            <div class="bg" v-else>
+                <password-setting></password-setting>
+            </div>
         </div>
-        <div class="bg" v-else-if="isInit">
-            <password-unlock></password-unlock>
-        </div>
-        <div class="bg" v-else>
-            <password-setting></password-setting>
-        </div>
-    </div>
+    </n-config-provider>
 </template>
 
 <style lang="scss" scoped>

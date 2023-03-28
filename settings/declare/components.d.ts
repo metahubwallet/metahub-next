@@ -9,11 +9,19 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    Home: typeof import('./../../src/components/Home.vue')['default']
+    IconClose: typeof import('@icon-park/vue-next')['Close']
+    IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
     Main: typeof import('./../../src/components/Main.vue')['default']
+    NButton: typeof import('naive-ui')['NButton']
+    NCard: typeof import('naive-ui')['NCard']
+    NInput: typeof import('naive-ui')['NInput']
+    NModal: typeof import('naive-ui')['NModal']
+    NPopselect: typeof import('naive-ui')['NPopselect']
+    NUpload: typeof import('naive-ui')['NUpload']
+    PasswordSetting: typeof import('./../../src/entries/popup/components/PasswordSetting.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./../../src/components/Test.vue')['default']
-    TopNav: typeof import('./../../src/components/TopNav.vue')['default']
+    TopNav: typeof import('./../../src/entries/popup/components/TopNav.vue')['default']
   }
 }

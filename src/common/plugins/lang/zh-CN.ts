@@ -3,8 +3,8 @@
  */
 /* eslint-disable */
 export default {
+    // 公共部分
     public: {
-        // 公共部分
         language: '简体中文',
         ok: '确 定',
         cancel: '取 消',

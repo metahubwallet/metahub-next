@@ -1,10 +1,16 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
-import Home from '../components/Home.vue';
-import Test from '../components/Test.vue';
+import Test from '@/components/Test.vue';
 
 const routes = [
-    { path: '/', name: 'home', component: Home },
+    {
+        path: '/',
+        name: 'wallet',
+        component: () => import('@/entries/wallet/index.vue'),
+        meta: {
+            index: 1,
+        },
+    },
     { path: '/test', name: 'test', component: Test },
 ];
 
