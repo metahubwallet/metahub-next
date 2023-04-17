@@ -16,6 +16,7 @@ declare module '@vue/runtime-core' {
     NCard: typeof import('naive-ui')['NCard']
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
+    NoAccount: typeof import('./../../src/entries/popup/components/NoAccount.vue')['default']
     NPopselect: typeof import('naive-ui')['NPopselect']
     NUpload: typeof import('naive-ui')['NUpload']
     PasswordSetting: typeof import('./../../src/entries/popup/components/PasswordSetting.vue')['default']
