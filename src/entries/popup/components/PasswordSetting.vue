@@ -149,7 +149,7 @@ const importWalletsFromData = (content: string) => {
 
 <template>
     <div class="main-container">
-        <div class="nav-header-view">
+        <div class="nav-header-view mb-2">
             <div class="nav-view-item">
                 <div class="btn-import" @click="isShowImportWallet = true">
                     {{ $t('public.importBackup') }}
@@ -179,11 +179,11 @@ const importWalletsFromData = (content: string) => {
 
             <div class="tip">{{ $t('public.settingPasswordTip') }}</div>
 
-            <div class="password-form px-8">
+            <div class="password-form px-12">
                 <!-- 密码 -->
                 <div class="flex flex-col">
                     <n-input
-                        class="h-[60px] rounded-full bg-gray-50 px-7 leading-[60px]"
+                        class="h-[50px] rounded-full bg-gray-50 px-7 leading-[50px]"
                         type="password"
                         :placeholder="$t('public.password')"
                         v-model="values.password"
@@ -195,7 +195,7 @@ const importWalletsFromData = (content: string) => {
                 <!-- 确认密码 -->
                 <div class="flex flex-col">
                     <n-input
-                        class="h-[60px] rounded-full bg-gray-50 px-7 leading-[60px]"
+                        class="h-[50px] rounded-full bg-gray-50 px-7 leading-[50px]"
                         type="password"
                         :placeholder="$t('public.repeatPassword')"
                         v-model="values.password_confirm"
