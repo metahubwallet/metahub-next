@@ -1,3 +1,4 @@
+import { Account } from '../chain/types';
 import { UserState } from './types';
 
 export default defineStore('user', {
@@ -6,14 +7,19 @@ export default defineStore('user', {
         passwordHash: '',
         wallets: [],
         selectedIndex: 0,
-        userTokens: '',
+        userTokens: {},
         networks: null,
         selectedRpc: null,
         customRpcs: null,
     }),
     getters: {
-        currentWallet: (state) => {
+        currentWallet(state) {
             return state.wallets.length > 0 ? state.wallets[state.selectedIndex] : null;
+        },
+        currentUserTokens(state) {
+            const account: Account = this.currentWallet;
+            const key = account.name + '@' + account.chainId.substring(0, 16);
+            return state.userTokens[key] ? state.userTokens[key] : [];
         },
     },
 });
