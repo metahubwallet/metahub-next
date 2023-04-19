@@ -17,7 +17,7 @@ declare module '@vue/runtime-core' {
     NImage: typeof import('naive-ui')['NImage']
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
-    NoAccount: typeof import('./../../src/entries/popup/components/NoAccount.vue')['default']
+    NoAccount: typeof import('./../../src/entries/wallet/components/NoAccount.vue')['default']
     NPopselect: typeof import('naive-ui')['NPopselect']
     NScrollbar: typeof import('naive-ui')['NScrollbar']
     NTable: typeof import('naive-ui')['NTable']
@@ -26,8 +26,9 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./../../src/components/Test.vue')['default']
-    TokenSelector: typeof import('./../../src/entries/popup/components/TokenSelector.vue')['default']
+    TokenSelector: typeof import('./../../src/entries/wallet/components/TokenSelector.vue')['default']
     TopHandle: typeof import('./../../src/entries/popup/components/TopHandle.vue')['default']
     TopNav: typeof import('./../../src/entries/popup/components/TopNav.vue')['default']
+    WalletHeader: typeof import('./../../src/entries/wallet/components/WalletHeader.vue')['default']
   }
 }
