@@ -6,6 +6,7 @@ export default defineStore('user', {
         password: '',
         passwordHash: '',
         wallets: [],
+        walletCaches: {},
         selectedIndex: 0,
         userTokens: {},
         networks: null,
