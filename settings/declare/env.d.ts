@@ -12,3 +12,9 @@ declare module '*.vue' {
 declare interface MetaEnv {
     VITE_ENV: string;
 }
+
+// 声明Window
+declare interface Window {
+    msg: any;
+    dialog: any;
+}

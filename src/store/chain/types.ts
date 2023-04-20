@@ -37,6 +37,8 @@ export interface Authorization {
 
 export interface Network {
     chain: string;
+    chainId: string;
+    name: string;
     token: any;
 }
 

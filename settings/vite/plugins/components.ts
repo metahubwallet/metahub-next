@@ -4,7 +4,7 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers';
 export const setupComponent = () => {
     return Components({
         // 需要自动注册的组件目录
-        dirs: ['src/**/components'],
+        dirs: ['src/**/components', 'src/entries'],
         resolvers: [
             NaiveUiResolver(),
             // iconpark组件按需引入

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NConfigProvider, GlobalThemeOverrides } from 'naive-ui';
+import Global from '@/components/Global.vue';
 import '@/assets/css/common.scss';
 import '@/assets/css/app.scss';
 import Windows from '@/common/libs/windows';
@@ -61,6 +62,7 @@ const handleImportClick = (chainId: string) => {
 <template>
     <n-config-provider :theme-overrides="themeOverrides">
         <div id="app">
+            <Global></Global>
             <!-- 是否需要解锁钱包  -->
             <div class="bg" v-if="isInit && !isLock">
                 <header class="app-header">

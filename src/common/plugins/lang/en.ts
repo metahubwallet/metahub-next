@@ -197,7 +197,7 @@ export default {
         operation: 'Operation',
         sureAddPrefix: 'Are you sure you want to add the "',
         sureAddSuffix: '"network?',
-        sureDeletePrefix: 'Are you sure you want to delete the ',
+        sureDeletePrefix: 'Are you sure you want to delete the "',
         sureDeleteSuffix: '"network?',
         nodeName: 'Node Name',
         blockchainFoundation: 'Blockchain',

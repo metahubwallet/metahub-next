@@ -9,11 +9,14 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    App: typeof import('./../../src/entries/options/App.vue')['default']
+    Global: typeof import('./../../src/components/Global.vue')['default']
     IconClose: typeof import('@icon-park/vue-next')['Close']
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
     Main: typeof import('./../../src/components/Main.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
+    NetworkManager: typeof import('./../../src/entries/setting/NetworkManager.vue')['default']
     NImage: typeof import('naive-ui')['NImage']
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
@@ -28,8 +31,9 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./../../src/components/Test.vue')['default']
     TokenSelector: typeof import('./../../src/entries/wallet/components/TokenSelector.vue')['default']
-    TopHandle: typeof import('./../../src/entries/popup/components/TopHandle.vue')['default']
+    TopHandle: typeof import('./../../src/components/TopHandle.vue')['default']
     TopNav: typeof import('./../../src/entries/popup/components/TopNav.vue')['default']
+    Wallet: typeof import('./../../src/entries/wallet/index.vue')['default']
     WalletHeader: typeof import('./../../src/entries/wallet/components/WalletHeader.vue')['default']
   }
 }

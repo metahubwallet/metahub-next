@@ -5,7 +5,7 @@ export default defineStore('chain', {
         currentChain: 'eos',
         currentChainId: '',
         currentNetwork: {} as Network,
-        networks: [], // 默认节点信息
+        networks: [],
         allTokens: {},
         rpc: {},
     }),
