@@ -227,16 +227,6 @@ const handleCoinClick = (item: Token) => {
 <style scoped lang="scss">
 @import '@/assets/css/color.scss';
 
-/deep/ .el-scrollbar {
-    height: 100%;
-    .el-scrollbar__wrap {
-        overflow-x: hidden;
-    }
-    .el-scrollbar__bar.is-horizontal {
-        display: none;
-    }
-}
-
 .wallet-page {
     width: 100%;
     height: 530px;

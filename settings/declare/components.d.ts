@@ -23,6 +23,7 @@ declare module '@vue/runtime-core' {
     NTable: typeof import('naive-ui')['NTable']
     NUpload: typeof import('naive-ui')['NUpload']
     PasswordSetting: typeof import('./../../src/entries/popup/components/PasswordSetting.vue')['default']
+    PasswordUnlock: typeof import('./../../src/entries/popup/components/PasswordUnlock.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./../../src/components/Test.vue')['default']
