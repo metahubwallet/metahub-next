@@ -54,7 +54,6 @@ export const getEndpoints = async (chainId = store.chain().currentChainId) => {
         );
         return res ? res.data : [];
     } catch (e) {
-        // console.error(e);
         return [];
     }
 };
