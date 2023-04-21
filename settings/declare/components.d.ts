@@ -24,6 +24,7 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SelectNetwork: typeof import('./../../src/entries/setting/SelectNetwork.vue')['default']
+    SettingLanguage: typeof import('./../../src/entries/setting/SettingLanguage.vue')['default']
     Test: typeof import('./../../src/components/Test.vue')['default']
     TokenSelector: typeof import('./../../src/entries/wallet/components/TokenSelector.vue')['default']
     TopHandle: typeof import('./../../src/components/TopHandle.vue')['default']

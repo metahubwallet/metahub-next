@@ -1,4 +1,6 @@
 export interface SettingState {
-    language: 'zh-CN' | 'en'; // 界面语言
+    language: LangugeType; // 界面语言
     isLock: boolean; // 是否锁定界面
 }
+
+export type LangugeType = 'zh-CN' | 'en';
