@@ -9,17 +9,20 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AddCustomNetwork: typeof import('./../../src/entries/setting/network/AddCustomNetwork.vue')['default']
     AddNetwork: typeof import('./../../src/entries/setting/network/AddNetwork.vue')['default']
     App: typeof import('./../../src/entries/options/App.vue')['default']
     Global: typeof import('./../../src/components/Global.vue')['default']
     IconClose: typeof import('@icon-park/vue-next')['Close']
-    IconDelete: typeof import('@icon-park/vue-next')['Delete']
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
-    IconPlus: typeof import('@icon-park/vue-next')['Plus']
     Main: typeof import('./../../src/components/Main.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
+    NCheckbox: typeof import('naive-ui')['NCheckbox']
+    NCol: typeof import('naive-ui')['NCol']
     NetworkManager: typeof import('./../../src/entries/setting/network/NetworkManager.vue')['default']
+    NForm: typeof import('naive-ui')['NForm']
+    NFormItem: typeof import('naive-ui')['NFormItem']
     NImage: typeof import('naive-ui')['NImage']
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']

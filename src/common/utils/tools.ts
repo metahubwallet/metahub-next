@@ -9,7 +9,11 @@ export const briefAccount = (account: string, prefixLength = 6, subfixLength = 5
     );
 };
 
-export function bignum(number: string, base = 10) {
+export const bignum = (number: string, base = 10) => {
     let num = isNaN(parseFloat(number)) ? 0 : number;
     return new BigNumber(num, base);
-}
+};
+
+export const randomInt = (min: number, max: number) => {
+    return Math.floor(Math.random() * (max - min) + min);
+};
