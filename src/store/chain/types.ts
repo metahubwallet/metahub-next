@@ -40,6 +40,7 @@ export interface Network {
     chainId: string;
     name: string;
     token: any;
+    endpoint?: any;
 }
 
 export type hyperionKey =

@@ -9,15 +9,17 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AddNetwork: typeof import('./../../src/entries/setting/network/AddNetwork.vue')['default']
     App: typeof import('./../../src/entries/options/App.vue')['default']
     Global: typeof import('./../../src/components/Global.vue')['default']
     IconClose: typeof import('@icon-park/vue-next')['Close']
+    IconDelete: typeof import('@icon-park/vue-next')['Delete']
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
+    IconPlus: typeof import('@icon-park/vue-next')['Plus']
     Main: typeof import('./../../src/components/Main.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
-    NDialog: typeof import('naive-ui')['NDialog']
-    NetworkManager: typeof import('./../../src/entries/setting/NetworkManager.vue')['default']
+    NetworkManager: typeof import('./../../src/entries/setting/network/NetworkManager.vue')['default']
     NImage: typeof import('naive-ui')['NImage']
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
@@ -30,7 +32,7 @@ declare module '@vue/runtime-core' {
     PasswordUnlock: typeof import('./../../src/entries/popup/components/PasswordUnlock.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SelectNetwork: typeof import('./../../src/entries/setting/SelectNetwork.vue')['default']
+    SelectNetwork: typeof import('./../../src/entries/setting/network/SelectNetwork.vue')['default']
     SettingLanguage: typeof import('./../../src/entries/setting/SettingLanguage.vue')['default']
     SettingNode: typeof import('./../../src/entries/setting/SettingNode.vue')['default']
     Test: typeof import('./../../src/components/Test.vue')['default']
