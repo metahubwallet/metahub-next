@@ -60,4 +60,6 @@ export type hyperionKey =
 
 export interface WhiteItem {
     domain: any;
+    actor: any;
+    contract: string;
 }
