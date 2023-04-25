@@ -8,6 +8,7 @@ export default defineStore('chain', {
         networks: [],
         allTokens: {},
         rpc: {},
+        whitelist: [],
     }),
     getters: {
         findNetwork: (state) => (chainId: string) => {

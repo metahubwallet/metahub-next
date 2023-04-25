@@ -5,6 +5,7 @@ export interface ChainState {
     networks: Array<any>;
     allTokens: Record<string | number, Token[]>;
     rpc: any;
+    whitelist: WhiteItem[];
 }
 
 export interface Account {
@@ -56,3 +57,7 @@ export type hyperionKey =
     | 'telos-test'
     | 'wax-test'
     | 'proton-test';
+
+export interface WhiteItem {
+    domain: any;
+}
