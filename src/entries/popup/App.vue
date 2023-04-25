@@ -90,7 +90,8 @@ const handleImportClick = (chainId: string) => {
                 <password-unlock></password-unlock>
             </div>
             <div class="bg" v-else>
-                <password-setting></password-setting>
+                <!-- <password-setting></password-setting> -->
+                <account-manager></account-manager>
             </div>
         </div>
     </n-config-provider>
