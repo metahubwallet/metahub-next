@@ -17,4 +17,5 @@ declare interface MetaEnv {
 declare interface Window {
     msg: any;
     dialog: any;
+    clip: any;
 }

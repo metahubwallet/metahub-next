@@ -13,6 +13,7 @@ declare module '@vue/runtime-core' {
     AddCustomNetwork: typeof import('./../../src/entries/network/AddCustomNetwork.vue')['default']
     AddNetwork: typeof import('./../../src/entries/network/AddNetwork.vue')['default']
     App: typeof import('./../../src/entries/options/App.vue')['default']
+    GenerateKey: typeof import('./../../src/entries/wallet/GenerateKey.vue')['default']
     Global: typeof import('./../../src/components/Global.vue')['default']
     IconClose: typeof import('@icon-park/vue-next')['Close']
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
