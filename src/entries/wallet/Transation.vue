@@ -28,7 +28,7 @@ const { currentWallet: account } = store.user();
                             <div class="transation-success">
                                 <img
                                     class="transation-img"
-                                    src="../../assets/images/transaction_successful@2x.png"
+                                    src="@/assets/images/transaction_successful@2x.png"
                                 />
                                 <div class="transation-type">
                                     {{ $t('wallet.transferSuccess') }}
@@ -124,22 +124,8 @@ const { currentWallet: account } = store.user();
 </template>
 
 <style lang="scss" scoped>
-@import '../../assets/css/color.scss';
+@import '@/assets/css/color.scss';
 
-/deep/ .el-scrollbar {
-    width: 100%;
-    height: 100%;
-    .el-scrollbar__wrap {
-        overflow-x: hidden;
-    }
-    .el-scrollbar__bar.is-horizontal {
-        display: none;
-    }
-}
-
-.el-container {
-    height: 100%;
-}
 .transation-count-blue {
     color: $primary-color;
 }

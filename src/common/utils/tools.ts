@@ -22,3 +22,13 @@ export const randomInt = (min: number, max: number) => {
 export const timeUtcFormat = (utcDate: string) => {
     return moment(new Date(moment.utc(utcDate))).format('YYYY/MM/DD HH:mm:ss');
 };
+
+export const formatNumber = (num: number) => {
+    if (isNaN(num)) return 0;
+
+    let length = ('' + num).split('.').length;
+    let long = 0;
+    if (length > 1) long = ('' + num).split('.')[1].length;
+
+    return Number(num).toLocaleString('en', { minimumFractionDigits: long });
+};
