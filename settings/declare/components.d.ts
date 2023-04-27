@@ -45,6 +45,7 @@ declare module '@vue/runtime-core' {
     TopHandle: typeof import('./../../src/components/TopHandle.vue')['default']
     TopNav: typeof import('./../../src/entries/popup/components/TopNav.vue')['default']
     Transation: typeof import('./../../src/entries/wallet/Transation.vue')['default']
+    TransferConfirm: typeof import('./../../src/entries/wallet/transfer/TransferConfirm.vue')['default']
     Wallet: typeof import('./../../src/entries/wallet/index.vue')['default']
     WalletHeader: typeof import('./../../src/entries/wallet/components/WalletHeader.vue')['default']
     WhiteList: typeof import('./../../src/entries/setting/white/WhiteList.vue')['default']
