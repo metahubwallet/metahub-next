@@ -54,8 +54,8 @@ const handleImportClick = (chainId: string) => {
     emit('import-click', chainId);
 };
 
-const copy = (e: any) => {
-    window.clip(e);
+const copy = (value: any) => {
+    window.clip(value);
 };
 </script>
 
@@ -126,7 +126,7 @@ const copy = (e: any) => {
                                             <div class="account-left-name">
                                                 <span>{{ showAccount(item.account) }}</span>
                                                 <img
-                                                    @click="copy"
+                                                    @click="copy(showAccount(item.account))"
                                                     class="account-cell-key-copy"
                                                     src="@/assets/images/account_copy.png"
                                                 />
