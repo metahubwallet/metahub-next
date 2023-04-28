@@ -10,6 +10,7 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AccountManager: typeof import('./../../src/entries/setting/AccountManager.vue')['default']
+    AccountSelector: typeof import('./../../src/entries/popup/components/AccountSelector.vue')['default']
     AddCustomNetwork: typeof import('./../../src/entries/network/AddCustomNetwork.vue')['default']
     AddNetwork: typeof import('./../../src/entries/network/AddNetwork.vue')['default']
     App: typeof import('./../../src/entries/options/App.vue')['default']
