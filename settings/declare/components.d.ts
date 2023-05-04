@@ -37,6 +37,7 @@ declare module '@vue/runtime-core' {
     PasswordSetting: typeof import('./../../src/entries/popup/components/PasswordSetting.vue')['default']
     PasswordUnlock: typeof import('./../../src/entries/popup/components/PasswordUnlock.vue')['default']
     ResourceStakedDetail: typeof import('./../../src/entries/resource/ResourceStakedDetail.vue')['default']
+    ResourceStakedOtherDetail: typeof import('./../../src/entries/resource/ResourceStakedOtherDetail.vue')['default']
     Root: typeof import('./../../src/entries/popup/components/Root.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
