@@ -57,6 +57,8 @@ const handleImportClick = (chainId: string) => {
     });
     showAccountSelector.value = false;
 };
+
+const isShow = ref(false);
 </script>
 
 <template>
@@ -80,6 +82,7 @@ const handleImportClick = (chainId: string) => {
                 </section>
 
                 <account-selector
+                    :is-show="isShow"
                     v-model="showAccountSelector"
                     @account-click="showAccountSelector = false"
                     @close-click="showAccountSelector = false"

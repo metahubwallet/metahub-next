@@ -13,6 +13,7 @@ declare module '@vue/runtime-core' {
     AccountSelector: typeof import('./../../src/entries/popup/components/AccountSelector.vue')['default']
     AddCustomNetwork: typeof import('./../../src/entries/network/AddCustomNetwork.vue')['default']
     AddNetwork: typeof import('./../../src/entries/network/AddNetwork.vue')['default']
+    AddToken: typeof import('./../../src/entries/wallet/AddToken.vue')['default']
     App: typeof import('./../../src/entries/options/App.vue')['default']
     AuthChange: typeof import('./../../src/entries/setting/auth/AuthChange.vue')['default']
     GenerateKey: typeof import('./../../src/entries/wallet/GenerateKey.vue')['default']
