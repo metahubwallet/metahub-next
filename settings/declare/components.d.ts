@@ -22,6 +22,7 @@ declare module '@vue/runtime-core' {
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
     ImportChoose: typeof import('./../../src/entries/wallet/import/ImportChoose.vue')['default']
     ImportProtocol: typeof import('./../../src/entries/wallet/import/ImportProtocol.vue')['default']
+    LoginWindow: typeof import('./../../src/entries/window/LoginWindow.vue')['default']
     Main: typeof import('./../../src/components/Main.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
