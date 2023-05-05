@@ -11,6 +11,7 @@ declare module '*.vue' {
 // 声明环境变量类型
 declare interface MetaEnv {
     VITE_ENV: string;
+    VITE_RESPAYERURl: string;
 }
 
 // 声明Window
