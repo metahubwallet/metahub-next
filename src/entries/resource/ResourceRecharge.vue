@@ -192,32 +192,6 @@ const onSubmit = async () => {
     flex-direction: column-reverse;
 }
 
-/deep/ .el-dialog {
-    font-family: PingFang SC;
-    border-radius: 6px;
-    width: 90%;
-    .el-dialog__header {
-        border-bottom: #f2f2f2 1px solid;
-    }
-    .el-dialog__body {
-        padding: 0px;
-    }
-}
-/deep/ .el-scrollbar {
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    .el-scrollbar__wrap {
-        overflow-x: hidden;
-    }
-    .el-scrollbar__bar.is-horizontal {
-        display: none;
-    }
-}
-/deep/ .el-card__body {
-    padding: 15px;
-}
-
 .full {
     background-color: #fff;
 

@@ -46,6 +46,7 @@ declare module '@vue/runtime-core' {
     SettingLanguage: typeof import('./../../src/entries/setting/SettingLanguage.vue')['default']
     SettingNode: typeof import('./../../src/entries/setting/SettingNode.vue')['default']
     SettingsIndex: typeof import('./../../src/entries/setting/SettingsIndex.vue')['default']
+    SvgIcon: typeof import('./../../src/components/SvgIcon.vue')['default']
     Test: typeof import('./../../src/components/Test.vue')['default']
     TokenSelector: typeof import('./../../src/entries/wallet/components/TokenSelector.vue')['default']
     TokenTraces: typeof import('./../../src/entries/wallet/TokenTraces.vue')['default']
