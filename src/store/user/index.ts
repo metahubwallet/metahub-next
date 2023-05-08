@@ -12,6 +12,7 @@ export default defineStore('user', {
         networks: null,
         selectedRpc: null,
         customRpcs: null,
+        currentSymbol: '',
     }),
     getters: {
         currentWallet(state) {

@@ -37,6 +37,7 @@ declare module '@vue/runtime-core' {
     NUpload: typeof import('naive-ui')['NUpload']
     PasswordSetting: typeof import('./../../src/entries/popup/components/PasswordSetting.vue')['default']
     PasswordUnlock: typeof import('./../../src/entries/popup/components/PasswordUnlock.vue')['default']
+    Receive: typeof import('./../../src/entries/wallet/Receive.vue')['default']
     ResourceRecharge: typeof import('./../../src/entries/resource/ResourceRecharge.vue')['default']
     ResourceStakedDetail: typeof import('./../../src/entries/resource/ResourceStakedDetail.vue')['default']
     ResourceStakedOtherDetail: typeof import('./../../src/entries/resource/ResourceStakedOtherDetail.vue')['default']

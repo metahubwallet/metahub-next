@@ -10,4 +10,5 @@ export interface UserState {
     networks: any;
     selectedRpc: any;
     customRpcs: any;
+    currentSymbol: any;
 }
