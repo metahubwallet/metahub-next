@@ -60,5 +60,6 @@ declare module '@vue/runtime-core' {
     WalletHeader: typeof import('./../../src/entries/wallet/components/WalletHeader.vue')['default']
     WhiteList: typeof import('./../../src/entries/setting/white/WhiteList.vue')['default']
     WhiteListDetail: typeof import('./../../src/entries/setting/white/WhiteListDetail.vue')['default']
+    Window: typeof import('./../../src/entries/window/index.vue')['default']
   }
 }
