@@ -24,6 +24,7 @@ declare module '@vue/runtime-core' {
     ImportProtocol: typeof import('./../../src/entries/wallet/import/ImportProtocol.vue')['default']
     LoginWindow: typeof import('./../../src/entries/window/LoginWindow.vue')['default']
     Main: typeof import('./../../src/components/Main.vue')['default']
+    MemoryColumn: typeof import('./../../src/entries/resource/MemoryColumn.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
     NetworkManager: typeof import('./../../src/entries/network/NetworkManager.vue')['default']
