@@ -97,6 +97,10 @@ export async function getBalanceList(account: number, tokens: Token[], onBlanceI
     }
 }
 
+export const getBpInfo = async () => {
+    return { data: [], code: 1, msg: '' };
+};
+
 export async function getTransactionList(chain: hyperionKey, data: any) {
     try {
         if (!hyperionApis[chain]) {
