@@ -1,19 +1,23 @@
 <script setup lang="ts">
 const signupClick = () => {
-    window.open('https://totoro.finance/tools/create-account', '_blank');
+    window.open('https://totoro.finance/tool/create-account', '_blank');
 };
 </script>
 
 <template>
     <div class="no-account-container">
-        <div class="no-account-tip">{{ $t('public.noImport') }}</div>
+        <div class="no-account-tip w-full text-center">{{ $t('public.noImport') }}</div>
         <img
-            class="no-account-img"
+            class="no-account-img cursor-pointer"
             src="@/assets/images/import-btn.png"
             @click="$router.push({ name: 'import-wallet' })"
         />
-        <div class="no-account-btn">{{ $t('public.importAccountNow') }}</div>
-        <div class="free-signup" @click="signupClick()">{{ $t('public.freeSignup') }}</div>
+        <div class="w-full text-center cursor-pointer">
+            <div class="no-account-btn">{{ $t('public.importAccountNow') }}</div>
+            <div class="free-signup" @click="signupClick()">
+                {{ $t('public.freeSignup') }}
+            </div>
+        </div>
     </div>
 </template>
 
@@ -29,8 +33,8 @@ const signupClick = () => {
 
     .no-account-img {
         margin-top: 52px;
-        width: 156px;
-        height: 156px;
+        width: 66px !important;
+        height: 66px !important;
         margin-bottom: 10px;
         cursor: pointer;
     }

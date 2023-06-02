@@ -18,7 +18,7 @@ export default {
         {
             path: 'add-cus-network',
             name: 'network-add-cus',
-            component: () => import('@/entries/network/AddCusNetwork.vue'),
+            component: () => import('@/entries/network/AddCustomNetwork.vue'),
         },
     ],
 } as RouteRecordRaw;

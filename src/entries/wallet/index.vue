@@ -109,7 +109,8 @@ const handleGetEosPrice = async () => {
         valueAmount.value = eosToken.amount;
         valueType.value = eosToken.symbol;
         if (eosToken.chain == 'eos') {
-            const eosPrice = await chain.get().getEosPrice();
+            const eosPrice = 0;
+            // const eosPrice = await chain.get().getEosPrice();
             valueType.value = 'usd';
             valueAmount.value = parseFloat(
                 bignum(eosToken.amount + '')
@@ -124,16 +125,15 @@ const loadRex = async () => {
     let rexEOS = 0.0;
     let rexCount = 0.0;
     if (store.chain().currentChainId === eosChainId) {
-        let response = await chain.get().getREXInfo(store.user().currentWallet.name);
+        let response: any = {};
+        // let response = await chain.get().getREXInfo(store.user().currentWallet.name);
         rexEOS = response['rows'][0]['vote_stake'];
         rexCount = response['rows'][0]['rex_balance'];
     }
     const walletCaches = store.user().walletCaches;
     let currentWalletCaches =
         walletCaches[store.user().currentWallet.name + '@' + store.user().currentWallet.chainId];
-    if (!currentWalletCaches) {
-        return; // todo: need complete
-    }
+    if (!currentWalletCaches) return;
     currentWalletCaches['rexEOS'] = rexEOS;
     currentWalletCaches['rexCount'] = rexCount;
 };
@@ -142,17 +142,17 @@ const getUserBalance = async () => {
     let newTokens = tokens.value.map((x: Token) => {
         return { contract: x.contract, symbol: x.symbol };
     }) as Token[];
-    await getBalanceList(store.user().currentWallet.name, newTokens, (token: Token) => {
-        const selectedToken = tokens.value.find(
-            (x) => x.contract === token.contract && x.symbol == token.symbol
-        );
-        if (selectedToken) selectedToken.amount = token.amount;
-    });
+    // await getBalanceList(store.user().currentWallet.name, newTokens, (token: Token) => {
+    //     const selectedToken = tokens.value.find(
+    //         (x) => x.contract === token.contract && x.symbol == token.symbol
+    //     );
+    //     if (selectedToken) selectedToken.amount = token.amount;
+    // });
 };
 
 const { currentChain } = store.chain();
 const handleCoinClick = (item: Token) => {
-    if (!isSupportChain(currentChain)) return;
+    // if (!isSupportChain(currentChain)) return;
     const token = item.contract + '-' + item.symbol;
     router.push('/wallet/tokenTraces/' + token);
 };
@@ -160,7 +160,7 @@ const handleCoinClick = (item: Token) => {
 
 <template>
     <div class="wallet-page">
-        <el-scrollbar class="full" v-if="wallets.length > 0">
+        <n-scrollbar class="full" v-if="wallets.length > 0">
             <div class="wallet-container">
                 <wallet-header
                     :type="valueType"
@@ -191,7 +191,7 @@ const handleCoinClick = (item: Token) => {
                         v-for="item in tokens"
                     >
                         <div class="resource-item-left">
-                            <el-image
+                            <n-image
                                 :src="
                                     currentChain == 'eos' && item.contract === 'eosio.token'
                                         ? require('@/assets/images/eos_icon.png')
@@ -205,7 +205,7 @@ const handleCoinClick = (item: Token) => {
                                         style="border: none; height: 36px; width: 36px"
                                     />
                                 </div>
-                            </el-image>
+                            </n-image>
                             <div class="list-name-img">{{ item.symbol }}</div>
                         </div>
                         <div class="value-item-right">
@@ -214,7 +214,7 @@ const handleCoinClick = (item: Token) => {
                     </div>
                 </div>
             </div>
-        </el-scrollbar>
+        </n-scrollbar>
         <no-account v-else></no-account>
         <token-selector
             :isShow="showAddToken"

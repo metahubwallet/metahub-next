@@ -1,20 +1,14 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
-
-import Test from '@/components/Test.vue';
-
-const routes = [
-    {
-        path: '/',
-        name: 'wallet',
-        component: () => import('@/entries/wallet/index.vue'),
-        meta: {
-            index: 1,
-        },
-    },
-    { path: '/test', name: 'test', component: Test },
-];
+import { App } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import { baseRoutes } from './base';
+import { setupModuleRoutes } from './module';
 
 export const router = createRouter({
-    history: createWebHashHistory(),
-    routes,
+    history: createWebHistory(),
+    routes: baseRoutes,
 });
+
+export const setupRouter = (app: App) => {
+    setupModuleRoutes(router);
+    app.use(router); // 注册路由
+};

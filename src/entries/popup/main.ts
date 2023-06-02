@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import { router } from '../../router';
+import { setupRouter } from '@/router';
 import App from './App.vue';
 
 import { setupPlugins } from '@/common/plugins';
@@ -8,7 +8,7 @@ const bootstrap = () => {
     const app = createApp(App);
 
     setupPlugins(app);
-    app.use(router);
+    setupRouter(app);
     app.mount('#app');
 };
 

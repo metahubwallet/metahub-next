@@ -18,11 +18,10 @@ const decline = ref(false); // 是否激活子路由
 const showAccountSelector = ref(false);
 const transitionName = ref<'' | 'slide-left' | 'slide-right'>(''); // 过渡动画效果
 
-const { passwordHash } = store.user();
 const { isLock } = store.setting();
 
 const isInit = computed(() => {
-    return passwordHash != '';
+    return store.user().passwordHash != '';
 });
 
 onBeforeMount(() => {

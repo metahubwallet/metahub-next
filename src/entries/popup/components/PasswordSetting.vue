@@ -186,7 +186,7 @@ const importWalletsFromData = (content: string) => {
                         class="h-[50px] rounded-full bg-gray-50 px-7 leading-[50px]"
                         type="password"
                         :placeholder="$t('public.password')"
-                        v-model="values.password"
+                        v-model:value="values.password"
                     />
                     <span class="self-end mr-5 mt-1 h-6 text-xs text-yellow-300">
                         {{ errors.password }}
@@ -198,7 +198,7 @@ const importWalletsFromData = (content: string) => {
                         class="h-[50px] rounded-full bg-gray-50 px-7 leading-[50px]"
                         type="password"
                         :placeholder="$t('public.repeatPassword')"
-                        v-model="values.password_confirm"
+                        v-model:value="values.password_confirm"
                     />
                     <span class="self-end mr-5 mt-1 h-6 text-xs text-yellow-300">
                         {{ errors.password_confirm }}
