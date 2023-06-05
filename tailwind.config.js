@@ -8,9 +8,7 @@ module.exports = {
         extend: {
             // 全部颜色
             colors: {
-                purple: {
-                    500: '#bf01fa'
-                }
+                primary: '#bf01fa',
             },
         },
     },

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 interface Props {
     iconClass: string;
-    className: string;
+    className?: string;
 }
 const props = withDefaults(defineProps<Props>(), {});
 

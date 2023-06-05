@@ -8,15 +8,11 @@ const props = withDefaults(defineProps<Props>(), {
     isPrev: false,
     titles: () => [],
 });
-
-const tabLabel = ref('');
 </script>
 
 <template>
     <div class="cover-top">
-        <div @click="$router.go(-1)" class="top-back">
-            <svg-icon icon-class="back"></svg-icon>
-        </div>
+        <icon-arrow-left @click="$router.go(-1)" theme="outline" size="24" fill="#222222" />
 
         <div class="top-title _effect" :class="{ '_effect--50': props.isPrev }">
             {{ props.title }}
@@ -25,10 +21,6 @@ const tabLabel = ref('');
 </template>
 
 <style lang="scss" scoped>
-.top-back {
-    min-width: 25px;
-}
-
 .top-back-img {
     width: 11px;
     height: 32px;

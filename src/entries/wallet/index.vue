@@ -5,7 +5,6 @@ import { eosChainId } from '@/common/utils/network';
 import { bignum } from '@/common/utils/tools';
 import { Token } from '@/store/chain/types';
 
-const props = withDefaults(defineProps<{ msg: string }>(), {});
 const router = useRouter();
 
 const valueType = ref('usd');
@@ -159,7 +158,8 @@ const handleCoinClick = (item: Token) => {
 </script>
 
 <template>
-    <div class="wallet-page">
+    <div class="wallet-page w-full h-full">
+        <div class="demo">1</div>
         <n-scrollbar class="full" v-if="wallets.length > 0">
             <div class="wallet-container">
                 <wallet-header
@@ -224,7 +224,7 @@ const handleCoinClick = (item: Token) => {
     </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @import '@/assets/css/color.scss';
 
 .wallet-page {

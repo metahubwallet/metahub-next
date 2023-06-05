@@ -28,8 +28,9 @@ const schema = {
 };
 const { values, errors, handleSubmit } = useForms(schema);
 const onSubmit = handleSubmit(() => {
-    store.user().password = values.password;
-    store.user().passwordHash = values.password;
+    store.user().password = password1(values.password);
+    store.user().passwordHash = password2(values.password);
+    localCache.set('passwordHash', store.user().passwordHash);
     store.setting().isLock = false;
     router.push({ name: 'wallet' });
 });
@@ -205,7 +206,7 @@ const importWalletsFromData = (content: string) => {
                     </span>
                 </div>
                 <n-button
-                    class="mt-10 bg-purple-500 w-full rounded-[50px] h-[50px]"
+                    class="mt-10 bg-primary w-full rounded-[50px] h-[50px]"
                     type="primary"
                     @click="onSubmit()"
                 >
@@ -279,7 +280,7 @@ const importWalletsFromData = (content: string) => {
                         :before-upload="beforeUpload"
                         :show-file-list="false"
                     >
-                        <n-button text class="upload-button text-purple-500">
+                        <n-button text class="upload-button text-primary">
                             {{ $t('public.selectFileToImport') }}
                         </n-button>
                     </n-upload>
@@ -298,7 +299,7 @@ const importWalletsFromData = (content: string) => {
                             {{ $t('public.cancel') }}
                         </n-button>
                         <n-button
-                            class="bg-purple-500 ml-3"
+                            class="bg-primary ml-3"
                             type="primary"
                             @click="handleImportWallets"
                         >

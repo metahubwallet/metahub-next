@@ -33,7 +33,7 @@ const submit = () => {
                 style="border-radius: 200px"
             ></n-input>
             <n-button
-                class="bg-purple-500 mt-5 w-full h-[50px] leading-[50px]"
+                class="bg-primary mt-5 w-full h-[50px] leading-[50px]"
                 type="primary"
                 @click="submit"
                 round

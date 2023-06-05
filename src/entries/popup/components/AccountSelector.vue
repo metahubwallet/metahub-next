@@ -94,10 +94,10 @@ const copy = (value: any) => {
                                                 class="search-acts"
                                             >
                                                 <i class="el-icon-search"></i>
-                                                <input
+                                                <!-- <input
                                                     v-model="searchName"
                                                     :placeholder="$t('wallet.searchTip')"
-                                                />
+                                                /> -->
                                             </div>
                                             <img
                                                 v-show="searchName != '' || accounts.length"

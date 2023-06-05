@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     AuthChange: typeof import('./../../src/entries/setting/auth/AuthChange.vue')['default']
     GenerateKey: typeof import('./../../src/entries/wallet/GenerateKey.vue')['default']
     Global: typeof import('./../../src/components/Global.vue')['default']
+    IconArrowLeft: typeof import('@icon-park/vue-next')['ArrowLeft']
     IconClose: typeof import('@icon-park/vue-next')['Close']
     IconDelete: typeof import('@icon-park/vue-next')['Delete']
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']

@@ -21,6 +21,10 @@ const transitionName = ref<'' | 'slide-left' | 'slide-right'>(''); // 过渡动�
 const { isLock } = store.setting();
 
 const isInit = computed(() => {
+    localCache.get('passwordHash').then((res: any) => {
+        store.user().passwordHash = res;
+    });
+
     return store.user().passwordHash != '';
 });
 

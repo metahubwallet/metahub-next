@@ -5,24 +5,25 @@ const signupClick = () => {
 </script>
 
 <template>
-    <div class="no-account-container">
-        <div class="no-account-tip w-full text-center">{{ $t('public.noImport') }}</div>
+    <div class="no-account-container h-full flex flex-col items-center mt-20">
+        <div class="no-account-tip w-full text-center text-[13px]">{{ $t('public.noImport') }}</div>
         <img
-            class="no-account-img cursor-pointer"
+            class="no-account-img w-44 h-44 mt-10 mb-4 cursor-pointer"
             src="@/assets/images/import-btn.png"
             @click="$router.push({ name: 'import-wallet' })"
         />
         <div class="w-full text-center cursor-pointer">
-            <div class="no-account-btn">{{ $t('public.importAccountNow') }}</div>
-            <div class="free-signup" @click="signupClick()">
+            <div class="no-account-btn text-primary text-[26px] font-semibold">
+                {{ $t('public.importAccountNow') }}
+            </div>
+            <div class="free-signup mt-28" @click="signupClick()">
                 {{ $t('public.freeSignup') }}
             </div>
         </div>
     </div>
 </template>
 
-<style scoped lang="scss">
-@import '@/assets/css/color.scss';
+<style lang="scss" scoped>
 .no-account-container {
     width: 100%;
     height: 100%;
@@ -33,8 +34,8 @@ const signupClick = () => {
 
     .no-account-img {
         margin-top: 52px;
-        width: 66px !important;
-        height: 66px !important;
+        width: 66px;
+        height: 66px;
         margin-bottom: 10px;
         cursor: pointer;
     }
