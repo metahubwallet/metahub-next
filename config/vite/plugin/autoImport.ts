@@ -14,6 +14,7 @@ export const autoImport = () => {
                 '@/common/plugin/axios': ['http'],
                 '@/api': ['api'],
                 '@/common/plugin/validate': ['yup', 'useForms'],
+                '@/common/util/cache/index': ['localCache'],
             },
         ],
         // 声明文件位置
