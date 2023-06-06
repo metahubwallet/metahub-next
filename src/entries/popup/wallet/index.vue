@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const demo = async () => {
-    localCache.set('lang', 'zh-CN');
-    console.log(await localCache.get('lang'));
+const { t } = useI18n();
+const demo = () => {
+    console.log(t('public.language'));
 };
 demo();
 </script>

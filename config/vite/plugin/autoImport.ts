@@ -15,6 +15,7 @@ export const autoImport = () => {
                 '@/api': ['api'],
                 '@/common/plugin/validate': ['yup', 'useForms'],
                 '@/common/util/cache/index': ['localCache'],
+                'vue-i18n': ['useI18n'],
             },
         ],
         // 声明文件位置
