@@ -1,7 +1,6 @@
 <script setup lang="ts">
-const { t } = useI18n();
 const demo = () => {
-    console.log(t('public.language'));
+    window.msg.warning('123');
 };
 demo();
 </script>

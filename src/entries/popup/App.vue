@@ -1,7 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Global from '@/component/Global.vue';
+</script>
 
 <template>
-    <router-view></router-view>
+    <div>
+        <Global></Global>
+        <router-view></router-view>
+    </div>
 </template>
 
 <style lang="scss" scoped></style>
