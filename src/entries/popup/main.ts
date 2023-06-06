@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 import { router } from '../../router';
 import App from './App.vue';
 
-import { setupPlugins } from '@/common/plugins';
+import { setupPlugins } from '@/common/plugin';
 
 const bootstrap = () => {
     const app = createApp(App);

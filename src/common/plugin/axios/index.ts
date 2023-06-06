@@ -1,4 +1,4 @@
-import { env } from '@/common/utils/env';
+import { env } from '@/common/util/env';
 import axios from 'axios';
 
 // 接口根路径

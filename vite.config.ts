@@ -1,7 +1,7 @@
-import { setupPlugins } from './settings/vite/plugins';
-import { alias } from './settings/vite/alias';
+import { setupPlugins } from './config/vite/plugin';
+import { alias } from './config/vite/alias';
 import { ConfigEnv, loadEnv } from 'vite';
-import { parseEnv } from './settings/vite/utils';
+import { parseEnv } from './config/vite/util';
 
 export default ({ mode }: ConfigEnv) => {
     const root = process.cwd();

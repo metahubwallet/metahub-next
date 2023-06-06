@@ -19,8 +19,8 @@
     "declaration": true
   },
   "include": [
-    "settings/**/*.ts",
-    "settings/**/*.d.ts",
+    "config/**/*.ts",
+    "config/**/*.d.ts",
     "vite.config.ts", 
     "src/**/*.ts", 
     "src/**/*.d.ts", 

@@ -1,3 +1,7 @@
+<script setup lang="ts"></script>
+
 <template>
-    <button class="bg-slate-600">123</button>
+    <router-view></router-view>
 </template>
+
+<style lang="scss" scoped></style>

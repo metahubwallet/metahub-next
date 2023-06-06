@@ -1,15 +1,10 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
-import Home from '../components/Home.vue';
-import Test from '../components/Test.vue';
+import Wallet from '@/entries/popup/wallet/index.vue';
 
-const routes = [
-    { path: '/', name: 'home', component: Home },
-    { path: '/test', name: 'test', component: Test }
-  ]
+const routes = [{ path: '/', name: 'wallet', component: Wallet }];
 
 export const router = createRouter({
-  history: createWebHashHistory(),
-  routes,
+    history: createWebHashHistory(),
+    routes,
 });
-

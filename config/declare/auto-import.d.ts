@@ -15,12 +15,12 @@ declare global {
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']
   const effectScope: typeof import('vue')['effectScope']
-  const env: typeof import('@/common/utils/env')['env']
+  const env: typeof import('@/common/util/env')['env']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
   const h: typeof import('vue')['h']
-  const http: typeof import('@/common/plugins/axios')['http']
+  const http: typeof import('@/common/plugin/axios')['http']
   const inject: typeof import('vue')['inject']
   const isProxy: typeof import('vue')['isProxy']
   const isReactive: typeof import('vue')['isReactive']
@@ -68,7 +68,7 @@ declare global {
   const useAttrs: typeof import('vue')['useAttrs']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
-  const useForms: typeof import('@/common/plugins/validate')['useForms']
+  const useForms: typeof import('@/common/plugin/validate')['useForms']
   const useLink: typeof import('vue-router')['useLink']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']
@@ -77,7 +77,7 @@ declare global {
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
   const watchSyncEffect: typeof import('vue')['watchSyncEffect']
-  const yup: typeof import('@/common/plugins/validate')['yup']
+  const yup: typeof import('@/common/plugin/validate')['yup']
 }
 // for type re-export
 declare global {

@@ -7,6 +7,6 @@ export const setupComponent = () => {
         dirs: ['src/components'],
         resolvers: [NaiveUiResolver()],
         // 声明文件位置
-        dts: 'settings/declare/components.d.ts',
+        dts: 'config/declare/component.d.ts',
     });
 };

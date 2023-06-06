@@ -10,13 +10,13 @@ export const autoImport = () => {
             // 自定义api
             {
                 '@/store': ['store'],
-                '@/common/utils/env': ['env'],
-                '@/common/plugins/axios': ['http'],
+                '@/common/util/env': ['env'],
+                '@/common/plugin/axios': ['http'],
                 '@/api': ['api'],
-                '@/common/plugins/validate': ['yup', 'useForms'],
+                '@/common/plugin/validate': ['yup', 'useForms'],
             },
         ],
         // 声明文件位置
-        dts: 'settings/declare/auto-imports.d.ts',
+        dts: 'config/declare/auto-import.d.ts',
     });
 };
