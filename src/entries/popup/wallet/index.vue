@@ -1,12 +1,9 @@
-<script setup lang="ts">
-const demo = () => {
-    window.msg.warning('123');
-};
-demo();
-</script>
+<script setup lang="ts"></script>
 
 <template>
-    <div class="demo">wallet</div>
+    <div class="demo">
+        <n-button type="primary">Primary</n-button>
+    </div>
 </template>
 
 <style lang="scss" scoped>
