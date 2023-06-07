@@ -1,3 +1,4 @@
 import setting from './setting';
+import user from './user';
 
-export const store = { setting };
+export const store = { setting, user };
