@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import PasswordUnlock from '@/entries/popup/wallet/password/PasswordUnlock.vue';
+import PasswordSetting from '@/entries/popup/wallet/password/PasswordSetting.vue';
 
 const setting = store.setting();
+
+// 是否设置过密码
+const isInit = computed(() => {
+    localCache.get('passwordHash').then((res: any) => {
+        store.user().passwordHash = res;
+    });
+    return store.user().passwordHash != null;
+});
 </script>
 
 <template>
@@ -9,8 +18,13 @@ const setting = store.setting();
         <div v-if="!setting.isLock">
             <router-view></router-view>
         </div>
-        <div class="bg" v-else>
+
+        <div class="bg" v-else-if="isInit">
             <password-unlock></password-unlock>
+        </div>
+
+        <div class="bg" v-else>
+            <password-setting></password-setting>
         </div>
     </div>
 </template>

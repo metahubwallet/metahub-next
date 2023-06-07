@@ -1,1 +1,1 @@
-export type CacheKey = 'lang';
+export type CacheKey = 'lang' | 'passwordHash';
