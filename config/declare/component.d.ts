@@ -13,7 +13,8 @@ declare module '@vue/runtime-core' {
     NButton: typeof import('naive-ui')['NButton']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
     NInput: typeof import('naive-ui')['NInput']
-    PasswordUnlock: typeof import('./../../src/entries/popup/wallet/component/PasswordUnlock.vue')['default']
+    PasswordSetting: typeof import('./../../src/entries/popup/wallet/component/password/PasswordSetting.vue')['default']
+    PasswordUnlock: typeof import('./../../src/entries/popup/wallet/component/password/PasswordUnlock.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

@@ -6,7 +6,7 @@ const iv = CryptoJS.enc.Utf8.parse('A3CE6FKE34SG3LD2'); //十六位十六进制�
 export const metahubKey = 'YM4BqViCkPs2qt3tTdTuP3ABUimU7sBU';
 
 //解密方法
-export function decrypt(word: string, seed = key) {
+export const decrypt = (word: string, seed = key) => {
     const parseSeed = CryptoJS.enc.Utf8.parse(seed);
     let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
     let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
@@ -17,10 +17,10 @@ export function decrypt(word: string, seed = key) {
     });
     let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
     return decryptedStr.toString();
-}
+};
 
 //加密方法
-export function encrypt(word: string, seed = key) {
+export const encrypt = (word: string, seed = key) => {
     const parseSeed = CryptoJS.enc.Utf8.parse(seed);
     let srcs = CryptoJS.enc.Utf8.parse(word);
     let encrypted = CryptoJS.AES.encrypt(srcs, parseSeed, {
@@ -29,12 +29,16 @@ export function encrypt(word: string, seed = key) {
         padding: CryptoJS.pad.Pkcs7,
     });
     return encrypted.ciphertext.toString().toUpperCase();
-}
+};
 
-export function password1(word: string) {
+export const md5 = (word: string) => {
+    return CryptoJS.MD5(word);
+};
+
+export const password1 = (word: string) => {
     return CryptoJS.SHA1(CryptoJS.SHA1('metahub-' + word) + '#c22Dc1B6').toString();
-}
+};
 
-export function password2(word: string) {
+export const password2 = (word: string) => {
     return CryptoJS.SHA1(CryptoJS.SHA1('metahub-' + word) + '#B33c4A15').toString();
-}
+};
