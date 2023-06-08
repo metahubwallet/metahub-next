@@ -32,7 +32,7 @@ export const encrypt = (word: string, seed = key) => {
 };
 
 export const md5 = (word: string) => {
-    return CryptoJS.MD5(word);
+    return CryptoJS.MD5(word).toString();
 };
 
 export const password1 = (word: string) => {

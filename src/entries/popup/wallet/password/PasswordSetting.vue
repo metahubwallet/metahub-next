@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { password1, password2 } from '@/common/util/crypto';
 import { useI18n } from 'vue-i18n';
+import ImportBackUp from '../import/ImportBackUp.vue';
 
 const router = useRouter();
 const currentPage = ref(1);
@@ -36,13 +37,16 @@ const onSubmit = handleSubmit(() => {
     store.setting().isLock = false;
     router.push({ name: 'wallet' });
 });
+
+// 是否打开导入备份弹出层
+const isShow = ref(false);
 </script>
 
 <template>
     <div class="main-container">
         <div class="nav-header-view mb-2">
             <div class="nav-view-item">
-                <div class="btn-import">
+                <div class="btn-import" @click="isShow = true">
                     {{ $t('public.importBackup') }}
                 </div>
             </div>
@@ -105,6 +109,8 @@ const onSubmit = handleSubmit(() => {
                 </n-button>
             </div>
         </div>
+
+        <import-back-up :is-show="isShow" @close="isShow = false"></import-back-up>
     </div>
 </template>
 
