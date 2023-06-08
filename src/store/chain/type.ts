@@ -13,9 +13,9 @@ export interface ChainState {
 }
 
 export interface Network {
-    chainId: string;
-    chain: string;
     name: string;
+    chain: string;
+    chainId: string;
     endpoint: string;
     token: Token;
 }

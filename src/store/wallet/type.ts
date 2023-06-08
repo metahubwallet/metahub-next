@@ -9,7 +9,7 @@ export interface WalletState {
 }
 
 export interface Wallet {
-    keys: string[];
+    keys: Key[];
     seed: string;
     chainId: string;
     name: string;
@@ -21,10 +21,14 @@ export interface Wallet {
     chainName: string;
 }
 
+export interface Key {
+    publicKey: string;
+}
+
 export interface Token {
     symbol: string;
     contract: string;
-    precision: string;
+    precision: number;
 }
 
 export interface WhiteItem {
