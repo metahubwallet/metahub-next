@@ -8,7 +8,6 @@ export interface ChainState {
     customRpcs: {
         [key: string]: RPC[];
     }; // 用户自定义节点相关信息
-    selectedIndex: number;
     currentChain: string; // 当前链
     currentChainId: string;
 }

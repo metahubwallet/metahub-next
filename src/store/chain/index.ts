@@ -5,7 +5,6 @@ export default defineStore('chain', {
         networks: [],
         selectedRpc: {},
         customRpcs: {},
-        selectedIndex: 0,
         currentChain: 'eos',
         currentChainId: '',
     }),

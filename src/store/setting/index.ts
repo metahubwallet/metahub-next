@@ -1,4 +1,4 @@
-import { SettingState } from './types';
+import { SettingState } from './type';
 
 export default defineStore('setting', {
     state: (): SettingState => ({

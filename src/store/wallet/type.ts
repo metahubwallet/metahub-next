@@ -1,5 +1,7 @@
 export interface WalletState {
     wallets: Wallet[]; // 里面存储 eos 账号相关信息
+    selectedIndex: number; // 当前选中钱包的索引
+    currentWallet: Wallet | null; // 当前选中钱包
     whitelist: WhiteItem[];
     recentTransfers: Transfer[]; // 最近转账记录
     allTokens: Token[];
@@ -13,7 +15,7 @@ export interface Wallet {
     name: string;
     symbol: string;
 
-    account: {};
+    account: string;
     isSelected: boolean;
     index: number;
     chainName: string;

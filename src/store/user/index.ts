@@ -1,4 +1,4 @@
-import { UserState } from './types';
+import { UserState } from './type';
 
 export default defineStore('user', {
     state: (): UserState => ({
