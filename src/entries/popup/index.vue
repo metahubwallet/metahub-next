@@ -2,27 +2,32 @@
 import PasswordUnlock from '@/entries/popup/wallet/password/PasswordUnlock.vue';
 import PasswordSetting from '@/entries/popup/wallet/password/PasswordSetting.vue';
 
+// 初始化钱包解锁情况
+const user = store.user();
 const setting = store.setting();
-
-// 是否设置过密码
-const isInit = computed(() => {
-    localCache.get('passwordHash').then((res: any) => {
+onMounted(async () => {
+    await localCache.get('passwordHash').then(async (res: any) => {
         store.user().passwordHash = res;
+        await localCache.get('isLock', true).then((res: any) => {
+            store.setting().isLock = res;
+        });
     });
-    return store.user().passwordHash != null;
 });
 </script>
 
 <template>
     <div>
+        <!-- 已解锁钱包 -->
         <div v-if="!setting.isLock">
             <router-view></router-view>
         </div>
 
-        <div class="bg" v-else-if="isInit">
+        <!-- 未解锁钱包但已初始化 -->
+        <div class="bg" v-else-if="user.passwordHash">
             <password-unlock></password-unlock>
         </div>
 
+        <!-- 未初始化钱包 -->
         <div class="bg" v-else>
             <password-setting></password-setting>
         </div>

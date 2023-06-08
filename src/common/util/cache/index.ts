@@ -1,37 +1,39 @@
 import { CacheKey } from './type';
 
+interface CacheData {
+    value: any;
+    expire?: number;
+}
+
 // 配置完后，到chrome://extensions刷新整个扩展
 export const localCache = {
-    set(key: CacheKey, value: any): void {
+    async set(key: CacheKey, value: any, liveSeconds?: number) {
         new Promise(() => {
-            if (!key) return;
-
-            let data: any = {};
-            if (typeof key == 'object') {
-                data = key;
-            } else if (typeof key == 'string') {
-                if (typeof value != 'undefined' && typeof value !== 'string') {
-                    value = JSON.stringify(value);
-                }
-                data[key] = value;
-            } else return;
-
-            chrome.storage.local.set(data, () => {});
+            let data: CacheData = { value };
+            if (liveSeconds) data.expire = new Date().getTime() + liveSeconds * 1000;
+            chrome.storage.local.set({ [key]: data }, () => {});
         });
     },
-    get(key: CacheKey, defaultValue: any = null) {
+
+    async get(key: CacheKey, defaultValue: any = null) {
         return new Promise((resolve) => {
             chrome.storage.local.get(key, (items) => {
-                if (Array.isArray(key)) {
-                    resolve(items);
-                    return;
-                }
-                let value = typeof items[key] != 'undefined' ? items[key] : defaultValue;
-                if (typeof value == 'string' && (value.startsWith('[') || value.startsWith('{'))) {
-                    value = JSON.parse(value);
-                }
-                resolve(value);
+                let data = items[key];
+                if (data) {
+                    // 超时清空
+                    if (data.expire && data.expire < new Date().getTime()) {
+                        console.log(2);
+
+                        localCache.remove(key).then(() => {
+                            resolve(defaultValue);
+                        });
+                    } else resolve(data.value);
+                } else resolve(defaultValue);
             });
         });
+    },
+
+    async remove(key: CacheKey) {
+        chrome.storage.local.remove(key, () => {});
     },
 };

@@ -13,9 +13,12 @@ const submit = () => {
     let passwordHash = password2(password.value);
     if (passwordHash != store.user().passwordHash) return window.msg.error(t('password.error'));
 
-    store.setting().isLock = false;
-    store.user().password = password1(password.value);
-    router.push({ name: 'wallet' });
+    // 持久化存储锁屏状态，有效1d
+    localCache.set('isLock', false, 60 * 60 * 24).then(() => {
+        store.setting().isLock = false;
+        store.user().password = password1(password.value);
+        router.push({ name: 'wallet' });
+    });
 };
 </script>
 

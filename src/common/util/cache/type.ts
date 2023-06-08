@@ -1,1 +1,1 @@
-export type CacheKey = 'lang' | 'passwordHash';
+export type CacheKey = 'lang' | 'passwordHash' | 'isLock';
