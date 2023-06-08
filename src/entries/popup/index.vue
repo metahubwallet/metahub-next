@@ -18,7 +18,8 @@ onMounted(async () => {
 <template>
     <div>
         <!-- 已解锁钱包 -->
-        <div v-if="!setting.isLock">
+        <div v-if="!setting.isLock" class="bg">
+            <top-nav></top-nav>
             <router-view></router-view>
         </div>
 

@@ -1,0 +1,40 @@
+/* 子路由被激活后应用的样式 */
+._effect {
+    opacity: 1;
+    transition: 0.3s all ease;
+  }
+
+._effect--30 {
+    transform: translate3d(-30%, 0, 0);
+}
+  
+._effect--50 {
+    opacity: 0;
+    transform: translate3d(-50%, 0, 0);
+}
+
+/* 初始化路由动画 */
+.cover-top {
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 15px;
+    height: 70px;
+    line-height: 40px;
+    opacity: 1;
+    color: #ffffff;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: 0.22s all ease;
+
+    .top-title {
+        transition: 0.2s all ease;
+        display: flex;
+        flex: 1;
+    }
+}

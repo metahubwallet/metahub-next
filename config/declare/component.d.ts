@@ -22,5 +22,6 @@ declare module '@vue/runtime-core' {
     NUpload: typeof import('naive-ui')['NUpload']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TopNav: typeof import('./../../src/entries/popup/wallet/component/TopNav.vue')['default']
   }
 }
