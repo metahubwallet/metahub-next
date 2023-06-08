@@ -38,3 +38,9 @@
         flex: 1;
     }
 }
+
+
+/* 底部弹出动画 */ 
+.animate__animated.animate__fadeInUpBig {
+    --animate-duration: .4s;
+}
