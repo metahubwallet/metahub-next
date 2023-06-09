@@ -7,7 +7,7 @@ export default defineStore('wallet', {
         currentWallet: null,
         whitelist: [],
         recentTransfers: [],
-        allTokens: [],
+        allTokens: {},
         userTokens: [],
     }),
 });

@@ -4,7 +4,9 @@ export interface WalletState {
     currentWallet: Wallet | null; // 当前选中钱包
     whitelist: WhiteItem[];
     recentTransfers: Transfer[]; // 最近转账记录
-    allTokens: Token[];
+    allTokens: {
+        [key: string]: Token[]; // 链: Tokens
+    };
     userTokens: Token[];
 }
 
