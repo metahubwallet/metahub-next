@@ -13,14 +13,34 @@ onMounted(async () => {
         });
     });
 });
+
+// 钱包选择
+const showAccountSelector = ref(false);
+const router = useRouter();
+const importClickHandle = (chainId: string) => {
+    router.push({
+        name: 'import-key',
+        query: { chainId },
+    });
+    showAccountSelector.value = false;
+};
 </script>
 
 <template>
-    <div>
+    <div class="overflow-hidden">
         <!-- 已解锁钱包 -->
         <div v-if="!setting.isLock" class="bg">
-            <top-nav></top-nav>
+            <top-nav @change-account="showAccountSelector = true"></top-nav>
+
             <router-view></router-view>
+
+            <account-selector
+                :is-show="showAccountSelector"
+                v-model="showAccountSelector"
+                @account-click="showAccountSelector = false"
+                @close-click="showAccountSelector = false"
+                @import-click="importClickHandle"
+            ></account-selector>
         </div>
 
         <!-- 未解锁钱包但已初始化 -->

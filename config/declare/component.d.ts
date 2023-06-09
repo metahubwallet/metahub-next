@@ -9,6 +9,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AccountSelector: typeof import('./../../src/entries/popup/wallet/component/AccountSelector.vue')['default']
     Global: typeof import('./../../src/component/Global.vue')['default']
     IconClose: typeof import('@icon-park/vue-next')['Close']
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
@@ -19,6 +20,9 @@ declare module '@vue/runtime-core' {
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
     NPopselect: typeof import('naive-ui')['NPopselect']
+    NScrollbar: typeof import('naive-ui')['NScrollbar']
+    NTabPane: typeof import('naive-ui')['NTabPane']
+    NTabs: typeof import('naive-ui')['NTabs']
     NUpload: typeof import('naive-ui')['NUpload']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
