@@ -1,13 +1,16 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const showTokenSelect = ref(false);
+</script>
 
 <template>
-    <div class="demo">
-        <n-button type="primary">Primary</n-button>
+    <div>
+        <n-button @click="showTokenSelect = true">click</n-button>
+        <token-selector
+            :isShow="showTokenSelect"
+            v-model="showTokenSelect"
+            @close="showTokenSelect = false"
+        ></token-selector>
     </div>
 </template>
 
-<style lang="scss" scoped>
-.demo {
-    font-size: 100px;
-}
-</style>
+<style lang="scss" scoped></style>
