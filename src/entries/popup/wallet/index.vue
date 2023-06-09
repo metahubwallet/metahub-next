@@ -4,7 +4,8 @@ const showTokenSelect = ref(false);
 
 <template>
     <div>
-        <n-button @click="showTokenSelect = true">click</n-button>
+        <no-account></no-account>
+
         <token-selector
             :isShow="showTokenSelect"
             v-model="showTokenSelect"

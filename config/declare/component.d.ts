@@ -19,6 +19,7 @@ declare module '@vue/runtime-core' {
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
+    NoAccount: typeof import('./../../src/entries/popup/wallet/component/NoAccount.vue')['default']
     NPopselect: typeof import('naive-ui')['NPopselect']
     NScrollbar: typeof import('naive-ui')['NScrollbar']
     NTabPane: typeof import('naive-ui')['NTabPane']
