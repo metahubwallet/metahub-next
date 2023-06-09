@@ -10,9 +10,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {});
 
 // 锁屏
-const emit = defineEmits(['close-click', 'account-click', 'import-click']);
+const emit = defineEmits(['close', 'importKey']);
 const handleLock = () => {
-    emit('close-click');
+    emit('close');
     store.user().password = '';
     store.setting().isLock = true;
 };
@@ -26,7 +26,7 @@ const getNetworkIcon = (item: Network) => {
 
 // 导入密钥
 const importKeyHandle = (chainId: string) => {
-    emit('import-click', chainId);
+    emit('importKey', chainId);
 };
 
 // 搜索账号
@@ -55,7 +55,7 @@ const copy = (value: string) => {
 const accountSelectHandle = (account: Wallet) => {
     let index = store.wallet().wallets.indexOf(account);
     store.wallet().selectedIndex = index;
-    emit('account-click', index);
+    emit('close');
 };
 
 const wallet = store.wallet();
@@ -63,109 +63,96 @@ const chain = store.chain();
 </script>
 
 <template>
-    <section class="account-selector" v-show="props.isShow">
-        <div class="selector-bg" @click="$emit('close-click')"></div>
-        <div
-            class="animate__animated animate__fadeInUpBig selector-container"
-            v-show="props.isShow"
-        >
-            <div class="selector-header">
-                <img @click="handleLock" class="lock-icon" src="@/asset/img/lock.png" />
-                <div class="title">{{ $t('auth.chooseAccount') }}</div>
-                <icon-close
-                    @click="$emit('close-click')"
-                    theme="outline"
-                    size="18"
-                    fill="#3f3f3f"
-                    class="mr-4"
-                />
-            </div>
-            <div class="list-container">
-                <n-tabs
-                    placement="left"
-                    v-model="activeChainId"
-                    type="line"
-                    animated
-                    size="small"
-                    style="height: 400px"
-                >
-                    <n-tab-pane v-for="item in networks" :key="item.chainId" :name="item.chainId">
-                        <template #tab>
-                            <div @click="activeChainId = item.chainId">
-                                <img :src="getNetworkIcon(item)" class="icon-img m-[7px]" />
-                            </div>
-                        </template>
-                        <n-scrollbar class="full">
-                            <div class="accounts">
-                                <div class="title-cell" style="border: none">
-                                    <span>{{ item.name }}</span>
+    <popup-bottom :is-show="props.isShow" :title="$t('auth.chooseAccount')" @close="$emit('close')">
+        <template #headLeft>
+            <img @click="handleLock" class="lock-icon" src="@/asset/img/lock.png" />
+        </template>
 
-                                    <div class="actions">
-                                        <div
-                                            v-if="searchName != '' || accounts.length >= 8"
-                                            class="search-acts"
-                                        >
-                                            <i class="el-icon-search"></i>
-                                            <input
-                                                v-model="searchName"
-                                                :placeholder="$t('wallet.searchTip')"
-                                            />
-                                        </div>
-                                        <img
-                                            v-show="searchName != '' || accounts.length"
-                                            @click="importKeyHandle(item.chainId)"
-                                            class="add-icon"
-                                            src="@/asset/img/account_add.png"
+        <div class="list-container">
+            <n-tabs
+                placement="left"
+                v-model="activeChainId"
+                type="line"
+                animated
+                size="small"
+                style="height: 400px"
+            >
+                <n-tab-pane v-for="item in networks" :key="item.chainId" :name="item.chainId">
+                    <template #tab>
+                        <div @click="activeChainId = item.chainId">
+                            <img :src="getNetworkIcon(item)" class="icon-img m-[7px]" />
+                        </div>
+                    </template>
+                    <n-scrollbar class="full">
+                        <div class="accounts">
+                            <div class="title-cell" style="border: none">
+                                <span>{{ item.name }}</span>
+
+                                <div class="actions">
+                                    <div
+                                        v-if="searchName != '' || accounts.length >= 8"
+                                        class="search-acts"
+                                    >
+                                        <i class="el-icon-search"></i>
+                                        <input
+                                            v-model="searchName"
+                                            :placeholder="$t('wallet.searchTip')"
                                         />
                                     </div>
-                                </div>
-
-                                <div v-show="accounts.length == 0">
-                                    <n-button
-                                        @click="importKeyHandle(item.chainId)"
-                                        class="import-key-btn"
-                                    >
-                                        +{{ $t('public.importKey') }}
-                                    </n-button>
-                                </div>
-
-                                <div
-                                    :key="item.index"
-                                    @click="accountSelectHandle(item)"
-                                    class="account-cell"
-                                    v-for="item in accounts"
-                                >
-                                    <div class="account-left">
-                                        <div class="account-left-name">
-                                            <span>{{ showAccount(item.account) }}</span>
-                                            <img
-                                                @click="copy(showAccount(item.account))"
-                                                class="account-cell-key-copy"
-                                                src="@/asset/img/account_copy.png"
-                                            />
-                                        </div>
-                                        <div class="account-left-key">
-                                            {{ item.keys[0].publicKey.substring(0, 8) }}...{{
-                                                item.keys[0].publicKey.substring(-16, 16)
-                                            }}
-                                        </div>
-                                    </div>
                                     <img
-                                        class="close"
-                                        src="@/asset/img/account_select.png"
-                                        v-show="
-                                            wallet.selectedIndex == item.index &&
-                                            chain.currentChainId === item.chainId
-                                        "
+                                        v-show="searchName != '' || accounts.length"
+                                        @click="importKeyHandle(item.chainId)"
+                                        class="add-icon"
+                                        src="@/asset/img/account_add.png"
                                     />
                                 </div>
                             </div>
-                        </n-scrollbar>
-                    </n-tab-pane>
-                </n-tabs>
-            </div>
+
+                            <div v-show="accounts.length == 0">
+                                <n-button
+                                    @click="importKeyHandle(item.chainId)"
+                                    class="import-key-btn"
+                                >
+                                    +{{ $t('public.importKey') }}
+                                </n-button>
+                            </div>
+
+                            <div
+                                :key="item.index"
+                                @click="accountSelectHandle(item)"
+                                class="account-cell"
+                                v-for="item in accounts"
+                            >
+                                <div class="account-left">
+                                    <div class="account-left-name">
+                                        <span>{{ showAccount(item.account) }}</span>
+                                        <img
+                                            @click="copy(showAccount(item.account))"
+                                            class="account-cell-key-copy"
+                                            src="@/asset/img/account_copy.png"
+                                        />
+                                    </div>
+                                    <div class="account-left-key">
+                                        {{ item.keys[0].publicKey.substring(0, 8) }}...{{
+                                            item.keys[0].publicKey.substring(-16, 16)
+                                        }}
+                                    </div>
+                                </div>
+                                <img
+                                    class="close"
+                                    src="@/asset/img/account_select.png"
+                                    v-show="
+                                        wallet.selectedIndex == item.index &&
+                                        chain.currentChainId === item.chainId
+                                    "
+                                />
+                            </div>
+                        </div>
+                    </n-scrollbar>
+                </n-tab-pane>
+            </n-tabs>
         </div>
-    </section>
+    </popup-bottom>
 </template>
 
 <style lang="scss" scoped>
@@ -187,7 +174,6 @@ const chain = store.chain();
     height: 21px;
     width: auto;
     cursor: pointer;
-    margin-left: 18px;
 }
 .close {
     cursor: pointer;

@@ -24,8 +24,10 @@ declare module '@vue/runtime-core' {
     NTabPane: typeof import('naive-ui')['NTabPane']
     NTabs: typeof import('naive-ui')['NTabs']
     NUpload: typeof import('naive-ui')['NUpload']
+    PopupBottom: typeof import('./../../src/component/PopupBottom.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TokenSelector: typeof import('./../../src/entries/popup/wallet/component/TokenSelector.vue')['default']
     TopNav: typeof import('./../../src/entries/popup/wallet/component/TopNav.vue')['default']
   }
 }

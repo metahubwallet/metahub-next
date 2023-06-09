@@ -18,7 +18,7 @@ onMounted(async () => {
 // 钱包选择
 const showAccountSelector = ref(false);
 const router = useRouter();
-const importClickHandle = (chainId: string) => {
+const importKeyHandle = (chainId: string) => {
     router.push({
         name: 'import-key',
         query: { chainId },
@@ -66,9 +66,8 @@ watch(
             <account-selector
                 :is-show="showAccountSelector"
                 v-model="showAccountSelector"
-                @account-click="showAccountSelector = false"
-                @close-click="showAccountSelector = false"
-                @import-click="importClickHandle"
+                @close="showAccountSelector = false"
+                @importKey="importKeyHandle"
             ></account-selector>
         </div>
 
