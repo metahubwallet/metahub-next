@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PasswordUnlock from '@/entries/popup/wallet/password/PasswordUnlock.vue';
 import PasswordSetting from '@/entries/popup/wallet/password/PasswordSetting.vue';
+import Windows from '@/common/lib/windows';
 
 // 初始化钱包解锁情况
 const user = store.user();
@@ -24,6 +25,27 @@ const importClickHandle = (chainId: string) => {
     });
     showAccountSelector.value = false;
 };
+
+// 检查窗口情况，还原图标
+onBeforeMount(() => {
+    if (Windows.getCount() == 0) {
+        chrome.browserAction.setIcon({
+            path: '@/assets/images/icons/metahub-128.png',
+        });
+    }
+});
+
+// 路由动画
+const route = useRoute();
+const transitionName = ref('');
+watch(
+    () => route.meta.index,
+    (toIndex, fromIndex) => {
+        if (toIndex < fromIndex) transitionName.value = 'slideInLeft';
+        else if (toIndex > fromIndex) transitionName.value = 'slideInRight';
+        else transitionName.value = '';
+    }
+);
 </script>
 
 <template>
@@ -32,7 +54,14 @@ const importClickHandle = (chainId: string) => {
         <div v-if="!setting.isLock" class="bg">
             <top-nav @change-account="showAccountSelector = true"></top-nav>
 
-            <router-view></router-view>
+            <div class="app-content">
+                <keep-alive include="wallet">
+                    <router-view
+                        class="animate__animated"
+                        :class="`animate__${transitionName}`"
+                    ></router-view>
+                </keep-alive>
+            </div>
 
             <account-selector
                 :is-show="showAccountSelector"
@@ -59,5 +88,15 @@ const importClickHandle = (chainId: string) => {
 .bg {
     height: 100%;
     background-image: linear-gradient(rgba(246, 221, 255, 0.24), rgba(225, 225, 250, 0.04));
+}
+
+.app-content {
+    padding-top: 70px;
+    overflow: hidden;
+    height: 600px;
+}
+
+.app-content .full-inner {
+    z-index: 2;
 }
 </style>

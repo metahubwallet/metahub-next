@@ -40,7 +40,15 @@
 }
 
 
-/* 底部弹出动画 */ 
+/* 动画 */ 
 .animate__animated.animate__fadeInUpBig {
     --animate-duration: .4s;
+}
+
+.animate__animated.animate__slideInLeft {
+    --animate-duration: .2s;
+}
+
+.animate__animated.animate__slideInRight {
+    --animate-duration: .2s;
 }
