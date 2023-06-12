@@ -18,6 +18,8 @@ const selectPageHandle = (index: number) => {};
                 :amount="assetAmount"
                 @select="selectPageHandle"
             ></wallet-header>
+
+            <coin-list @setUnit="assetUnit = $event" @setAmount="assetAmount = $event"></coin-list>
         </n-scrollbar>
 
         <no-account v-else></no-account>
