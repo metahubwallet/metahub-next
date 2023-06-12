@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { briefAccount } from '@/common/util/tool';
-
 const { currentWallet } = store.wallet();
+const briefAccount = tool.briefAccount;
 
 // 路由动画
 const decline = ref(false);
