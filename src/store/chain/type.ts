@@ -1,7 +1,8 @@
 import { Token } from '../wallet/type';
 
 export interface ChainState {
-    networks: Network[]; // 默认节点信息
+    networks: Network[]; // 默认节点列表
+    currentNetwork: Network; // 当前节点
     selectedRpc: {
         [key: string]: string;
     }; // 当前选中节点

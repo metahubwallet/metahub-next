@@ -103,7 +103,7 @@ const importWalletsFromData = (content: string) => {
 
     store.wallet().wallets = importData.wallets;
     store.wallet().userTokens = importData.userTokens;
-    store.chain().selectedIndex = importData.selectedIndex;
+    store.wallet().selectedIndex = importData.selectedIndex;
     store.chain().networks = importData.networks;
     store.chain().selectedRpc = importData.selectedRpc;
     store.chain().customRpcs = importData.customRpcs;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Token } from '@/store/wallet/type';
+import { Token, Coin } from '@/store/wallet/type';
 import CoinAddSelected from '@/asset/img/coin_add_selected.png';
 import CoinAdd from '@/asset/img/coin_add.png';
 
@@ -8,15 +8,8 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {});
 
-// 定义局部token
-interface CurrentToken extends Token {
-    isShow: boolean;
-    logo: string;
-    amount: number;
-    chain: string;
-}
-let chainTokens: CurrentToken[] = [];
-const tokenList = ref<CurrentToken[]>([]);
+let chainTokens: Coin[] = [];
+const tokenList = ref<Coin[]>([]);
 
 // 初始化组件
 watch(
@@ -33,13 +26,13 @@ watch(
 
 // 初始化token列表
 const initTokens = () => {
-    let tokens: CurrentToken[] = [];
-    chainTokens = (store.wallet().allTokens[store.chain().currentChain] as CurrentToken[]) || [];
+    let tokens: Coin[] = [];
+    chainTokens = (store.wallet().allTokens[store.chain().currentChain] as Coin[]) || [];
     for (const k in chainTokens) {
         const chainToken = chainTokens[k];
         if (chainToken.contract == 'eosio.token') continue;
 
-        let token = {} as CurrentToken;
+        let token = {} as Coin;
         Object.assign(token, chainToken);
         token.isShow =
             store
@@ -54,7 +47,7 @@ const initTokens = () => {
         if (tokens.findIndex((x) => x.contract == ut.contract && x.symbol == ut.symbol) >= 0)
             continue;
 
-        let token = {} as CurrentToken;
+        let token = {} as Coin;
         Object.assign(token, ut);
         token.isShow = true;
         tokens.push(token);
@@ -72,12 +65,12 @@ const searchTokens = () => {
         keywords.value == ''
             ? chainTokens.concat()
             : chainTokens.filter(
-                  (token: CurrentToken) =>
+                  (token: Coin) =>
                       token.symbol.toLowerCase().includes(keywords.value) ||
                       token.contract.toLowerCase() == keywords.value
               );
     // sort
-    tokenList.value = tokens.sort((x: CurrentToken, y: CurrentToken) => {
+    tokenList.value = tokens.sort((x: Coin, y: Coin) => {
         if (x.symbol.toLowerCase() == keywords.value) return -1;
         if (y.symbol.toLowerCase() == keywords.value) return 1;
         if (x.isShow != y.isShow) return x.isShow ? -1 : 1;
@@ -88,7 +81,7 @@ const searchTokens = () => {
 
 // 新增token
 const emit = defineEmits(['close', 'refreshTokens']);
-const addTokenHandle = async (token: CurrentToken) => {
+const addTokenHandle = async (token: Coin) => {
     if (token.isShow) {
         const index = store
             .wallet()
