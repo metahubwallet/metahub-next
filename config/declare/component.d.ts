@@ -30,5 +30,6 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     TokenSelector: typeof import('./../../src/entries/popup/wallet/component/TokenSelector.vue')['default']
     TopNav: typeof import('./../../src/entries/popup/wallet/component/TopNav.vue')['default']
+    WalletHeader: typeof import('./../../src/entries/popup/wallet/component/WalletHeader.vue')['default']
   }
 }
