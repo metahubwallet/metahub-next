@@ -9,7 +9,7 @@ module.exports = {
                 "feat", // 新功能
                 "fix", // 修改bug
                 "alter", // 调整代码
-                "wrap", // 封装代码
+                "pack", // 封装代码
                 "style", // 页码样式
                 "config", // 配置
                 "chore", // 琐碎操作
