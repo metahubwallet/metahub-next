@@ -237,10 +237,8 @@ const chain = store.chain();
         padding: 0;
         overflow: hidden;
 
-        :deep {
-            .n-tabs-tab-pad {
-                display: none !important;
-            }
+        :deep(.n-tabs-tab-pad) {
+            display: none !important;
         }
 
         .icon-img {
