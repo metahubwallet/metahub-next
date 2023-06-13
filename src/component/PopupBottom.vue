@@ -1,9 +1,12 @@
 <script setup lang="ts">
 interface Props {
+    isCustom?: boolean;
     isShow: boolean;
-    title: string;
+    title?: string;
 }
-const props = withDefaults(defineProps<Props>(), {});
+const props = withDefaults(defineProps<Props>(), {
+    isCustom: false,
+});
 </script>
 
 <template>
@@ -13,7 +16,7 @@ const props = withDefaults(defineProps<Props>(), {});
             class="animate__animated animate__fadeInUpBig selector-container"
             v-show="props.isShow"
         >
-            <div class="selector-header">
+            <div v-if="!props.isCustom" class="selector-header">
                 <div class="ml-[18px] min-w-[19px]"><slot name="headLeft"></slot></div>
                 <div class="title">{{ props.title }}</div>
                 <icon-close
