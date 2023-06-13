@@ -1,7 +1,7 @@
 import { RouteRecordRaw } from 'vue-router';
 
 import Wallet from '@/entries/popup/wallet/index.vue';
-import ImportKey from '@/entries/popup/wallet/import/ImportKey.vue';
+import ImportKey from '@/entries/popup/wallet/ImportKey.vue';
 
 export const routes: RouteRecordRaw[] = [
     {

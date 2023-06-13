@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import PasswordUnlock from '@/entries/popup/wallet/password/PasswordUnlock.vue';
-import PasswordSetting from '@/entries/popup/wallet/password/PasswordSetting.vue';
 import Windows from '@/common/lib/windows';
 
 // 初始化钱包解锁情况

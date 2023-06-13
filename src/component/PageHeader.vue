@@ -11,7 +11,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
     <div class="cover-top">
-        <icon-arrow-left @click="$router.go(-1)" theme="outline" size="24" fill="#222222" />
+        <icon-arrow-left
+            @click="$router.go(-1)"
+            theme="outline"
+            size="24"
+            fill="#222222"
+            class="cursor-pointer"
+        />
 
         <div
             class="top-title _effect font-bold text-[26px] text-[#222] px-[8px]"

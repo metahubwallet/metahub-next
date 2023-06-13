@@ -9,13 +9,14 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    AccountSelector: typeof import('./../../src/entries/popup/wallet/component/AccountSelector.vue')['default']
+    AccountSelector: typeof import('./../../src/entries/popup/component/AccountSelector.vue')['default']
     CoinList: typeof import('./../../src/entries/popup/wallet/component/CoinList.vue')['default']
     Global: typeof import('./../../src/component/Global.vue')['default']
     IconArrowLeft: typeof import('@icon-park/vue-next')['ArrowLeft']
     IconClose: typeof import('@icon-park/vue-next')['Close']
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
     IconFileSuccess: typeof import('@icon-park/vue-next')['FileSuccess']
+    ImportBackUp: typeof import('./../../src/entries/popup/component/ImportBackUp.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
@@ -28,6 +29,8 @@ declare module '@vue/runtime-core' {
     NTabs: typeof import('naive-ui')['NTabs']
     NUpload: typeof import('naive-ui')['NUpload']
     PageHeader: typeof import('./../../src/component/PageHeader.vue')['default']
+    PasswordSetting: typeof import('./../../src/entries/popup/component/PasswordSetting.vue')['default']
+    PasswordUnlock: typeof import('./../../src/entries/popup/component/PasswordUnlock.vue')['default']
     PopupBottom: typeof import('./../../src/component/PopupBottom.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { password1, password2 } from '@/common/util/crypto';
 import { useI18n } from 'vue-i18n';
-import ImportBackUp from '../import/ImportBackUp.vue';
 
 const router = useRouter();
 const currentPage = ref(1);
