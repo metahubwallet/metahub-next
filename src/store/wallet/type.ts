@@ -26,6 +26,7 @@ export interface Wallet {
     isSelected: boolean;
     index: number;
     chainName: string;
+    publicKey: string;
 }
 
 export interface Key {
