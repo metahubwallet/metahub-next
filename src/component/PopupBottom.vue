@@ -64,7 +64,7 @@ const props = withDefaults(defineProps<Props>(), {});
         font-size: 16px;
         color: #222;
         height: 40px;
-        border-bottom: 1px solid $separate-color;
+        border-bottom: 1px solid $color-separate;
         display: flex;
         justify-content: space-between;
         align-items: center;

@@ -203,7 +203,7 @@ const addTokenHandle = async (token: Coin) => {
         font-size: 16px;
         color: #222;
         height: 40px;
-        border-bottom: 1px solid $separate-color;
+        border-bottom: 1px solid $color-separate;
         display: flex;
         justify-content: center;
         align-items: center;
