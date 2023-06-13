@@ -5,7 +5,7 @@ const signupClick = () => {
 </script>
 
 <template>
-    <div class="no-account-container">
+    <div class="no-account-container relative">
         <div class="no-account-tip">{{ $t('public.noImport') }}</div>
         <img
             class="no-account-img"
@@ -13,7 +13,9 @@ const signupClick = () => {
             @click="$router.push({ name: 'import-key' })"
         />
         <div class="no-account-btn">{{ $t('public.importAccountNow') }}</div>
-        <div class="free-signup" @click="signupClick()">{{ $t('public.freeSignup') }}</div>
+        <div class="free-signup -bottom-[130px]" @click="signupClick()">
+            {{ $t('public.freeSignup') }}
+        </div>
     </div>
 </template>
 
@@ -50,7 +52,6 @@ const signupClick = () => {
     .free-signup {
         position: absolute;
         left: 0;
-        bottom: 25px;
         font-size: 16px;
         line-height: 24px;
         width: 100%;
