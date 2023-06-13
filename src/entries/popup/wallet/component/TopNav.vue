@@ -4,17 +4,14 @@ const briefAccount = tool.briefAccount;
 
 // 路由动画
 const decline = ref(false);
-onBeforeRouteUpdate((to, from) => {
-    if (to.meta.index > from.meta.index) {
-        if (from.meta.index == 1 && to.meta.index > 1) {
-            decline.value = true;
-        }
-    } else if (to.meta.index < from.meta.index) {
-        if (from.meta.index > 1 && to.meta.index == 1) {
-            decline.value = false;
-        }
+const route = useRoute();
+watch(
+    () => route.meta.index,
+    (toIndex, fromIndex) => {
+        if (toIndex > 1 && fromIndex == 1) decline.value = true;
+        else if (toIndex == 1 && fromIndex > 1) decline.value = false;
     }
-});
+);
 </script>
 
 <template>
