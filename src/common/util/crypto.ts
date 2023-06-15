@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import CryptoJS from 'crypto-js'; //引用AES源码js
 
 const key = '1E24L27O12ATTDEF'; //十六位十六进制数作为密钥
@@ -41,4 +42,10 @@ export const password1 = (word: string) => {
 
 export const password2 = (word: string) => {
     return CryptoJS.SHA1(CryptoJS.SHA1('metahub-' + word) + '#B33c4A15').toString();
+};
+
+export const sha256 = (word: Buffer | string, secret: string = '') => {
+    const hash =
+        secret === null ? crypto.createHash('sha256') : crypto.createHmac('sha256', secret);
+    return hash.update(word).digest('hex');
 };

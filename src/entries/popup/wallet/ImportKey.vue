@@ -1,25 +1,135 @@
 <script setup lang="ts">
 import { Wallet } from '@/store/wallet/type';
-import { eosChainId } from '@/common/util/network';
+import { eosChainId, getNetworkLocalIcon } from '@/common/util/network';
+import { Network } from '@/store/chain/type';
+import { sha256, md5, encrypt } from '@/common/util/crypto';
+import bs58 from 'bs58';
 
 const { t } = useI18n();
+
+const route = useRoute();
+
+// get network
+const networks = ref<Network[]>(store.chain().networks);
+const activeIndex = ref(0);
+const chainId = ref(route.query.chainId ? (route.query.chainId as string) : eosChainId);
+const getNetworkIcon = (chainId: string) => {
+    const chain = store.chain().findNetwork(chainId)?.chain;
+    if (chain) return getNetworkLocalIcon(chain);
+    else return null;
+};
+
+// select network
+const selectNetwork = (index: number) => {
+    activeIndex.value = index;
+    chainId.value = networks.value[index].chainId;
+    store.chain().currentNetwork = networks.value[index];
+};
+
+// import wallet
+const checked = ref(true);
+const importAccountList = ref([]);
+const isShowChangeAccount = ref(false);
+const importKeyHandle = async () => {
+    /** 判断协议勾选 */
+    if (!checked.value) return window.msg.warning('请仔细阅读协议,并勾选');
+
+    /** 循环遍历需要取的协议 */
+    const importAccounts = [];
+    let tipMessage = t('public.noAccountForPrivateKey');
+    let isKey = false;
+    // let isKey = chain.get().isValidPrivate(privateKey.value);
+    let ethAddress = '';
+    if (!isKey && privateKey.value.length == 64) {
+        const privateKeyHex = Buffer.from(privateKey.value, 'hex');
+        // ethAddress = Address.fromPrivateKey(privateKeyHex).toString();
+
+        let versionedKey = '80' + privateKey.value;
+        const sha256dKey: any = sha256(Buffer.from(versionedKey, 'hex'));
+        const checksum = sha256(Buffer.from(sha256dKey, 'hex')).toString().substring(0, 8);
+        versionedKey += checksum;
+
+        privateKey.value = bs58.encode(new Uint8Array(Buffer.from(versionedKey, 'hex')));
+        isKey = true;
+    }
+    if (isKey) {
+        let network = store.chain().networks.find((x) => x.chainId == chainId.value);
+        let chainAccount: any = {};
+        chainAccount.chainId = network?.chainId;
+        chainAccount.seed = sha256('metahub' + Math.random(), new Date().toString() as any)
+            .toString()
+            .substring(0, 16)
+            .toUpperCase();
+        chainAccount.blockchain = 'eos'; // eth, tron ...
+        chainAccount.smoothMode = false; // 默认关闭顺畅模式
+        const publicKey = '';
+        // const publicKey = chain.get(network.chainId).privateToPublic(privateKey.value);
+        privateKey.value = encrypt(
+            privateKey.value,
+            md5(chainAccount.seed + store.user().password)
+        );
+        const key = { publicKey, privateKey, permissions: [] };
+        chainAccount.keys = [key];
+        try {
+            let accounts: any = [];
+            try {
+                // accounts = await getKeyAccounts(network.chain, publicKey);
+            } catch (e) {
+                accounts = [];
+            }
+            if (accounts.length == 0)
+                if (accounts.length == 0)
+                    // accounts = await chain.get(network.chainId).getKeyAccounts(publicKey);
+
+                    tipMessage = t('public.noAccountForPrivateKey');
+
+            for (let account of accounts) {
+                const newAccount = Object.assign({}, chainAccount);
+                newAccount.name = account; // real eos account
+                newAccount.account = ethAddress != '' ? ethAddress : account; // account (display)
+
+                let existed = false;
+                for (let i = 0; i < store.wallet().wallets.length; i++) {
+                    const element = store.wallet().wallets[i];
+                    if (
+                        element.name === newAccount.name &&
+                        element.chainId === newAccount.chainId
+                    ) {
+                        existed = true;
+                        break;
+                    }
+                }
+                if (existed) tipMessage = t('public.accountExists');
+                else importAccounts.push(newAccount);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    } else tipMessage = t('public.invaildPrivateKey');
+
+    importAccounts.sort(sortAccounts);
+
+    if (importAccounts.length > 1) {
+        importAccountList.value = importAccounts as any;
+        isShowChangeAccount.value = true;
+    } else if (importAccounts.length == 1) {
+        await importWallet(importAccounts);
+        return;
+    } else window.msg.error(tipMessage);
+};
+
+// import wallet
 const router = useRouter();
-
-const isShowImportChoose = ref(false);
-const accountList = ref([]);
-
-// 导入wallets
 const privateKey = ref('');
 const emit = defineEmits(['refreshTokens']);
-const importWallets = async (selectWallets: Wallet[]) => {
-    if (selectWallets.length < 1) return window.msg.warning(t('wallet.selectOneAtLeast'));
-    for (const wallet of selectWallets) {
+const importWallet = async (wallets: any) => {
+    for (const wallet of wallets) {
         store.wallet().wallets.push(wallet);
         // await chain.fetchPermissions(wallet.name, wallet.chainId);
     }
     store.wallet().wallets.sort(sortAccounts);
 
-    const firstWallet = selectWallets[0];
+    const firstWallet = wallets[0];
     let index = store.wallet().wallets.indexOf(firstWallet);
     store.wallet().selectedIndex = index >= 0 ? index : 0;
 
@@ -32,7 +142,14 @@ const importWallets = async (selectWallets: Wallet[]) => {
     router.go(-1);
 };
 
-// 账号排序
+// select wallet
+const isShowChoose = ref(false);
+const accountList = ref([]);
+const selectWalletHandle = async (selectWallets: Wallet[]) => {
+    if (selectWallets.length < 1) return window.msg.warning(t('wallet.selectOneAtLeast'));
+};
+
+// sort account
 const sortAccounts = (first: any, second: any) => {
     if (first.chainId == second.chainId) {
         return first.name > second.name ? 1 : -1;
@@ -49,15 +166,130 @@ const sortAccounts = (first: any, second: any) => {
         <div class="full-inner">
             <page-header :title="$t('public.importKey')"></page-header>
 
-            <popup-bottom
-                :isCustom="true"
-                :isShow="isShowImportChoose"
-                @close="isShowImportChoose = false"
-            >
-                <import-choose @import="importWallets" :accountList="accountList"></import-choose>
+            <div class="cover-content _effect pr-[15px]">
+                <div class="import-key-container">
+                    <div class="import-key-tip mb-[10px]">{{ $t('public.importNetTip') }}:</div>
+                    <n-popover
+                        style="max-height: 250px"
+                        trigger="click"
+                        scrollable
+                        placement="bottom"
+                    >
+                        <template #trigger>
+                            <div
+                                class="border border-[#DBDBDB] shadow-sm h-[71px] w-full rounded-[12px] flex items-center justify-between px-[20px]"
+                            >
+                                <div class="flex items-center">
+                                    <img :src="getNetworkIcon(chainId)" class="icon-img mr-[6px]" />
+                                    <span style="color: #3a3949; font-size: 14px">
+                                        {{ networks[activeIndex].name }}
+                                    </span>
+                                </div>
+
+                                <icon-down-one theme="filled" size="18" fill="#4a4a4a" />
+                            </div>
+                        </template>
+                        <div
+                            v-for="(item, index) of networks"
+                            :key="index"
+                            class="flex items-center !w-full py-[10px] pr-[90px] pl-[10px] duration-200"
+                            :class="activeIndex === index ? 'bg-slate-200' : ''"
+                            @click="selectNetwork(index)"
+                        >
+                            <img :src="getNetworkIcon(item.chainId)" class="icon-img mr-[6px]" />
+                            <span style="color: #3a3949; font-size: 14px">
+                                {{ item.name }}
+                            </span>
+                        </div>
+                    </n-popover>
+
+                    <div class="import-key-tip">{{ $t('public.importKeyTip') }}:</div>
+                    <n-input
+                        :autosize="{ minRows: 5, maxRows: 5 }"
+                        :placeholder="$t('public.importKeyTip')"
+                        class="import-key-input"
+                        type="textarea"
+                        v-model="privateKey"
+                    ></n-input>
+                    <n-checkbox class="import-key-protocol" v-model="checked"></n-checkbox>
+                    <span class="check-tip text-center cursor-pointer ml-[4px]">
+                        {{ $t('public.readAndAgree') }}
+                        <span
+                            @click="$router.push({ name: 'import-protocol' })"
+                            class="protocol-tip"
+                        >
+                            {{ $t('public.readAndAgreeProtocols') }}
+                        </span>
+                    </span>
+                    <n-button @click="importKeyHandle" class="import-key-btn">
+                        {{ $t('public.importKey') }}
+                    </n-button>
+                </div>
+            </div>
+
+            <popup-bottom :isCustom="true" :isShow="isShowChoose" @close="isShowChoose = false">
+                <import-choose
+                    @import="selectWalletHandle"
+                    :accountList="accountList"
+                ></import-choose>
             </popup-bottom>
         </div>
     </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.icon-img {
+    width: 24px;
+    height: 24px;
+}
+.import-key-container {
+    padding-left: 15px;
+
+    .import-key-tip {
+        font-size: 12px;
+        color: #222;
+        margin-top: 20px;
+    }
+    .import-key-input {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #999999;
+        width: 345px;
+    }
+    .import-key-protocol {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #999999;
+        margin-right: 0px;
+    }
+    .import-key-btn {
+        background: linear-gradient(140deg, #da00f2 0%, #bf01fa 100%, #bf01fa 100%);
+        box-shadow: 0px 2px 6px 0px rgba(210, 0, 244, 0.09);
+        border-radius: 50px;
+        width: 178px;
+        height: 44px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-family: PingFangSC-Medium, PingFang SC;
+        font-weight: 500;
+        color: #ffffff;
+        line-height: 20px;
+        text-shadow: 0px 2px 6px rgba(210, 0, 244, 0.09);
+        margin-top: 58px;
+        &:active {
+            border-color: $color-primary;
+        }
+    }
+    .check-tip {
+        color: #999999;
+        font-size: 12px;
+    }
+    .protocol-tip {
+        color: $color-primary;
+        cursor: pointer;
+    }
+}
+</style>
