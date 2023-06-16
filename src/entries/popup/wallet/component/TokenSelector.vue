@@ -236,7 +236,7 @@ const addTokenHandle = async (token: Coin) => {
     }
 
     .selector-list {
-        height: 365px;
+        height: 315px;
         overflow: hidden;
 
         .icon-img {

@@ -3,6 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 import Wallet from '@/entries/popup/wallet/index.vue';
 import ImportKey from '@/entries/popup/wallet/ImportKey.vue';
 import ImportProtocol from '@/entries/popup/wallet/ImportProtocol.vue';
+import AddToken from '@/entries/popup/wallet/AddToken.vue';
 
 export const routes: RouteRecordRaw[] = [
     {
@@ -26,7 +27,15 @@ export const routes: RouteRecordRaw[] = [
         name: 'import-protocol',
         component: ImportProtocol,
         meta: {
-            index: 10,
+            index: 14,
+        },
+    },
+    {
+        path: '/wallet/add-token',
+        name: 'add-token',
+        component: AddToken,
+        meta: {
+            index: 2,
         },
     },
 ];
