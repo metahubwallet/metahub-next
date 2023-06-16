@@ -27,10 +27,13 @@ export interface Wallet {
     index: number;
     chainName: string;
     publicKey: string;
+    privateKey: string;
 }
 
 export interface Key {
     publicKey: string;
+    privateKey: string;
+    permissions: string[];
 }
 
 export interface Token {
