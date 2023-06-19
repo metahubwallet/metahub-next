@@ -61,3 +61,18 @@ export interface WhiteItem {
 export interface Transfer {
     account: Object;
 }
+
+export interface Transation {
+    id: string;
+    sender: string;
+    receiver: string;
+    timestamp: string;
+    quantity: number;
+}
+
+export interface Action {
+    receiver: string;
+    sender: string;
+    quantity: string;
+    memo: string;
+}
