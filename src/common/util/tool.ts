@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import moment from 'moment';
 
 export const tool = {
     // 账号模糊
@@ -17,5 +18,10 @@ export const tool = {
     bignum: (number: string, base = 10) => {
         let num = isNaN(parseFloat(number)) ? 0 : number;
         return new BigNumber(num, base);
+    },
+
+    // 时间格式化
+    timeFormat: (date: string) => {
+        return moment(date).format('YYYY/MM/DD HH:mm:ss');
     },
 };
