@@ -61,12 +61,12 @@ const viewTransfer = () => {
 };
 
 // 跳转至事务详情页
-const handleDetailClick = (item: any) => {
+const handleDetailClick = (item: Transation) => {
     router.push({
         name: 'transation',
         query: {
-            token: token as any,
-            trx: item.value,
+            token: JSON.stringify(token),
+            trx: JSON.stringify(item),
         },
     });
 };

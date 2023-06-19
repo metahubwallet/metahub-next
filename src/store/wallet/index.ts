@@ -3,17 +3,19 @@ import { Coin, WalletState } from './type';
 export default defineStore('wallet', {
     state: (): WalletState => ({
         wallets: [
-            // {
-            //     keys: [],
-            //     seed: '',
-            //     chainId: '',
-            //     name: '',
-            //     symbol: '',
-            //     account: '',
-            //     isSelected: true,
-            //     index: 1,
-            //     chainName: '',
-            // },
+            {
+                keys: [],
+                seed: '',
+                chainId: '',
+                name: '',
+                symbol: '',
+                account: '',
+                isSelected: true,
+                index: 1,
+                chainName: '',
+                privateKey: '',
+                publicKey: '',
+            },
         ],
         selectedIndex: -1,
         currentWallet: null,
@@ -21,7 +23,15 @@ export default defineStore('wallet', {
         whitelist: [],
         recentTransfers: [],
         allTokens: {},
-        userTokens: [],
+        userTokens: [
+            {
+                amount: 1,
+                chain: '',
+                contract: '',
+                precision: 0,
+                symbol: '',
+            },
+        ],
     }),
 
     getters: {
