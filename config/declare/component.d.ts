@@ -22,6 +22,7 @@ declare module '@vue/runtime-core' {
     NCard: typeof import('naive-ui')['NCard']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
+    NImage: typeof import('naive-ui')['NImage']
     NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
     NoAccount: typeof import('./../../src/entries/popup/wallet/component/NoAccount.vue')['default']
