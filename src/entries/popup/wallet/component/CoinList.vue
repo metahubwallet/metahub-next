@@ -12,8 +12,9 @@ const tokens = ref<Coin[]>([]);
 // 初始化Tokens
 let isLoad = ref(false);
 const loadTokens = async () => {
-    isLoad.value = true;
     if (isLoad.value) return;
+
+    isLoad.value = true;
     if (store.wallet().wallets.length == 0) return;
 
     const network = store.chain().currentNetwork;
@@ -25,6 +26,7 @@ const loadTokens = async () => {
         });
     }
     tokens.value = store.wallet().userTokens.concat();
+
     getCoinsLogo(tokens.value);
 
     await getUserBalance();
@@ -34,7 +36,7 @@ const loadTokens = async () => {
     isLoad.value = false;
 };
 onMounted(async () => {
-    loadTokens();
+    await loadTokens();
 });
 watch(
     () => store.wallet().selectedIndex,
@@ -114,7 +116,7 @@ const getWalletCache = async () => {
 const router = useRouter();
 const viewCoinHandle = (item: Coin) => {
     const token = item.contract + '-' + item.symbol;
-    router.push('/wallet/tokenTraces/' + token);
+    router.push('/wallet/token-traces/' + token);
 };
 </script>
 
@@ -152,7 +154,7 @@ const viewCoinHandle = (item: Coin) => {
                             : item.logo
                     "
                     class="w-[36px] h-[36px] rounded-[50%]"
-                    @error.once="$event.target.src = ErrorCoinImg"
+                    @error.once="($event.target as HTMLImageElement).src = ErrorCoinImg"
                 />
                 <div class="list-name-img">{{ item.symbol }}</div>
             </div>

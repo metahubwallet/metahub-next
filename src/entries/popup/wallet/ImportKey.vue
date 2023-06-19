@@ -16,7 +16,7 @@ const chainId = ref(route.query.chainId ? (route.query.chainId as string) : eosC
 const getNetworkIcon = (chainId: string) => {
     const chain = store.chain().findNetwork(chainId)?.chain;
     if (chain) return getNetworkLocalIcon(chain);
-    else return null;
+    else return '';
 };
 
 // select network
