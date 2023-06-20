@@ -113,8 +113,8 @@ const handleDetailClick = (item: Transation) => {
                             <div
                                 @click="handleDetailClick(item)"
                                 class="content-item"
-                                v-for="item in traceList"
-                                :key="item.id"
+                                v-for="(item, index) of traceList"
+                                :key="index"
                             >
                                 <div class="content-info-big">
                                     <div class="content-info-left">
@@ -134,7 +134,7 @@ const handleDetailClick = (item: Transation) => {
                                                 }}
                                             </div>
                                             <div class="content-info-bottom">
-                                                {{ timeFormat(item.timestamp) }}
+                                                {{ timeFormat(item.time) }}
                                             </div>
                                         </div>
                                     </div>
