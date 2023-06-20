@@ -8,7 +8,7 @@ export interface WalletState {
         };
     };
     whitelist: WhiteItem[];
-    recentTransfers: Transfer[]; // 最近转账记录
+    recentTransations: Transation[]; // 最近转账记录
     allTokens: {
         [key: string]: Coin[]; // 链: Coins
     };
@@ -58,21 +58,18 @@ export interface WhiteItem {
     domain: number;
 }
 
-export interface Transfer {
-    account: Object;
-}
-
-export interface Transation {
-    id: string;
-    sender: string;
-    receiver: string;
-    timestamp: string;
-    quantity: number;
-}
-
 export interface Action {
     receiver: string;
     sender: string;
-    quantity: string;
+    quantity: number;
     memo: string;
+}
+
+export interface Transfer extends Action {
+    symbol: string;
+    contract: string;
+}
+
+export interface Transation extends Transfer {
+    time: number;
 }

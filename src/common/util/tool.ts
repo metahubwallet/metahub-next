@@ -21,7 +21,7 @@ export const tool = {
     },
 
     // 时间格式化
-    timeFormat: (date: string) => {
+    timeFormat: (date: string | number) => {
         return moment(date).format('YYYY/MM/DD HH:mm:ss');
     },
 };
