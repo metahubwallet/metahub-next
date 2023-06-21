@@ -7,6 +7,7 @@ import AddToken from '@/entries/popup/wallet/AddToken.vue';
 import TokenTraces from '@/entries/popup/wallet/TokenTraces.vue';
 import Transfer from '@/entries/popup/wallet/Transfer.vue';
 import Transation from '@/entries/popup/wallet/Transation.vue';
+import Receive from '@/entries/popup/wallet/Receive.vue';
 
 export const routes: RouteRecordRaw[] = [
     {
@@ -61,6 +62,14 @@ export const routes: RouteRecordRaw[] = [
         path: '/wallet/transation',
         name: 'transation',
         component: Transation,
+        meta: {
+            index: 3,
+        },
+    },
+    {
+        path: '/wallet/receive',
+        name: 'receive',
+        component: Receive,
         meta: {
             index: 3,
         },

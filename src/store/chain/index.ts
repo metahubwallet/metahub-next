@@ -24,5 +24,9 @@ export default defineStore('chain', {
             }
             return selectedRpc;
         },
+        currentSymbol: (state) => {
+            const network = state.networks.find((x: Network) => x.chainId == state.currentChainId);
+            return network ? network.token.symbol : 'EOS';
+        },
     },
 });

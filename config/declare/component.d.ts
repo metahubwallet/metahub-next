@@ -10,6 +10,7 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AccountSelector: typeof import('./../../src/entries/popup/component/AccountSelector.vue')['default']
+    ClipButton: typeof import('./../../src/component/ClipButton.vue')['default']
     CoinList: typeof import('./../../src/entries/popup/wallet/component/CoinList.vue')['default']
     Global: typeof import('./../../src/component/Global.vue')['default']
     IconArrowLeft: typeof import('@icon-park/vue-next')['ArrowLeft']
