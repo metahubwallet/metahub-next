@@ -61,7 +61,7 @@ const viewTransfer = () => {
 };
 
 // 跳转至事务详情页
-const handleDetailClick = (item: Transation) => {
+const viewTransation = (item: Transation) => {
     router.push({
         name: 'transation',
         query: {
@@ -76,6 +76,7 @@ const handleDetailClick = (item: Transation) => {
     <div class="full-router">
         <div class="full-inner">
             <page-header :title="$t('wallet.detail')"></page-header>
+
             <div class="cover-content _effect pb-[80px]">
                 <n-scrollbar>
                     <!-- header -->
@@ -111,7 +112,7 @@ const handleDetailClick = (item: Transation) => {
                         </div>
                         <div class="content-list">
                             <div
-                                @click="handleDetailClick(item)"
+                                @click="viewTransation(item)"
                                 class="content-item"
                                 v-for="(item, index) of traceList"
                                 :key="index"
