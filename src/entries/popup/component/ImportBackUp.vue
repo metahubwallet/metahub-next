@@ -114,7 +114,7 @@ const importWalletsFromData = (content: string) => {
     console.log(1);
 
     emits('refreshTokens', true);
-    router.push({ name: 'wallet' });
+    router.push({ name: 'index' });
 
     return window.msg.success(t('public.importBackupSuccess'));
 };

@@ -57,7 +57,7 @@ const submitHandle = async () => {
         // await chain.get().transfer(...params, chain.getAuth());
         window.msg.success(t('wallet.transferSuccess'));
 
-        router.push({ name: 'wallet' });
+        router.push({ name: 'index' });
     } catch (e) {
         // window.msg.error(chain.getErrorMsg(e));
     }

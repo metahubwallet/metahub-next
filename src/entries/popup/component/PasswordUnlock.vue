@@ -17,7 +17,7 @@ const submit = () => {
     localCache.set('isLock', false, 60 * 60 * 24).then(() => {
         store.setting().isLock = false;
         store.user().password = password1(password.value);
-        router.push({ name: 'wallet' });
+        router.push({ name: 'index' });
     });
 };
 </script>

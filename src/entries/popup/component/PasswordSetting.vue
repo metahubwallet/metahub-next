@@ -34,7 +34,7 @@ const onSubmit = handleSubmit(() => {
     store.user().passwordHash = password2(values.password);
     localCache.set('passwordHash', store.user().passwordHash);
     store.setting().isLock = false;
-    router.push({ name: 'wallet' });
+    router.push({ name: 'index' });
 });
 
 // 是否打开导入备份弹出层
