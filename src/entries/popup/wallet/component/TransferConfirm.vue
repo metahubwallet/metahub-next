@@ -49,7 +49,7 @@ const submitHandle = async () => {
 
         const params = [
             props.transfer.contract,
-            wallet.currentWallet?.name,
+            wallet.currentWallet.name,
             receiver,
             props.transfer.quantity + ' ' + props.coin.symbol,
             memo,

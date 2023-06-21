@@ -30,7 +30,7 @@ const getBalance = async () => {
     const balance = '0 EOS';
     // const balance = await chain
     //     .get()
-    //     .getCurrencyBalance(token.contract, wallet.currentWallet?.name, token.symbol);
+    //     .getCurrencyBalance(token.contract, wallet.currentWallet.name, token.symbol);
     if (balance) {
         token.amount = Number(balance.split(' ')[0]);
     }
@@ -41,7 +41,7 @@ const traceList = ref<Transation[]>([]);
 const getTraceList = async () => {
     const chain = store.chain().currentChain;
     const params = {
-        account: wallet.currentWallet?.name,
+        account: wallet.currentWallet.name,
         filter: `${token.contract}:*`,
         sort: 'desc',
     };
@@ -121,7 +121,7 @@ const viewTransation = (item: Transation) => {
                                     <div class="content-info-left">
                                         <img
                                             :src="
-                                                item.receiver == wallet.currentWallet?.name
+                                                item.receiver == wallet.currentWallet.name
                                                     ? CoinGet
                                                     : CoinOut
                                             "
@@ -129,7 +129,7 @@ const viewTransation = (item: Transation) => {
                                         <div>
                                             <div class="content-info-up">
                                                 {{
-                                                    item.receiver != wallet.currentWallet?.name
+                                                    item.receiver != wallet.currentWallet.name
                                                         ? item.receiver
                                                         : item.sender
                                                 }}
@@ -141,13 +141,13 @@ const viewTransation = (item: Transation) => {
                                     </div>
                                     <div
                                         :class="
-                                            item.receiver == wallet.currentWallet?.name
+                                            item.receiver == wallet.currentWallet.name
                                                 ? 'content-info-right-blue'
                                                 : 'content-info-right-red'
                                         "
                                     >
                                         {{
-                                            item.receiver == wallet.currentWallet?.name
+                                            item.receiver == wallet.currentWallet.name
                                                 ? '+' + item.quantity
                                                 : '-' + item.quantity
                                         }}

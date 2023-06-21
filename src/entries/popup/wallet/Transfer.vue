@@ -43,7 +43,7 @@ onBeforeMount(() => {
             targetCoin.precision = row.precision;
         }
     });
-    form.sender = tool.briefAccount(wallet.currentWallet?.account + '', 14, 8);
+    form.sender = tool.briefAccount(wallet.currentWallet.account, 14, 8);
     form.symbol = targetCoin.symbol;
     getBalance();
 });
@@ -53,7 +53,7 @@ const isShowMemo = ref(true);
 const receiverError = ref('');
 const checkReceiver = async () => {
     if (!form.receiver) return (receiverError.value = t('wallet.emptyReceiver'));
-    if (form.receiver == wallet.currentWallet?.name)
+    if (form.receiver == wallet.currentWallet.name)
         return (receiverError.value = t('wallet.transferSelf'));
 
     // 账号不存在
@@ -105,7 +105,7 @@ const getBalance = async () => {
     const balance = '0 eos';
     // const balance = await chain
     //     .get()
-    //     .getCurrencyBalance(targetCoin.contract, wallet.currentWallet?.name, targetCoin.symbol);
+    //     .getCurrencyBalance(targetCoin.contract, wallet.currentWallet.name, targetCoin.symbol);
     if (balance) targetCoin.amount = Number(balance.split(' ')[0]);
 };
 

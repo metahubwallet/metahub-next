@@ -32,13 +32,13 @@ const queryHandle = (url: string) => {
                                 <div
                                     :class="[
                                         'transation-count',
-                                        trx.receiver == wallet.currentWallet?.name
+                                        trx.receiver == wallet.currentWallet.name
                                             ? 'transation-count-blue'
                                             : 'transation-count-red',
                                     ]"
                                 >
                                     {{
-                                        trx.receiver == wallet.currentWallet?.name
+                                        trx.receiver == wallet.currentWallet.name
                                             ? '+' + trx.quantity
                                             : '-' + trx.quantity
                                     }}
