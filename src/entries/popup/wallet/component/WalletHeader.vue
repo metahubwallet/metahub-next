@@ -10,6 +10,22 @@ const totalValue = computed(() => {
     const subfix = props.type == 'usd' ? '' : props.type.toUpperCase();
     return `${prefix} ${props.amount} ${subfix}`;
 });
+
+// 跳转至转账页
+const wallet = store.wallet();
+const router = useRouter();
+const viewTransferHandle = () => {
+    const eosToken = wallet.userTokens.find(
+        (i) => i.contract === 'eosio.token' && i.symbol === 'EOS'
+    );
+    router.push({
+        name: 'transfer',
+        query: {
+            symbol: eosToken?.symbol,
+            contract: eosToken?.contract,
+        },
+    });
+};
 </script>
 
 <template>
@@ -21,19 +37,19 @@ const totalValue = computed(() => {
             </div>
         </div>
         <div class="bottom-btn-container">
-            <div @click="$emit('select', 1)" class="one-btn-container">
+            <div @click="viewTransferHandle" class="one-btn-container">
                 <img src="@/asset/img/wallet_transfer@2x.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('wallet.transfer') }}</div>
             </div>
-            <div @click="$emit('btnClick', 2)" class="one-btn-container">
+            <div @click="$router.push({ name: 'receive' })" class="one-btn-container">
                 <img src="@/asset/img/wallet_collection@2x.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('wallet.receive') }}</div>
             </div>
-            <div @click="$emit('btnClick', 3)" class="one-btn-container">
+            <div @click="$router.push({ name: 'resource' })" class="one-btn-container">
                 <img src="@/asset/img/wallet_voting@2x.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('resource.resources') }}</div>
             </div>
-            <div @click="$emit('btnClick', 4)" class="one-btn-container">
+            <div @click="$router.push({ name: 'setting' })" class="one-btn-container">
                 <img src="@/asset/img/setting.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('setting.setting') }}</div>
             </div>

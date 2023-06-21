@@ -116,7 +116,7 @@ const getWalletCache = async () => {
 const router = useRouter();
 const viewCoinHandle = (item: Coin) => {
     const token = item.contract + '-' + item.symbol;
-    router.push('/wallet/token-traces/' + token);
+    router.push('token-traces' + token);
 };
 </script>
 
