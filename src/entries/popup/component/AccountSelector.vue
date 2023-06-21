@@ -47,10 +47,6 @@ const showAccount = (account: string) => {
     return account.substring(0, 10) + '...' + account.substring(-8, 8);
 };
 
-const copy = (value: string) => {
-    window.clip(value);
-};
-
 // 选择账号
 const accountSelectHandle = (account: Wallet) => {
     let index = store.wallet().wallets.indexOf(account);
@@ -124,14 +120,10 @@ const chain = store.chain();
                                 v-for="item in accounts"
                             >
                                 <div class="account-left">
-                                    <div class="account-left-name">
-                                        <span>{{ showAccount(item.account) }}</span>
-                                        <img
-                                            @click="copy(showAccount(item.account))"
-                                            class="account-cell-key-copy"
-                                            src="@/asset/img/account_copy.png"
-                                        />
-                                    </div>
+                                    <clip-button
+                                        class="account-left-name"
+                                        :value="showAccount(item.account)"
+                                    ></clip-button>
                                     <div class="account-left-key">
                                         {{ item.keys[0].publicKey.substring(0, 8) }}...{{
                                             item.keys[0].publicKey.substring(-16, 16)
@@ -326,11 +318,6 @@ const chain = store.chain();
                     font-size: 14px;
                     color: #ffffff;
                     font-weight: 600;
-                    .account-cell-key-copy {
-                        height: 10px;
-                        width: 11px;
-                        cursor: pointer;
-                    }
                 }
                 .account-left-key {
                     color: #ffffff;
