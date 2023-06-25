@@ -73,3 +73,42 @@ export interface Transfer extends Action {
 export interface Transation extends Transfer {
     time: number;
 }
+
+export interface ResourceData {
+    core_liquid_balance: string;
+    ram_quota: number;
+    ram_usage: number;
+    ram_percentage: number;
+    cpu_limit: {
+        percentage: number;
+        max: number;
+        used: number;
+    };
+    net_limit: {
+        percentage: number;
+        max: number;
+        used: number;
+    };
+    stakeCpuMax: number;
+    stakeNetMax: number;
+    refund_request: RefundRequest;
+    total_resources: {
+        cpu_weight: string;
+        net_weight: string;
+    };
+    self_delegated_bandwidth: {
+        cpu_weight: string;
+        net_weight: string;
+    };
+    stakeForUserCPU: number;
+    stakeForUserNET: number;
+    stakeForOthersCPU: number;
+    stakeForOthersNET: number;
+}
+
+export interface RefundRequest {
+    cpu_amount: number;
+    net_amount: number;
+    request_time: number;
+    left_time: string;
+}

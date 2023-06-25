@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import chain from '@/common/lib/chain';
+import { ResourceData } from '@/store/wallet/type';
+import { toInteger } from 'lodash';
+
 const showResBox = ref(true);
 
 // 初始化
@@ -21,6 +25,102 @@ const changeSmoothMode = async () => {
 // 新标签页跳转
 const toLink = (url: string) => {
     chrome.tabs.create({ url: url });
+};
+
+// 获取数据
+const stakeList = ref([]);
+const wallet = store.wallet();
+const ramprice = ref(0);
+let resourceData = reactive({} as ResourceData);
+const loadData = async () => {
+    try {
+        // stakeList.value = await chain.get().getDelegatebwList(wallet.currentWallet.name);
+        const data = {} as ResourceData;
+        // const data: ResourceData = await chain.get().getAccount(wallet.currentWallet.name);
+        data.cpu_limit.percentage =
+            data.cpu_limit.max > 0
+                ? parseInt((data.cpu_limit.used / data.cpu_limit.max) * 100 + '')
+                : 100;
+        if (data.cpu_limit.percentage > 100) {
+            data.cpu_limit.percentage = 100;
+        }
+        data.net_limit.percentage =
+            data.net_limit.max > 0
+                ? parseInt((data.net_limit.used / data.net_limit.max) * 100 + '')
+                : 100;
+        if (data.net_limit.percentage > 100) {
+            data.net_limit.percentage = 100;
+        }
+        data.ram_percentage = parseInt((data.ram_usage / data.ram_quota) * 100 + '');
+        data.stakeCpuMax = parseFloat(data.core_liquid_balance);
+        if (data.refund_request) {
+            data.stakeCpuMax += data.refund_request.cpu_amount;
+        }
+        data.stakeCpuMax = Number(data.stakeCpuMax.toFixed(4));
+        data.stakeNetMax = parseFloat(data.core_liquid_balance);
+        if (data.refund_request) {
+            data.stakeNetMax += data.refund_request.net_amount;
+        }
+        data.stakeNetMax = Number(data.stakeNetMax.toFixed(4));
+        let stakeForOthersNET = 0;
+        let stakeForOthersCPU = 0;
+        stakeList.value.forEach((item: any) => {
+            if (item.to != wallet.currentWallet.name) {
+                stakeForOthersNET += parseFloat(item.net_weight);
+                stakeForOthersCPU += parseFloat(item.cpu_weight);
+            }
+        });
+        const emptyCoin = '0.0000 ' + store.chain().currentSymbol;
+        if (!data.total_resources) {
+            data.total_resources = {
+                cpu_weight: emptyCoin,
+                net_weight: emptyCoin,
+            };
+        }
+        if (!data.self_delegated_bandwidth) {
+            data.self_delegated_bandwidth = {
+                cpu_weight: emptyCoin,
+                net_weight: emptyCoin,
+            };
+        }
+        data.stakeForUserCPU =
+            parseFloat(data.total_resources.cpu_weight) -
+            parseFloat(data.self_delegated_bandwidth.cpu_weight);
+        data.stakeForUserNET =
+            parseFloat(data.total_resources.net_weight) -
+            parseFloat(data.self_delegated_bandwidth.net_weight);
+        data.stakeForUserCPU = Number(data.stakeForUserCPU.toFixed(4));
+        data.stakeForUserNET = Number(data.stakeForUserNET.toFixed(4));
+        data.stakeForOthersCPU = Number(stakeForOthersCPU.toFixed(4));
+        data.stakeForOthersNET = Number(stakeForOthersNET.toFixed(4));
+
+        if (data.refund_request) {
+            let leftTime =
+                new Date().getTime() - new Date(data.refund_request.request_time).getTime();
+            let minutes = 4320 - (leftTime / 60000 - 479); //赎回剩余分钟数
+            data.refund_request.left_time =
+                minutes > 0
+                    ? toInteger(minutes / 1440) +
+                      'd ' +
+                      (toInteger(minutes / 60) % 24) +
+                      'h ' +
+                      (minutes % 60) +
+                      'm'
+                    : '-';
+        }
+        resourceData = data;
+    } catch (e) {
+        console.log(e);
+    }
+    try {
+        let rammarketData = {} as any;
+        // let rammarketData = await chain.get().getRamMarket();
+        let balance1 = parseFloat(rammarketData.rows[0].quote.balance);
+        let balance2 = parseFloat(rammarketData.rows[0].base.balance);
+        ramprice.value = (balance1 / balance2) * 1024;
+    } catch (e) {
+        console.log('ramprice error');
+    }
 };
 </script>
 
@@ -77,6 +177,14 @@ const toLink = (url: string) => {
                                 </div>
                             </div>
                         </div>
+
+                        <!-- ram -->
+                        <row-ram
+                            @loadData="loadData"
+                            class="res-item"
+                            :ramprice="ramprice"
+                            :resourceData="resourceData"
+                        ></row-ram>
                     </div>
                 </n-scrollbar>
             </div>
