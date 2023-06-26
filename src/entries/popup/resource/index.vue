@@ -178,6 +178,22 @@ const loadData = async () => {
                             </div>
                         </div>
 
+                        <!-- cpu -->
+                        <row-resource
+                            @loadData="loadData"
+                            class="res-item"
+                            type="cpu"
+                            :resourceData="resourceData"
+                        ></row-resource>
+
+                        <!-- net -->
+                        <row-resource
+                            @loadData="loadData"
+                            class="res-item"
+                            type="net"
+                            :resourceData="resourceData"
+                        ></row-resource>
+
                         <!-- ram -->
                         <row-ram
                             @loadData="loadData"
