@@ -126,7 +126,7 @@ const viewCoinHandle = (item: Coin) => {
 </script>
 
 <template>
-    <div class="wallet-list-container">
+    <div class="wallet-list-container flex flex-col">
         <!-- head -->
         <div class="list-header-div">
             <div class="list-header-title">
@@ -145,28 +145,30 @@ const viewCoinHandle = (item: Coin) => {
         </div>
 
         <!-- body -->
-        <div
-            @click="viewCoinHandle(item)"
-            class="resource-item"
-            v-for="(item, index) of tokens"
-            :key="index"
-        >
-            <div class="resource-item-left">
-                <img
-                    :src="
-                        chain.currentChain == 'eos' && item.contract === 'eosio.token'
-                            ? EOSIcon
-                            : item.logo
-                    "
-                    class="w-[36px] h-[36px] rounded-[50%]"
-                    @error.once="($event.target as HTMLImageElement).src = ErrorCoinImg"
-                />
-                <div class="list-name-img">{{ item.symbol }}</div>
+        <n-scrollbar style="max-height: 277px">
+            <div
+                @click="viewCoinHandle(item)"
+                class="resource-item"
+                v-for="(item, index) of tokens"
+                :key="index"
+            >
+                <div class="resource-item-left">
+                    <img
+                        :src="
+                            chain.currentChain == 'eos' && item.contract === 'eosio.token'
+                                ? EOSIcon
+                                : item.logo
+                        "
+                        class="w-[36px] h-[36px] rounded-[50%]"
+                        @error.once="($event.target as HTMLImageElement).src = ErrorCoinImg"
+                    />
+                    <div class="list-name-img">{{ item.symbol }}</div>
+                </div>
+                <div class="value-item-right">
+                    <div class="value-item-top">{{ item.amount }}</div>
+                </div>
             </div>
-            <div class="value-item-right">
-                <div class="value-item-top">{{ item.amount }}</div>
-            </div>
-        </div>
+        </n-scrollbar>
     </div>
 </template>
 
