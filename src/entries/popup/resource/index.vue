@@ -8,15 +8,12 @@ const showResBox = ref(true);
 // 初始化
 onMounted(async () => {
     await localCache.get('smoothMode', false).then((res) => {
-        console.log(res);
-        console.log(Boolean(res));
-
         smoothMode.value = Boolean(res);
     });
 });
 
 // 切换顺畅模式
-const smoothMode = ref(true);
+const smoothMode = ref(false);
 const smoothModeCPU = ref('~');
 const changeSmoothMode = async () => {
     await localCache.set('smoothMode', smoothMode.value);

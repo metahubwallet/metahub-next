@@ -236,7 +236,7 @@ const checkSubmit = () => {
             :title="$t('wallet.transferInfo')"
             @close="confirmVisible = false"
         >
-            <transfer-confirm :transfer="form" :coin="targetCoin"></transfer-confirm>
+            <transfer-confirm :transfer="form" :precision="targetCoin.precision"></transfer-confirm>
         </popup-bottom>
     </div>
 </template>

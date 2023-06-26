@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { Coin, Transfer } from '@/store/wallet/type';
+import { Transfer } from '@/store/wallet/type';
 import chain from '@/common/lib/chain';
 
 interface Props {
     transfer: Transfer;
-    coin: Coin;
+    precision: number;
 }
 const props = withDefaults(defineProps<Props>(), {});
 const { t } = useI18n();
@@ -38,8 +38,7 @@ const submitHandle = async () => {
             memo = props.transfer.receiver;
         }
 
-        // 验证密码
-        props.transfer.quantity = Number(props.transfer.quantity.toFixed(props.coin.precision));
+        props.transfer.quantity = Number(props.transfer.quantity.toFixed(props.precision));
         let recent = {
             ...props.transfer,
             time: Date.now(),
@@ -51,13 +50,13 @@ const submitHandle = async () => {
             props.transfer.contract,
             wallet.currentWallet.name,
             receiver,
-            props.transfer.quantity + ' ' + props.coin.symbol,
+            props.transfer.quantity + ' ' + props.transfer.symbol,
             memo,
         ];
         // await chain.get().transfer(...params, chain.getAuth());
         window.msg.success(t('wallet.transferSuccess'));
 
-        router.push({ name: 'index' });
+        router.go(-1);
     } catch (e) {
         // window.msg.error(chain.getErrorMsg(e));
     }
@@ -82,7 +81,7 @@ const submitHandle = async () => {
             <div class="info-cell">
                 <span class="info-cell-key">{{ $t('wallet.amount') }}：</span>
                 <span class="info-cell-value">
-                    {{ transfer.quantity.toFixed(props.coin.precision) + ' ' + transfer.symbol }}
+                    {{ transfer.quantity.toFixed(props.precision) + ' ' + transfer.symbol }}
                 </span>
             </div>
             <div class="info-cell" v-show="isShowMemo">
