@@ -1,3 +1,5 @@
+import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
+
 export interface WalletState {
     wallets: Wallet[]; // 里面存储 eos 账号相关信息
     selectedIndex: number; // 当前选中钱包的索引
@@ -28,6 +30,16 @@ export interface Wallet {
     chainName: string;
     publicKey: string;
     privateKey: string;
+    smoothMode: boolean;
+}
+
+export interface CacheABI {
+    chainId: string;
+    contract: string;
+    expire: number;
+    timestamp: number;
+    abi: Abi;
+    hash: string;
 }
 
 export interface Key {
@@ -54,8 +66,11 @@ export interface WhiteItem {
     action: string;
     actor: string;
     contract: string;
-    properties: string;
+    properties: {
+        [key: string]: string;
+    };
     domain: number;
+    hash: string;
 }
 
 export interface Action {
@@ -111,4 +126,23 @@ export interface RefundRequest {
     net_amount: number;
     request_time: number;
     left_time: string;
+}
+
+export interface Authorization {
+    permission: string;
+    actor: string;
+    domain: string;
+    accounts: Account[];
+}
+
+export interface Account {
+    authorizations: Authorization[];
+    data: any;
+    account: any;
+    chainId: string;
+    name: string;
+    expire?: number;
+    authority: string;
+    publicKey: string;
+    address: string;
 }

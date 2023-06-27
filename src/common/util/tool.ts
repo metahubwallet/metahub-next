@@ -1,3 +1,4 @@
+import { CacheABI } from '@/store/wallet/type';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 
@@ -23,5 +24,24 @@ export const tool = {
     // 时间格式化
     timeFormat: (date: string | number) => {
         return moment(date).format('YYYY/MM/DD HH:mm:ss');
+    },
+
+    // 读写CacheABI
+    getCachedABI: async (chainId: string, contract: string) => {
+        const cachedAbis = (await localCache.get('cachedAbis', [])) as CacheABI[];
+        const cachedAbi = cachedAbis.find((x) => x.chainId == chainId && x.contract == contract);
+        return cachedAbi ? cachedAbi : '';
+    },
+    setCacheABI: async (abi: CacheABI) => {
+        const cachedAbis = (await localCache.get('cachedAbis', [])) as CacheABI[];
+        const index = cachedAbis.findIndex(
+            (x) => x.chainId == abi.chainId && x.contract == abi.contract
+        );
+        if (index >= 0) {
+            cachedAbis[index] = abi;
+        } else {
+            cachedAbis.push(abi);
+        }
+        await localCache.set('cachedAbis', cachedAbis);
     },
 };

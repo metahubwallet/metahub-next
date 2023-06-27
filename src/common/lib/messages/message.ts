@@ -1,60 +1,88 @@
+import { Network } from '@/store/chain/type';
 import MessageCenter from './messageCenter';
+import { Account } from '@/store/wallet/type';
 
 const strippedHost = () => {
-  let host = location.hostname;
+    let host = location.hostname;
 
-  // Replacing www. only if the domain starts with it.
-  if(host.indexOf('www.') === 0) host = host.replace('www.', '');
+    // Replacing www. only if the domain starts with it.
+    if (host.indexOf('www.') === 0) host = host.replace('www.', '');
 
-  return host;
+    return host;
 };
 
-export class Playload {
-  domain: string;
-  data?: string;
+export class Payload {
+    domain: string;
+    chainId: string;
+    data: string;
+    newLogin: string;
+    accounts: Network[];
+    account: string;
+    buf: Buffer;
+    transaction: {
+        delay_sec: string;
+        actions: Account[];
+        serializedTransaction: number[];
+        chainId: string;
+    };
+    publicKey: string;
 
-  constructor() {
-    this.domain = '';
-  }
+    constructor() {
+        this.domain = '';
+        this.chainId = '';
+        this.data = '';
+        this.newLogin = '';
+        this.accounts = [];
+        this.account = '';
+        this.buf = {} as Buffer;
+        this.transaction = {
+            delay_sec: '',
+            actions: [],
+            serializedTransaction: [],
+            chainId: '',
+        };
+        this.publicKey = '';
+    }
 }
 
 export class Message {
-  type: string;
-  payload: Playload;
+    type: string;
+    payload: Payload;
 
-  constructor() {
-    this.type = '';
-    this.payload = new Playload();
-  }
-
-  static placeholder() { return new Message(); }
-  static fromJson(json: Object) { return Object.assign(this.placeholder(), json); }
-
-  static payload(type: string, payload: Playload) {
-    let p = this.placeholder();
-    p.type = type;
-    p.payload = payload;
-    return p;
-  }
-
-  static signal(type: string) {
-    let p = this.placeholder();
-    p.type = type;
-    return p;
-  }
-
-  request() {
-    const msg = this;
-    if (!msg.payload.domain) {
-      msg.payload.domain = strippedHost();
+    constructor() {
+        this.type = '';
+        this.payload = new Payload();
     }
-    return new Promise((resolve, reject) => {
-      MessageCenter.send(msg, (response: any) => {
-        resolve(response)
-      });
-    });
-    
-  }
 
-  
+    static placeholder() {
+        return new Message();
+    }
+    static fromJson(json: Object) {
+        return Object.assign(this.placeholder(), json);
+    }
+
+    static payload(type: string, payload: Payload) {
+        let p = this.placeholder();
+        p.type = type;
+        p.payload = payload;
+        return p;
+    }
+
+    static signal(type: string) {
+        let p = this.placeholder();
+        p.type = type;
+        return p;
+    }
+
+    request() {
+        const msg = this;
+        if (!msg.payload.domain) {
+            msg.payload.domain = strippedHost();
+        }
+        return new Promise((resolve, reject) => {
+            MessageCenter.send(msg, (response: any) => {
+                resolve(response);
+            });
+        });
+    }
 }

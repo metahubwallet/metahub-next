@@ -25,4 +25,5 @@ export interface Network {
 export interface RPC {
     name: string;
     endpoint: string;
+    [key: string]: any;
 }

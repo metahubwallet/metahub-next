@@ -22,8 +22,6 @@ export const localCache = {
                 if (data) {
                     // 超时清空
                     if (data.expire && data.expire < new Date().getTime()) {
-                        console.log(2);
-
                         localCache.remove(key).then(() => {
                             resolve(defaultValue);
                         });
