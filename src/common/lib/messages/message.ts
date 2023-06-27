@@ -26,6 +26,7 @@ export class Payload {
         chainId: string;
     };
     publicKey: string;
+    availableKeys: string[];
 
     constructor() {
         this.domain = '';
@@ -42,6 +43,7 @@ export class Payload {
             chainId: '',
         };
         this.publicKey = '';
+        this.availableKeys = [];
     }
 }
 

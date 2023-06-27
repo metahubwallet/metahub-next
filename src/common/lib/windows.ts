@@ -30,6 +30,32 @@ export default class Windows {
     static getCount() {
         return this.windowCount;
     }
+
+    static createWindow(
+        type: string,
+        width: number,
+        height: number,
+        params: any,
+        callback: Function
+    ) {
+        chrome.windows.create(
+            {
+                url: 'pages/window.html#/' + type,
+                width: width,
+                height: height,
+                left: Math.round((screen.width - width) / 2),
+                top: Math.round((screen.height * 0.8 - height) / 2),
+                type: 'popup',
+            },
+            (window: any) => {
+                this.windowCount++;
+                chrome.browserAction.setIcon({
+                    path: '../icons/metahub-open.png',
+                });
+                this.windowIds[window.id] = { callback, params };
+            }
+        );
+    }
 }
 
 Windows.init();
