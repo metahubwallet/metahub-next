@@ -17,8 +17,8 @@ const aboutUs = () => {
             <page-header :title="$t('setting.setting')"></page-header>
 
             <div class="cover-content _effect">
-                <!-- select network -->
                 <div class="setting-group">
+                    <!-- select network -->
                     <div
                         @click="$router.push({ name: 'network-select', query: { type: 'node' } })"
                         class="setting-item"
@@ -33,7 +33,7 @@ const aboutUs = () => {
                         </div>
                     </div>
 
-                    <!-- manage wallet  -->
+                    <!-- wallet manage  -->
                     <div @click="$router.push({ name: 'wallet-manage' })" class="setting-item">
                         <div class="setting-icon">
                             <img class="img-icon" src="@/asset/img/setting_wallet@2x.png" />
@@ -59,6 +59,7 @@ const aboutUs = () => {
                         </div>
                     </div>
 
+                    <!-- network manage -->
                     <div @click="$router.push({ name: 'network-manage' })" class="setting-item">
                         <div class="setting-icon">
                             <img class="img-icon" src="@/asset/img/setting_network_select@2x.png" />
@@ -72,6 +73,7 @@ const aboutUs = () => {
                 </div>
 
                 <div class="setting-group">
+                    <!-- set language -->
                     <div @click="$router.push({ name: 'language' })" class="setting-item">
                         <div class="setting-icon">
                             <img class="img-icon" src="@/asset/img/setting_language@2x.png" />
@@ -82,7 +84,8 @@ const aboutUs = () => {
                             <img class="img-icon" src="@/asset/img/right_arrow@2x.png" />
                         </div>
                     </div>
-                    <!-- 当前版本 -->
+
+                    <!-- current version -->
                     <div class="setting-item">
                         <div class="setting-icon">
                             <img class="img-icon" src="@/asset/img/setting_refresh@2x.png" />
@@ -92,7 +95,8 @@ const aboutUs = () => {
                             <div class="item-subtitle">{{ currentVersion }}</div>
                         </div>
                     </div>
-                    <!-- 关于我们 -->
+
+                    <!-- about us -->
                     <div @click="aboutUs" class="setting-item">
                         <div class="setting-icon">
                             <img class="img-icon" src="@/asset/img/setting_about_me@2x.png" />
