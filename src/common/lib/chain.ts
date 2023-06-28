@@ -1,7 +1,7 @@
 import EOS from '@/common/lib/eos';
 import { decrypt, md5 } from '@/common/util/crypto';
 import { ErrorCode } from '@/common/util/type';
-import { Wallet } from '@/store/wallet/type';
+import { Perm, Wallet } from '@/store/wallet/type';
 
 const { t } = useI18n();
 export default class Chain {
@@ -52,7 +52,10 @@ export default class Chain {
             .wallets.find((x) => x.chainId === chainId && x.name === actor);
         if (wallet) {
             for (const key of wallet.keys) {
-                if (key.permissions.indexOf(permission) >= 0) return key.publicKey;
+                const flag = key.permissions.findIndex((item) => {
+                    return item.perm_name === permission;
+                });
+                if (flag != -1) return key.publicKey;
             }
         }
         return null;
@@ -74,7 +77,10 @@ export default class Chain {
     static getAuth() {
         let permission = 'active';
         for (let key of this.currentAccount().keys) {
-            if (key.permissions.indexOf('owner') > -1) {
+            const flag = key.permissions.findIndex((item) => {
+                return item.perm_name === 'owner';
+            });
+            if (flag != -1) {
                 permission = 'owner';
                 break;
             }
@@ -187,12 +193,15 @@ export default class Chain {
      * @param {string} account 账户名称
      *
      */
-    static findLocalAccount(account: string, chainId: string) {
+    static findLocalAccount(account: string, chainId: string): Wallet {
         let wallets = store.wallet().wallets;
         let i: number = 0;
         for (let index = 0; index < wallets.length; index++) {
             let wallet = wallets[index];
-            if (wallet.name === account && wallet.chainId === chainId) return (i = index);
+            if (wallet.name === account && wallet.chainId === chainId) {
+                i = index;
+                break;
+            }
         }
         return wallets[i];
     }
@@ -203,25 +212,23 @@ export default class Chain {
      *
      */
     static async fetchPermissions(account: string, chainId: string) {
-        let result = { code: ErrorCode.OK, permissions: ['active '], msg: '' };
+        let result = { code: ErrorCode.OK, permissions: [] as Perm[], msg: '' };
 
         let wallet = this.findLocalAccount(account, chainId) as Wallet;
         try {
             const accinfo = await this.get(chainId).getAccount(account);
-            if (!accinfo) {
-                throw new Error('fetch account eror');
-            }
+            if (!accinfo) throw new Error('fetch account eror');
+
             for (const key of wallet.keys) {
                 let permissions = new Set();
                 for (const perm of accinfo.permissions) {
                     if (perm.required_auth.keys.findIndex((x: any) => x.key == key.publicKey) >= 0)
                         permissions.add(perm.perm_name);
                 }
-                key.permissions = Array.from(permissions) as string[];
+                key.permissions = Array.from(permissions) as Perm[];
             }
             result.permissions = accinfo.permissions;
         } catch (e) {
-            console.log(e);
             result.code = ErrorCode.HTTP_END_POINT_ERROR;
             result.msg = t('public.requestHttpEndpointTimeout');
             return result;

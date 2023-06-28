@@ -45,7 +45,18 @@ export interface CacheABI {
 export interface Key {
     publicKey: string;
     privateKey: string;
-    permissions: string[];
+    permissions: Perm[];
+}
+
+export interface Perm {
+    perm_name: string;
+    required_auth: {
+        keys: {
+            id: string;
+            key: string;
+            isCurrent: boolean;
+        }[];
+    };
 }
 
 export interface Token {
