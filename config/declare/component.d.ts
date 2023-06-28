@@ -43,6 +43,7 @@ declare module '@vue/runtime-core' {
     NTabs: typeof import('naive-ui')['NTabs']
     NUpload: typeof import('naive-ui')['NUpload']
     PageHeader: typeof import('./../../src/component/PageHeader.vue')['default']
+    PasswordConfirm: typeof import('./../../src/entries/popup/component/PasswordConfirm.vue')['default']
     PasswordSetting: typeof import('./../../src/entries/popup/component/PasswordSetting.vue')['default']
     PasswordUnlock: typeof import('./../../src/entries/popup/component/PasswordUnlock.vue')['default']
     PopupBottom: typeof import('./../../src/component/PopupBottom.vue')['default']
