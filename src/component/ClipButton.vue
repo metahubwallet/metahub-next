@@ -19,7 +19,7 @@ const clip = () => {
 </script>
 
 <template>
-    <div>
+    <div class="flex items-center">
         {{ $props.value }}
         <img class="account-cell-key-copy" src="@/asset/img/account_copy2.png" @click="clip" />
     </div>

@@ -5,3 +5,17 @@
 .n-popover{
     padding: 0 !important;
 }
+
+.n-dialog__action {
+    .n-button--default-type {
+        --n-border: none !important;
+        border: 1px solid rgb(239, 239, 245) !important;
+    }
+    .n-button--default-type:hover {
+        --n-border-hover: none !important;
+        color: #333 !important;
+    }
+    .n-button--warning-type {
+        background: #fcb040 !important;
+    }
+}
