@@ -2,6 +2,7 @@ import { RouteRecordRaw } from 'vue-router';
 
 import Setting from '@/entries/popup/setting/index.vue';
 import WalletManage from '@/entries/popup/setting/wallet/WalletManage.vue';
+import AccountManage from '@/entries/popup/setting/account/AccountManage.vue';
 
 export default {
     path: '/setting',
@@ -20,6 +21,14 @@ export default {
             component: WalletManage,
             meta: {
                 index: 4,
+            },
+        },
+        {
+            path: 'account-manage',
+            name: 'account-manage',
+            component: AccountManage,
+            meta: {
+                index: 5,
             },
         },
     ],
