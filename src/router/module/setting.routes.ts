@@ -5,6 +5,7 @@ import WalletManage from '@/entries/popup/setting/wallet/WalletManage.vue';
 import AccountManage from '@/entries/popup/setting/account/AccountManage.vue';
 import AccountDetail from '@/entries/popup/setting/account/AccountDetail.vue';
 import AccountChange from '@/entries/popup/setting/account/AccountChange.vue';
+import WhiteList from '@/entries/popup/setting/whitelist/WhiteList.vue';
 
 export default {
     path: '/setting',
@@ -44,6 +45,14 @@ export default {
             name: 'account-change',
             component: AccountChange,
             meta: { index: 7 },
+        },
+        {
+            path: 'whitelist',
+            name: 'whitelist',
+            component: WhiteList,
+            meta: {
+                index: 4,
+            },
         },
     ],
 } as RouteRecordRaw;
