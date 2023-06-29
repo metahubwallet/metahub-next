@@ -4,6 +4,7 @@ import Setting from '@/entries/popup/setting/index.vue';
 import WalletManage from '@/entries/popup/setting/wallet/WalletManage.vue';
 import AccountManage from '@/entries/popup/setting/account/AccountManage.vue';
 import AccountDetail from '@/entries/popup/setting/account/AccountDetail.vue';
+import AccountChange from '@/entries/popup/setting/account/AccountChange.vue';
 
 export default {
     path: '/setting',
@@ -37,6 +38,12 @@ export default {
             name: 'account-detail',
             component: AccountDetail,
             meta: { index: 6 },
+        },
+        {
+            path: 'account-change',
+            name: 'account-change',
+            component: AccountChange,
+            meta: { index: 7 },
         },
     ],
 } as RouteRecordRaw;

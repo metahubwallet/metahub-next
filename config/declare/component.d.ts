@@ -15,6 +15,7 @@ declare module '@vue/runtime-core' {
     CoinList: typeof import('./../../src/entries/popup/wallet/component/CoinList.vue')['default']
     DestroyWallet: typeof import('./../../src/entries/popup/setting/wallet/component/DestroyWallet.vue')['default']
     ExportWallet: typeof import('./../../src/entries/popup/setting/wallet/component/ExportWallet.vue')['default']
+    GeneratePublicKey: typeof import('./../../src/entries/popup/setting/account/component/GeneratePublicKey.vue')['default']
     Global: typeof import('./../../src/component/Global.vue')['default']
     IconArrowLeft: typeof import('@icon-park/vue-next')['ArrowLeft']
     IconClose: typeof import('@icon-park/vue-next')['Close']
