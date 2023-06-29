@@ -6,6 +6,7 @@ import AccountManage from '@/entries/popup/setting/account/AccountManage.vue';
 import AccountDetail from '@/entries/popup/setting/account/AccountDetail.vue';
 import AccountChange from '@/entries/popup/setting/account/AccountChange.vue';
 import WhiteList from '@/entries/popup/setting/whitelist/WhiteList.vue';
+import WhiteListDetail from '@/entries/popup/setting/whitelist/WhiteListDetail.vue';
 
 export default {
     path: '/setting',
@@ -52,6 +53,14 @@ export default {
             component: WhiteList,
             meta: {
                 index: 4,
+            },
+        },
+        {
+            path: 'whitelist-detail',
+            name: 'whitelist-detail',
+            component: WhiteListDetail,
+            meta: {
+                index: 5,
             },
         },
     ],
