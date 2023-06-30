@@ -44,4 +44,9 @@ export const tool = {
         }
         await localCache.set('cachedAbis', cachedAbis);
     },
+
+    // 随机整数
+    randomInt: (min: number, max: number) => {
+        return Math.floor(Math.random() * (max - min) + min);
+    },
 };
