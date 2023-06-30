@@ -10,6 +10,7 @@ import WhiteListDetail from '@/entries/popup/setting/whitelist/WhiteListDetail.v
 import NetworkManage from '@/entries/popup/setting/network/NetworkManage.vue';
 import NetworkAdd from '@/entries/popup/setting/network/NetworkAdd.vue';
 import NetworkAddCustom from '@/entries/popup/setting/network/NetworkAddCustom.vue';
+import NetworkSelect from '@/entries/popup/setting/network/NetworkSelect.vue';
 
 export default {
     path: '/setting',
@@ -88,6 +89,14 @@ export default {
             component: NetworkAddCustom,
             meta: {
                 index: 15,
+            },
+        },
+        {
+            path: 'network-select',
+            name: 'network-select',
+            component: NetworkSelect,
+            meta: {
+                index: 4,
             },
         },
     ],
