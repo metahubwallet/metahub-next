@@ -58,9 +58,7 @@ const onSubmit = handleSubmit(() => {
 // 导入数据
 const router = useRouter();
 const emits = defineEmits(['refreshTokens', 'close']);
-const importWalletsFromData = (content: string) => {
-    console.log(2);
-
+const importWalletsFromData = async (content: string) => {
     if (!/^[0-9A-F]+$/.test(content)) return window.msg.error(t('public.importErrorTip'));
 
     let importData: any = {};
@@ -110,8 +108,7 @@ const importWalletsFromData = (content: string) => {
     store.user().password = importData.password;
     store.user().passwordHash = importData.passwordHash;
     store.setting().isLock = true;
-    store.setting().language = importData.language;
-    console.log(1);
+    await localCache.set('lang', importData.language);
 
     emits('refreshTokens', true);
     router.push({ name: 'index' });

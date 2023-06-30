@@ -1,6 +1,7 @@
 import { RouteRecordRaw } from 'vue-router';
 
 import Setting from '@/entries/popup/setting/index.vue';
+import SettingLanguage from '@/entries/popup/setting/SettingLanguage.vue';
 import WalletManage from '@/entries/popup/setting/wallet/WalletManage.vue';
 import AccountManage from '@/entries/popup/setting/account/AccountManage.vue';
 import AccountDetail from '@/entries/popup/setting/account/AccountDetail.vue';
@@ -21,6 +22,14 @@ export default {
             component: Setting,
             meta: {
                 index: 3,
+            },
+        },
+        {
+            path: 'language',
+            name: 'setting-language',
+            component: SettingLanguage,
+            meta: {
+                index: 4,
             },
         },
         {

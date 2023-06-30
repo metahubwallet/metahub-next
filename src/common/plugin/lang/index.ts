@@ -14,9 +14,9 @@ export const i18n = createI18n({
     messages,
     legacy: false,
     globalInjection: true, // 全局生效$t
-    locale: chrome.i18n.getUILanguage(),
+    locale: (await localCache.get('lang', chrome.i18n.getUILanguage())) + '',
 });
 
-export const setupI18n = (app: App) => {
+export const setupI18n = async (app: App) => {
     app.use(i18n);
 };

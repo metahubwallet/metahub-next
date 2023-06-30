@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { i18n } from '@/common/plugin/lang';
 import { password1, password2 } from '@/common/util/crypto';
 import { useI18n } from 'vue-i18n';
 
@@ -6,7 +7,7 @@ const router = useRouter();
 const currentPage = ref(1);
 
 // 切换语言
-const currentLang = ref(store.setting().language);
+const currentLang = ref(i18n.global.locale);
 const langOptions = [
     { label: '简体中文', value: 'zh-CN' },
     { label: 'English', value: 'en' },

@@ -74,7 +74,7 @@ const aboutUs = () => {
 
                 <div class="setting-group">
                     <!-- set language -->
-                    <div @click="$router.push({ name: 'language' })" class="setting-item">
+                    <div @click="$router.push({ name: 'setting-language' })" class="setting-item">
                         <div class="setting-icon">
                             <img class="img-icon" src="@/asset/img/setting_language@2x.png" />
                         </div>
