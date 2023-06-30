@@ -7,6 +7,7 @@ import AccountDetail from '@/entries/popup/setting/account/AccountDetail.vue';
 import AccountChange from '@/entries/popup/setting/account/AccountChange.vue';
 import WhiteList from '@/entries/popup/setting/whitelist/WhiteList.vue';
 import WhiteListDetail from '@/entries/popup/setting/whitelist/WhiteListDetail.vue';
+import NetworkManage from '@/entries/popup/setting/network/NetworkManage.vue';
 
 export default {
     path: '/setting',
@@ -61,6 +62,14 @@ export default {
             component: WhiteListDetail,
             meta: {
                 index: 5,
+            },
+        },
+        {
+            path: 'network-manage',
+            name: 'network-manage',
+            component: NetworkManage,
+            meta: {
+                index: 14,
             },
         },
     ],
