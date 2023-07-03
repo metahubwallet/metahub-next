@@ -27,6 +27,7 @@ declare module '@vue/runtime-core' {
     IconRight: typeof import('@icon-park/vue-next')['Right']
     ImportBackUp: typeof import('./../../src/entries/popup/component/ImportBackUp.vue')['default']
     ImportChoose: typeof import('./../../src/entries/popup/wallet/component/ImportChoose.vue')['default']
+    Modal: typeof import('./../../src/component/Modal.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
     NCheckbox: typeof import('naive-ui')['NCheckbox']

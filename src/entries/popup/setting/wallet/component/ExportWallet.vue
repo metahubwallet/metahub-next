@@ -65,40 +65,39 @@ const exportWallet = () => {
 </script>
 
 <template>
-    <n-modal :show="props.isShow" @mask-click="$emit('close')">
-        <n-card class="w-5/6" :title="$t('setting.exportWallet')" :bordered="false">
-            <!-- wallet passowrd -->
-            <div class="dialog-title">
-                {{ $t('setting.walletPassowrd') }}
-            </div>
-            <n-input
-                class="mb-3"
-                show-password
-                v-model:value="walletPassowrd"
-                :placeholder="$t('setting.walletPassowrd')"
-            ></n-input>
+    <modal
+        :is-show="props.isShow"
+        :title="$t('setting.exportWallet')"
+        @close="$emit('close')"
+        @submit="submitHandle"
+    >
+        <!-- wallet passowrd -->
+        <div class="dialog-title">
+            {{ $t('setting.walletPassowrd') }}
+        </div>
+        <n-input
+            class="mb-3"
+            show-password
+            v-model:value="walletPassowrd"
+            :placeholder="$t('setting.walletPassowrd')"
+        ></n-input>
 
-            <!-- encrypt password -->
-            <div class="dialog-title">
-                {{ $t('setting.encryptPassword') }}
-            </div>
-            <n-input
-                v-model:value="encryptPassword"
-                show-password
-                :placeholder="$t('setting.encryptPassword')"
-                clearable
-            ></n-input>
+        <!-- encrypt password -->
+        <div class="dialog-title">
+            {{ $t('setting.encryptPassword') }}
+        </div>
+        <n-input
+            v-model:value="encryptPassword"
+            show-password
+            :placeholder="$t('setting.encryptPassword')"
+            clearable
+        ></n-input>
 
-            <!-- encrypt password tip -->
-            <div class="dialog-tip">
-                {{ $t('setting.encryptPasswordTip') }}
-            </div>
-            <div class="dialog-foot">
-                <n-button @click="$emit('close')" class="mr-2">{{ $t('public.cancel') }}</n-button>
-                <n-button type="primary" @click="submitHandle">{{ $t('public.ok') }}</n-button>
-            </div>
-        </n-card>
-    </n-modal>
+        <!-- encrypt password tip -->
+        <div class="dialog-tip">
+            {{ $t('setting.encryptPasswordTip') }}
+        </div>
+    </modal>
 </template>
 
 <style lang="scss" scoped>

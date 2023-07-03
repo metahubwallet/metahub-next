@@ -32,19 +32,14 @@ const confirmHandle = () => {
     ></password-confirm>
 
     <!-- again confirm -->
-    <n-modal :show="showConfirmModal" @mask-click="$emit('close')">
-        <n-card class="w-5/6" :title="$t('setting.reconfirm')" :bordered="false">
-            <div>{{ $t('setting.confirmDestroy') }}</div>
-            <div class="mt-5 flex justify-end">
-                <n-button class="mr-2" @click="$emit('close')">
-                    {{ $t('public.cancel') }}
-                </n-button>
-                <n-button type="primary" @click="confirmHandle">
-                    {{ $t('public.ok') }}
-                </n-button>
-            </div>
-        </n-card>
-    </n-modal>
+    <modal
+        :is-show="showConfirmModal"
+        :title="$t('setting.reconfirm')"
+        @close="$emit('close')"
+        @submit="confirmHandle"
+    >
+        <div>{{ $t('setting.confirmDestroy') }}</div>
+    </modal>
 </template>
 
 <style lang="scss" scoped></style>

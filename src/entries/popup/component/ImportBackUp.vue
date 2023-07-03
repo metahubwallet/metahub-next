@@ -118,102 +118,79 @@ const importWalletsFromData = async (content: string) => {
 </script>
 
 <template>
-    <n-modal class="import-modal" v-model:show="props.isShow" @mask-click="$emit('close')">
-        <n-card class="w-5/6" :title="$t('public.importBackup')" :bordered="false">
-            <template #header-extra>
-                <icon-close
-                    @click="$emit('close')"
-                    class="cursor-pointer"
-                    theme="filled"
-                    size="16"
-                    fill="#333"
-                />
-            </template>
-            <!-- 加密密码 -->
-            <div class="mb-2">
-                <div class="dialog-title flex justify-between items-center">
-                    <span>{{ $t('setting.encryptPassword') }}</span>
-                    <span class="text-yellow-400 text-xs">
-                        {{ errors.encryptPassword }}
-                    </span>
-                </div>
-                <n-input
-                    v-model:value="values.encryptPassword"
-                    type="password"
-                    show-password-on="click"
-                    :placeholder="$t('setting.encryptPassword')"
-                ></n-input>
+    <modal
+        :is-show="props.isShow"
+        :title="$t('public.importBackup')"
+        @close="$emit('close')"
+        @submit="onSubmit"
+    >
+        <!-- 加密密码 -->
+        <div class="mb-2">
+            <div class="dialog-title flex justify-between items-center">
+                <span>{{ $t('setting.encryptPassword') }}</span>
+                <span class="text-yellow-400 text-xs">
+                    {{ errors.encryptPassword }}
+                </span>
             </div>
+            <n-input
+                v-model:value="values.encryptPassword"
+                type="password"
+                show-password-on="click"
+                :placeholder="$t('setting.encryptPassword')"
+            ></n-input>
+        </div>
 
-            <!-- 新密码 -->
-            <div class="mb-2">
-                <div class="dialog-title flex justify-between items-center">
-                    <span>{{ $t('setting.newPassword1') }}</span>
-                    <span class="text-yellow-400 text-xs">{{ errors.password }}</span>
-                </div>
-                <n-input
-                    v-model:value="values.password"
-                    type="password"
-                    show-password-on="click"
-                    :placeholder="$t('setting.newPassword1')"
-                ></n-input>
+        <!-- 新密码 -->
+        <div class="mb-2">
+            <div class="dialog-title flex justify-between items-center">
+                <span>{{ $t('setting.newPassword1') }}</span>
+                <span class="text-yellow-400 text-xs">{{ errors.password }}</span>
             </div>
+            <n-input
+                v-model:value="values.password"
+                type="password"
+                show-password-on="click"
+                :placeholder="$t('setting.newPassword1')"
+            ></n-input>
+        </div>
 
-            <!-- 重复密码 -->
-            <div class="mb-2">
-                <div class="dialog-title flex justify-between items-center">
-                    <span>{{ $t('setting.newPassword2') }}</span>
-                    <span class="text-yellow-400 text-xs">
-                        {{ errors.password_confirm }}
-                    </span>
-                </div>
-                <n-input
-                    v-model:value="values.password_confirm"
-                    type="password"
-                    show-password-on="click"
-                    :placeholder="$t('setting.newPassword2')"
-                ></n-input>
+        <!-- 重复密码 -->
+        <div class="mb-2">
+            <div class="dialog-title flex justify-between items-center">
+                <span>{{ $t('setting.newPassword2') }}</span>
+                <span class="text-yellow-400 text-xs">
+                    {{ errors.password_confirm }}
+                </span>
             </div>
+            <n-input
+                v-model:value="values.password_confirm"
+                type="password"
+                show-password-on="click"
+                :placeholder="$t('setting.newPassword2')"
+            ></n-input>
+        </div>
 
-            <!-- 选择备份文件 -->
-            <div class="dialog-title">
-                <n-upload
-                    v-if="values.uploadName == ''"
-                    @before-upload="beforeUpload"
-                    :show-file-list="false"
-                >
-                    <n-button text class="upload-button text-primary">
-                        {{ $t('public.selectFileToImport') }}
-                    </n-button>
-                </n-upload>
+        <!-- 选择备份文件 -->
+        <div class="dialog-title">
+            <n-upload
+                v-if="values.uploadName == ''"
+                @before-upload="beforeUpload"
+                :show-file-list="false"
+            >
+                <n-button text class="upload-button text-primary">
+                    {{ $t('public.selectFileToImport') }}
+                </n-button>
+            </n-upload>
 
-                <div class="upload-file-name flex items-center justify-between" v-else>
-                    <div class="flex items-center">
-                        <icon-file-success size="16" fill="#3f3f3f" class="cursor-pointer" />
-                        <span class="px-2">{{ values.uploadName }}</span>
-                    </div>
-                    <icon-close
-                        size="16"
-                        fill="#3f3f3f"
-                        @click="removeUpload"
-                        class="cursor-pointer"
-                    />
+            <div class="upload-file-name flex items-center justify-between" v-else>
+                <div class="flex items-center">
+                    <icon-file-success size="16" fill="#3f3f3f" class="cursor-pointer" />
+                    <span class="px-2">{{ values.uploadName }}</span>
                 </div>
+                <icon-close size="16" fill="#3f3f3f" @click="removeUpload" class="cursor-pointer" />
             </div>
-
-            <template #footer>
-                <!-- 决定按钮 -->
-                <div class="dialog-foot">
-                    <n-button class="bg-white" @click="$emit('close')">
-                        {{ $t('public.cancel') }}
-                    </n-button>
-                    <n-button class="bg-primary ml-3" type="primary" @click="onSubmit()">
-                        {{ $t('public.import') }}
-                    </n-button>
-                </div>
-            </template>
-        </n-card>
-    </n-modal>
+        </div>
+    </modal>
 </template>
 
 <style lang="scss" scoped></style>

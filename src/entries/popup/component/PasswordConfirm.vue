@@ -22,23 +22,18 @@ const submitHandle = () => {
 </script>
 
 <template>
-    <n-modal :show="props.isShow" @mask-click="$emit('close')">
-        <n-card class="w-5/6" :title="props.title" :bordered="false">
-            <n-input
-                type="password"
-                :placeholder="$t('password.inputPasswrod')"
-                v-model:value="password"
-            />
-            <div class="mt-5 flex justify-end">
-                <n-button class="mr-2" @click="$emit('close')">
-                    {{ $t('public.cancel') }}
-                </n-button>
-                <n-button type="primary" @click="submitHandle">
-                    {{ $t('public.ok') }}
-                </n-button>
-            </div>
-        </n-card>
-    </n-modal>
+    <modal
+        :is-show="props.isShow"
+        :title="props.title"
+        @close="$emit('close')"
+        @submit="submitHandle"
+    >
+        <n-input
+            type="password"
+            :placeholder="$t('password.inputPasswrod')"
+            v-model:value="password"
+        />
+    </modal>
 </template>
 
 <style lang="scss" scoped></style>

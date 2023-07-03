@@ -34,41 +34,44 @@ const useKeyHandle = () => {
 </script>
 
 <template>
-    <n-modal :show="props.isShow" @mask-click="$emit('close')">
-        <n-card class="w-5/6" :title="$t('setting.generatePublicKey')" :bordered="false">
-            <div class="dialog-box">
-                <!-- public key -->
-                <div class="dialog-cell py-3">
-                    <div class="dialog-cell-left">{{ $t('setting.newPublicKey') }}</div>
-                    <clip-button :value="publicKey" />
-                </div>
-
-                <!-- private key -->
-                <div class="dialog-cell py-3">
-                    <div class="dialog-cell-left">{{ $t('setting.newPrivateKey') }}</div>
-                    <clip-button :value="privateKey" />
-                </div>
-
-                <!-- tip -->
-                <div class="dialog-tip">
-                    <div class="dialog-tip-one">{{ $t('setting.notice') }}</div>
-                    <div class="dialog-tip-one">- {{ $t('setting.generateTipOne') }}</div>
-                    <div class="dialog-tip-one">- {{ $t('setting.generateTipTwo') }}</div>
-                    <div class="dialog-tip-one">- {{ $t('setting.generateTipThree') }}</div>
-                </div>
-
-                <!-- button -->
-                <div class="flex justify-between mt-3">
-                    <n-button @click="generateKeyHandle" class="dialog-change-button">
-                        {{ $t('setting.refresh') }}
-                    </n-button>
-                    <n-button type="primary" @click="useKeyHandle" class="dialog-change-button">
-                        {{ $t('setting.useIt') }}
-                    </n-button>
-                </div>
+    <modal
+        :is-show="props.isShow"
+        :title="$t('setting.generatePublicKey')"
+        :is-cus-footer="true"
+        @close="$emit('close')"
+    >
+        <div class="dialog-box">
+            <!-- public key -->
+            <div class="dialog-cell py-3">
+                <div class="dialog-cell-left">{{ $t('setting.newPublicKey') }}</div>
+                <clip-button :value="publicKey" />
             </div>
-        </n-card>
-    </n-modal>
+
+            <!-- private key -->
+            <div class="dialog-cell py-3">
+                <div class="dialog-cell-left">{{ $t('setting.newPrivateKey') }}</div>
+                <clip-button :value="privateKey" />
+            </div>
+
+            <!-- tip -->
+            <div class="dialog-tip">
+                <div class="dialog-tip-one">{{ $t('setting.notice') }}</div>
+                <div class="dialog-tip-one">- {{ $t('setting.generateTipOne') }}</div>
+                <div class="dialog-tip-one">- {{ $t('setting.generateTipTwo') }}</div>
+                <div class="dialog-tip-one">- {{ $t('setting.generateTipThree') }}</div>
+            </div>
+
+            <!-- button -->
+            <div class="flex justify-between mt-3">
+                <n-button @click="generateKeyHandle" class="dialog-change-button">
+                    {{ $t('setting.refresh') }}
+                </n-button>
+                <n-button type="primary" @click="useKeyHandle" class="dialog-change-button">
+                    {{ $t('setting.useIt') }}
+                </n-button>
+            </div>
+        </div>
+    </modal>
 </template>
 
 <style lang="scss" scoped>
