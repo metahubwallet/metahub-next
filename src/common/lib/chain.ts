@@ -2,8 +2,8 @@ import EOS from '@/common/lib/eos';
 import { decrypt, md5 } from '@/common/util/crypto';
 import { ErrorCode } from '@/common/util/type';
 import { Perm, Wallet } from '@/store/wallet/type';
+import { i18n } from '../plugin/lang';
 
-const { t } = useI18n();
 export default class Chain {
     static chains: any = {};
 
@@ -67,9 +67,12 @@ export default class Chain {
 
     static get(chainId: string = '') {
         if (chainId == '') chainId = store.chain().currentChainId;
-
         if (typeof this.chains[chainId] == 'undefined') {
-            this.chains[chainId] = new EOS(chainId, store.chain().getSelectedRpc(chainId), this);
+            this.chains[chainId] = new EOS(
+                chainId,
+                store.chain().getSelectedRpc(chainId) as string,
+                this
+            );
         }
         return this.chains[chainId];
     }
@@ -102,31 +105,31 @@ export default class Chain {
             }
             if (e.name) {
                 if (e.name == 'tx_cpu_usage_exceeded' || e.name == 'leeway_deadline_exception') {
-                    return t('public.resourceCPULimit');
+                    return i18n.global.t('public.resourceCPULimit');
                 }
                 if (e.name == 'tx_net_usage_exceeded') {
-                    return t('public.resourceNetLimit');
+                    return i18n.global.t('public.resourceNetLimit');
                 }
                 if (e.name == 'ram_usage_exceeded') {
-                    return t('public.resourceLimitRam');
+                    return i18n.global.t('public.resourceLimitRam');
                 }
             }
             if (e.details) {
                 const msg = e.details[0].message;
                 if (msg.indexOf('first transfer must be EOS') > -1) {
-                    return t('error.firstNeedEOS');
+                    return i18n.global.t('error.firstNeedEOS');
                 }
                 return msg;
             }
             let msg = e.message;
             if (msg && msg.length < 100) {
                 if (msg.indexOf('reach free cpu') != -1) {
-                    return t('error.cpuTimeLimit');
+                    return i18n.global.t('error.cpuTimeLimit');
                 }
                 return msg;
             }
         }
-        return t('public.requestHttpEndpointTimeout');
+        return i18n.global.t('public.requestHttpEndpointTimeout');
     }
 
     static authorityProvider(chainId: string) {
@@ -230,7 +233,7 @@ export default class Chain {
             result.permissions = accinfo.permissions;
         } catch (e) {
             result.code = ErrorCode.HTTP_END_POINT_ERROR;
-            result.msg = t('public.requestHttpEndpointTimeout');
+            result.msg = i18n.global.t('public.requestHttpEndpointTimeout');
             return result;
         }
         return result;
