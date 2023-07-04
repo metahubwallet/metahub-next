@@ -62,8 +62,7 @@ const checkReceiver = async () => {
         return (receiverError.value = t('wallet.errorReceiver'));
     else {
         isShowMemo.value = true;
-        let accountData = null;
-        // let accountData = await chain.get().getAccount(form.receiver.value);
+        let accountData = await chain.get().getAccount(form.receiver);
         if (accountData == null) return (receiverError.value = t('wallet.accountNotExist'));
     }
     receiverError.value = '';
@@ -102,10 +101,9 @@ const changeTokenHandle = (coin: Coin) => {
 
 // 获取余额
 const getBalance = async () => {
-    const balance = '0 eos';
-    // const balance = await chain
-    //     .get()
-    //     .getCurrencyBalance(targetCoin.contract, wallet.currentWallet.name, targetCoin.symbol);
+    const balance = await chain
+        .get()
+        .getCurrencyBalance(targetCoin.contract, wallet.currentWallet.name, targetCoin.symbol);
     if (balance) targetCoin.amount = Number(balance.split(' ')[0]);
 };
 

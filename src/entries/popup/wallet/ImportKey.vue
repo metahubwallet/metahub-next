@@ -4,6 +4,9 @@ import { eosChainId, getNetworkLocalIcon } from '@/common/util/network';
 import { Network } from '@/store/chain/type';
 import { sha256, md5, encrypt } from '@/common/util/crypto';
 import bs58 from 'bs58';
+import { Address } from 'ethereumjs-util';
+import chain from '@/common/lib/chain';
+import { getKeyAccounts, lightKey } from '@/common/lib/remote';
 
 const { t } = useI18n();
 
@@ -37,12 +40,11 @@ const importKeyHandle = async () => {
     /** 循环遍历需要取的协议 */
     const importAccounts = [];
     let tipMessage = t('public.noAccountForPrivateKey');
-    let isKey = false;
-    // let isKey = chain.get().isValidPrivate(privateKey.value);
+    let isKey = chain.get().isValidPrivate(privateKey.value);
     let ethAddress = '';
     if (!isKey && privateKey.value.length == 64) {
         const privateKeyHex = Buffer.from(privateKey.value, 'hex');
-        // ethAddress = Address.fromPrivateKey(privateKeyHex).toString();
+        ethAddress = Address.fromPrivateKey(privateKeyHex).toString();
 
         let versionedKey = '80' + privateKey.value;
         const sha256dKey: any = sha256(Buffer.from(versionedKey, 'hex'));
@@ -62,8 +64,7 @@ const importKeyHandle = async () => {
             .toUpperCase();
         chainAccount.blockchain = 'eos'; // eth, tron ...
         chainAccount.smoothMode = false; // 默认关闭顺畅模式
-        const publicKey = '';
-        // const publicKey = chain.get(network.chainId).privateToPublic(privateKey.value);
+        const publicKey = chain.get(network?.chainId).privateToPublic(privateKey.value);
         privateKey.value = encrypt(
             privateKey.value,
             md5(chainAccount.seed + store.user().password)
@@ -73,15 +74,14 @@ const importKeyHandle = async () => {
         try {
             let accounts: any = [];
             try {
-                // accounts = await getKeyAccounts(network.chain, publicKey);
+                accounts = await getKeyAccounts(network?.chain as lightKey, publicKey);
             } catch (e) {
                 accounts = [];
             }
             if (accounts.length == 0)
                 if (accounts.length == 0)
-                    // accounts = await chain.get(network.chainId).getKeyAccounts(publicKey);
-
-                    tipMessage = t('public.noAccountForPrivateKey');
+                    accounts = await chain.get(network?.chainId).getKeyAccounts(publicKey);
+            tipMessage = t('public.noAccountForPrivateKey');
 
             for (let account of accounts) {
                 const newAccount = Object.assign({}, chainAccount);
@@ -125,7 +125,7 @@ const emit = defineEmits(['refreshTokens']);
 const importWallet = async (wallets: any) => {
     for (const wallet of wallets) {
         store.wallet().wallets.push(wallet);
-        // await chain.fetchPermissions(wallet.name, wallet.chainId);
+        await chain.fetchPermissions(wallet.name, wallet.chainId);
     }
     store.wallet().wallets.sort(sortAccounts);
     store.wallet().setWallets(store.wallet().wallets);

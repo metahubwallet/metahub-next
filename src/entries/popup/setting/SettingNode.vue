@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
+import { getEndpoints } from '@/common/lib/remote';
 import { RPC } from '@/store/chain/type';
 import _ from 'lodash';
 
@@ -20,8 +21,7 @@ onMounted(() => {
 
 // 加载默认节点
 const loadRecommendEndpoints = async () => {
-    const endpoints: any[] = [];
-    // const endpoints = await getEndpoints(chainId.value);
+    const endpoints = await getEndpoints(chainId.value);
     if (endpoints && endpoints.length) {
         for (const endpoint of endpoints) {
             endpoint.delay = '';
@@ -36,7 +36,7 @@ const pingEndpoints = async (endpoints: RPC[]) => {
     for (let item of endpoints) {
         const startTimestamp = new Date().getTime();
         try {
-            // await chain.get().testHttpEndpoint(item.endpoint);
+            await chain.get().testHttpEndpoint(item.endpoint);
             const endTimestamp = new Date().getTime();
             const timeInterval = endTimestamp - startTimestamp;
             item.delay = timeInterval + 'ms';
@@ -55,7 +55,7 @@ const selectNodeHandle = (item: RPC) => {
 
     try {
         // 更新URL
-        // chain.get(chainId.value).updateHttpEndpoint(item.endpoint);
+        chain.get(chainId.value).updateHttpEndpoint(item.endpoint);
         window.msg.success(t('public.executeSuccess'));
     } catch (error) {
         window.msg.error(error);
@@ -114,9 +114,9 @@ const addCustomEndpoint = async () => {
 
     const startTimestamp = new Date().getTime();
     try {
-        // await chain.get().testHttpEndpoint(completeUrl);
+        await chain.get().testHttpEndpoint(completeUrl);
     } catch (e) {
-        // return window.msg.error(chain.getErrorMsg(e));
+        return window.msg.error(chain.getErrorMsg(e));
     }
     let endTimestamp = new Date().getTime();
 

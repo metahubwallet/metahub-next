@@ -41,11 +41,10 @@ onBeforeMount(() => {
 });
 
 onMounted(async () => {
-    let result: any = null;
-    // let result = await chain.fetchPermissions(
-    //     wallet.currentWallet.name,
-    //     wallet.currentWallet.chainId
-    // );
+    let result = await chain.fetchPermissions(
+        wallet.currentWallet.name,
+        wallet.currentWallet.chainId
+    );
     if (result.code != 200) return window.msg.error(result.msg);
 
     for (const p of result.permissions) {
@@ -83,21 +82,21 @@ const removeHandle = async (
     walletAuthType: string,
     newOperateKey?: string
 ) => {
-    // let newPerms = await chain
-    //     .get(chainId.value)
-    //     .updateNewPermissions(perms, authType, operateType, oldOperateKey, newOperateKey);
+    let newPerms = await chain
+        .get(chainId.value)
+        .updateNewPermissions(perms, authType, operateType, oldOperateKey, newOperateKey);
     try {
-        // await chain
-        //     .get(chainId.value)
-        //     .updatePerms(
-        //         account.value,
-        //         newPerms,
-        //         chain.getAuthByAccount(account.value.name, walletAuthType)
-        //     );
-        // perms = newPerms;
+        await chain
+            .get(chainId.value)
+            .updatePerms(
+                account.value,
+                newPerms,
+                chain.getAuthByAccount(account.value.name, walletAuthType)
+            );
+        perms = newPerms;
         window.msg.success(t('public.executeSuccess'));
     } catch (e) {
-        // window.msg.error(chain.getErrorMsg(e))
+        window.msg.error(chain.getErrorMsg(e));
     }
 };
 
@@ -160,11 +159,10 @@ const activeRemoveHandle = (oldOperateKey: string) => {
 const showPasswordConfirm = ref(false);
 const emit = defineEmits(['refreshTokens']);
 const removeAccountClicked = () => {
-    let index = 0;
-    // let index = chain.findLocalAccount(
-    //     wallet.currentWallet.name,
-    //     wallet.currentWallet.chainId
-    // ).index;
+    let index = chain.findLocalAccount(
+        wallet.currentWallet.name,
+        wallet.currentWallet.chainId
+    ).index;
     wallet.wallets.splice(index, 1);
     wallet.setWallets(wallet.wallets);
     if (wallet.wallets.length > 0) {

@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import chain from '@/common/lib/chain';
+
 interface Props {
     isShow: boolean;
+    chainId: string;
 }
 const props = withDefaults(defineProps<Props>(), {});
 
@@ -17,8 +20,7 @@ watch(
 const publicKey = ref('');
 const privateKey = ref('');
 const generateKeyHandle = async () => {
-    let keypair = null as any;
-    // let keypair = await chain.get(chainId.value).getRandomPairKey();
+    let keypair = await chain.get(props.chainId).getRandomPairKey();
     if (keypair) {
         publicKey.value = keypair.publicKey;
         privateKey.value = keypair.privateKey;

@@ -32,16 +32,15 @@ const { t } = useI18n();
 const emit = defineEmits(['close', 'loadData', 'refreshTokens']);
 const submit = async (item: any) => {
     try {
-        let result = '';
-        // let result = await chain
-        //     .get()
-        //     .undelegatebw(item.from, item.to, item.net_weight, item.cpu_weight, chain.getAuth());
+        await chain
+            .get()
+            .undelegatebw(item.from, item.to, item.net_weight, item.cpu_weight, chain.getAuth());
         window.msg.success(t('resource.stakeSuccess'));
         emit('close');
         emit('loadData');
         emit('refreshTokens', true);
     } catch (e) {
-        // window.msg.error(chain.getErrorMsg(e));
+        window.msg.error(chain.getErrorMsg(e));
     }
 };
 
@@ -50,8 +49,7 @@ const { currentWallet } = store.wallet();
 const loadOtherDetailData = async () => {
     otherCPU.value = [];
     otherNET.value = [];
-    let stakeList = [] as any;
-    // let stakeList = await chain.get().getDelegatebwList(currentWallet.name);
+    let stakeList = await chain.get().getDelegatebwList(currentWallet.name);
     for (let index = 0; index < stakeList.length; index++) {
         const stakeRow = stakeList[index];
         if (stakeRow.to != currentWallet.name) {

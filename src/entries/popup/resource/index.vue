@@ -31,9 +31,8 @@ const ramprice = ref(0);
 let resourceData = reactive({} as ResourceData);
 const loadData = async () => {
     try {
-        // stakeList.value = await chain.get().getDelegatebwList(wallet.currentWallet.name);
-        const data = {} as ResourceData;
-        // const data: ResourceData = await chain.get().getAccount(wallet.currentWallet.name);
+        stakeList.value = await chain.get().getDelegatebwList(wallet.currentWallet.name);
+        const data: ResourceData = await chain.get().getAccount(wallet.currentWallet.name);
         data.cpu_limit.percentage =
             data.cpu_limit.max > 0
                 ? parseInt((data.cpu_limit.used / data.cpu_limit.max) * 100 + '')
@@ -110,8 +109,7 @@ const loadData = async () => {
         console.log(e);
     }
     try {
-        let rammarketData = {} as any;
-        // let rammarketData = await chain.get().getRamMarket();
+        let rammarketData = await chain.get().getRamMarket();
         let balance1 = parseFloat(rammarketData.rows[0].quote.balance);
         let balance2 = parseFloat(rammarketData.rows[0].base.balance);
         ramprice.value = (balance1 / balance2) * 1024;

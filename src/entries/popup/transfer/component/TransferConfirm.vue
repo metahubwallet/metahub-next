@@ -53,12 +53,12 @@ const submitHandle = async () => {
             props.transfer.quantity + ' ' + props.transfer.symbol,
             memo,
         ];
-        // await chain.get().transfer(...params, chain.getAuth());
+        await chain.get().transfer(...params, chain.getAuth());
         window.msg.success(t('wallet.transferSuccess'));
 
         router.go(-1);
     } catch (e) {
-        // window.msg.error(chain.getErrorMsg(e));
+        window.msg.error(chain.getErrorMsg(e));
     }
 };
 </script>

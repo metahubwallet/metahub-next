@@ -52,9 +52,9 @@ const onSubmit = async () => {
         if (action.value == 'buyRam') {
             const precision = store.chain().currentNetwork.token.precision;
             let value = inputValue.value.toFixed(precision) + ' ' + currentSymbol;
-            // result = await chain
-            //     .get()
-            //     .buyRam(wallet.currentWallet.name, receiver.value, value, chain.getAuth());
+            result = await chain
+                .get()
+                .buyRam(wallet.currentWallet.name, receiver.value, value, chain.getAuth());
         }
         // 出售
         else if (action.value == 'sellRam') {
@@ -64,7 +64,7 @@ const onSubmit = async () => {
                 submitLoading.value = false;
                 return window.msg.warning(t('resource.valueSizeError'));
             }
-            // result = await chain.get().sellRam(wallet.currentWallet.name, value, chain.getAuth());
+            result = await chain.get().sellRam(wallet.currentWallet.name, value, chain.getAuth());
         }
         window.msg.success(t('resource.stakeSuccess'));
 
@@ -74,7 +74,7 @@ const onSubmit = async () => {
         emit('loadData');
         emit('refreshTokens', true);
     } catch (e) {
-        // window.msg.error(chain.getErrorMsg(e));
+        window.msg.error(chain.getErrorMsg(e));
     } finally {
         modalVisible.value = false;
         submitLoading.value = false;

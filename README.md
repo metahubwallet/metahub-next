@@ -18,7 +18,7 @@ Hot Module Reloading is used to load changes inline without requiring extension 
 Currently only works in Chromium based browsers.
 
 ```sh
-npm run dev
+npm run watch
 ```
 
 ### Build

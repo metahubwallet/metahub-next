@@ -32,7 +32,7 @@ const hyperionApis = {
     'proton-test': 'https://testnet.protonchain.com',
 };
 
-type lightKey =
+export type lightKey =
     | 'eos'
     | 'wax'
     | 'telos'
@@ -92,7 +92,7 @@ export const getKeyAccounts = async (chain: lightKey, publicKey: string) => {
 };
 
 export const getBalanceList = async (
-    account: number,
+    account: string,
     tokens: Coin[],
     onBlanceInquired: Function
 ) => {

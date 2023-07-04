@@ -27,10 +27,9 @@ onMounted(() => {
 
 // 获取余额
 const getBalance = async () => {
-    const balance = '0 EOS';
-    // const balance = await chain
-    //     .get()
-    //     .getCurrencyBalance(token.contract, wallet.currentWallet.name, token.symbol);
+    const balance = await chain
+        .get()
+        .getCurrencyBalance(token.contract, wallet.currentWallet.name, token.symbol);
     if (balance) {
         token.amount = Number(balance.split(' ')[0]);
     }
@@ -45,7 +44,7 @@ const getTraceList = async () => {
         filter: `${token.contract}:*`,
         sort: 'desc',
     };
-    // traceList.value = await getTransactionList(chain, params);
+    traceList.value = await getTransactionList(chain, params);
 };
 
 // 跳转至转账页面

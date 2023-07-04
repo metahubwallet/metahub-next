@@ -36,14 +36,13 @@ const wallet = store.wallet();
 const emit = defineEmits(['loadData', 'refreshTokens']);
 const refundNow = async () => {
     try {
-        let result = '';
-        // let result = await chain.get().refund(wallet.currentWallet.name, chain.getAuth());
+        await chain.get().refund(wallet.currentWallet.name, chain.getAuth());
 
         window.msg.success(t('resource.stakeSuccess'));
         emit('loadData');
         emit('refreshTokens', true);
     } catch (e) {
-        // window.msg.success(chain.getErrorMsg(e))
+        window.msg.success(chain.getErrorMsg(e));
     }
 };
 
@@ -136,37 +135,35 @@ const submitHandle = async () => {
     let cpu = formatValue(cpuValue.value);
     let net = formatValue(netValue.value);
 
-    console.log(cpu, net);
-
     if (cpu == formatValue(0) && net == formatValue(0))
         return window.msg.warning(t('resource.valueError'));
     try {
         let result = {};
         if (action.value == 'stake') {
-            // result = await chain
-            //     .get()
-            //     .delegatebw(
-            //         wallet.currentWallet.name,
-            //         receiver.value,
-            //         netValue,
-            //         cpuValue,
-            //         transfer.value,
-            //         chain.getAuth()
-            //     );
+            result = await chain
+                .get()
+                .delegatebw(
+                    wallet.currentWallet.name,
+                    receiver.value,
+                    netValue,
+                    cpuValue,
+                    transfer.value,
+                    chain.getAuth()
+                );
         } else if (action.value == 'refund') {
-            // result = await chain
-            //     .get()
-            //     .undelegatebw(
-            //         wallet.currentWallet.name,
-            //         receiver.value,
-            //         netValue,
-            //         cpuValue,
-            //         chain.getAuth()
-            //     );
+            result = await chain
+                .get()
+                .undelegatebw(
+                    wallet.currentWallet.name,
+                    receiver.value,
+                    netValue,
+                    cpuValue,
+                    chain.getAuth()
+                );
         } else if (action.value == 'rent') {
             const powupState = await getPowupState();
             let parms = powerup(wallet.currentWallet.name, receiver.value, cpu, net, powupState);
-            // result = await chain.get().powerup(parms, chain.getAuth());
+            result = await chain.get().powerup(parms, chain.getAuth());
         }
         window.msg.success(t('resource.stakeSuccess'));
 
@@ -174,7 +171,7 @@ const submitHandle = async () => {
         emit('loadData');
         emit('refreshTokens', true);
     } catch (e) {
-        // window.msg.error(chain.getErrorMsg(e));
+        window.msg.error(chain.getErrorMsg(e));
     } finally {
         cpuValue.value = 0;
         netValue.value = 0;

@@ -30,29 +30,28 @@ const walleAuthType = computed(() => {
     else return 'active';
 });
 const onSubmit = async () => {
-    // if (!chain.get(chainId.value).isValidPublic(newOperateKey.value))
-    //     return window.msg.error(t('setting.invalidPublicKey'));
-    // let newPerms = chain.get(chainId.value).updateNewPermissions(
-    //     perms.value,
-    //     authType.value, // active or others
-    //     operateType.value, // modify or add
-    //     oldOperateKey.value, // pubkey
-    //     newOperateKey.value // pubkey
-    // );
-    // newPerms = newPerms.filter((x: any) => x.perm_name == authType.value);
-    let newPerms = [] as any;
+    if (!chain.get(chainId.value).isValidPublic(newOperateKey.value))
+        return window.msg.error(t('setting.invalidPublicKey'));
+    let newPerms = chain.get(chainId.value).updateNewPermissions(
+        perms.value,
+        authType.value, // active or others
+        operateType.value, // modify or add
+        oldOperateKey.value, // pubkey
+        newOperateKey.value // pubkey
+    );
+    newPerms = newPerms.filter((x: any) => x.perm_name == authType.value);
     try {
-        // await chain
-        //     .get(chainId.value)
-        //     .updatePerms(
-        //         account.value,
-        //         newPerms,
-        //         chain.getAuthByAccount(account.value.name, walleAuthType.value)
-        //     );
+        await chain
+            .get(chainId.value)
+            .updatePerms(
+                account.value,
+                newPerms,
+                chain.getAuthByAccount(account.value.name, walleAuthType.value)
+            );
         perms.value = newPerms;
         window.msg.success(t('public.executeSuccess'));
     } catch (e) {
-        // window.msg.success(chain.getErrorMsg(e));
+        window.msg.success(chain.getErrorMsg(e));
     }
 };
 </script>
@@ -100,6 +99,7 @@ const onSubmit = async () => {
 
             <generate-public-key
                 :is-show="showGeneratePublicKey"
+                :chain-id="chainId"
                 @close="showGeneratePublicKey = false"
                 @set-operate-key="newOperateKey = $event"
             ></generate-public-key>

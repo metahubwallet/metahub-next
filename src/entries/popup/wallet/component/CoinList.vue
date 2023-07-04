@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import EOSIcon from '@/asset/img/eos_icon.png';
 import ErrorCoinImg from '@/asset/img/placeholder.png';
-import { Coin } from '@/store/wallet/type';
+import { Coin, Token } from '@/store/wallet/type';
 import { eosChainId } from '@/common/util/network';
+import { getBalanceList } from '@/common/lib/remote';
+import chain from '@/common/lib/chain';
 
-const chain = store.chain();
+const chainStore = store.chain();
 const showAddToken = ref(false);
 
 const tokens = ref<Coin[]>([]);
@@ -18,7 +20,7 @@ const loadTokens = async () => {
     isLoad.value = true;
     if (wallet.wallets.length == 0) return;
 
-    const network = chain.currentNetwork;
+    const network = chainStore.currentNetwork;
     if (wallet.userTokens.length == 0) {
         wallet.setUserTokens([
             {
@@ -63,12 +65,12 @@ const getUserBalance = async () => {
     let userCoins = tokens.value.map((x: Coin) => {
         return { contract: x.contract, symbol: x.symbol };
     }) as Coin[];
-    // await getBalanceList(store.user().currentWallet.name, userCoins, (token: Token) => {
-    //     const selectedToken = tokens.value.find(
-    //         (x) => x.contract === token.contract && x.symbol == token.symbol
-    //     );
-    //     if (selectedToken) selectedToken.amount = token.amount;
-    // });
+    await getBalanceList(store.wallet().currentWallet.name, userCoins, (coin: Coin) => {
+        const selectedToken = tokens.value.find(
+            (x) => x.contract === coin.contract && x.symbol == coin.symbol
+        );
+        if (selectedToken) selectedToken.amount = coin.amount;
+    });
 };
 
 // 获取价格
@@ -79,8 +81,7 @@ const handleGetEosPrice = async () => {
         emit('setUnit', eosToken.symbol);
         emit('setAmount', eosToken.amount);
         if (eosToken.chain == 'eos') {
-            const eosPrice = 0;
-            // const eosPrice = await chain.get().getEosPrice();
+            const eosPrice = await chain.get().getEosPrice();
             emit('setUnit', 'usd');
             emit(
                 'setAmount',
@@ -99,9 +100,8 @@ const handleGetEosPrice = async () => {
 const getWalletCache = async () => {
     let rexEOS = 0.0;
     let rexCount = 0.0;
-    if (chain.currentChainId === eosChainId) {
-        let response: any = {};
-        // let response = await chain.get().getREXInfo(wallet.currentWallet.name);
+    if (chainStore.currentChainId === eosChainId) {
+        let response = await chain.get().getREXInfo(wallet.currentWallet.name);
         rexEOS = response['rows'][0]['vote_stake'];
         rexCount = response['rows'][0]['rex_balance'];
     }
@@ -156,7 +156,7 @@ const viewCoinHandle = (item: Coin) => {
                 <div class="resource-item-left">
                     <img
                         :src="
-                            chain.currentChain == 'eos' && item.contract === 'eosio.token'
+                            chainStore.currentChain == 'eos' && item.contract === 'eosio.token'
                                 ? EOSIcon
                                 : item.logo
                         "
