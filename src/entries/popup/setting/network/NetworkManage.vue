@@ -27,9 +27,11 @@ const removeNetwork = (network: Network) => {
     const idx = networks.findIndex((x) => x.chainId == network.chainId);
     if (idx >= 0) {
         networks.splice(idx, 1);
-        store.chain().networks = networks;
-        if (store.chain().customRpcs[network.chainId])
+        store.chain().setNetworks(networks);
+        if (store.chain().customRpcs[network.chainId]) {
             delete store.chain().customRpcs[network.chainId];
+            store.chain().setCustomRpcs(store.chain().customRpcs);
+        }
     }
 };
 </script>

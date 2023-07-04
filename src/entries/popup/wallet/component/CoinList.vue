@@ -11,21 +11,24 @@ const tokens = ref<Coin[]>([]);
 
 // 初始化Tokens
 let isLoad = ref(false);
+const wallet = store.wallet();
 const loadTokens = async () => {
     if (isLoad.value) return;
 
     isLoad.value = true;
-    if (store.wallet().wallets.length == 0) return;
+    if (wallet.wallets.length == 0) return;
 
-    const network = store.chain().currentNetwork;
-    if (store.wallet().userTokens.length == 0) {
-        store.wallet().userTokens.push({
-            amount: 0,
-            chain: network.chain,
-            ...network.token,
-        });
+    const network = chain.currentNetwork;
+    if (wallet.userTokens.length == 0) {
+        wallet.setUserTokens([
+            {
+                amount: 0,
+                chain: network.chain,
+                ...network.token,
+            },
+        ]);
     }
-    tokens.value = store.wallet().userTokens.concat();
+    tokens.value = wallet.userTokens.concat();
 
     getCoinsLogo(tokens.value);
 
@@ -39,7 +42,7 @@ onMounted(async () => {
     await loadTokens();
 });
 watch(
-    () => store.wallet().selectedIndex,
+    () => wallet.selectedIndex,
     (newValue, oldValue) => {
         if (newValue !== oldValue) loadTokens();
     }
@@ -49,7 +52,7 @@ watch(
 const getCoinsLogo = (coins: Coin[]) => {
     for (const coin of coins) {
         if (!coin.logo) {
-            const t = store.wallet().getCoin(coin);
+            const t = wallet.getCoin(coin);
             if (t.logo) coin.logo = t.logo;
         }
     }
@@ -96,17 +99,15 @@ const handleGetEosPrice = async () => {
 const getWalletCache = async () => {
     let rexEOS = 0.0;
     let rexCount = 0.0;
-    if (store.chain().currentChainId === eosChainId) {
+    if (chain.currentChainId === eosChainId) {
         let response: any = {};
-        // let response = await chain.get().getREXInfo(store.wallet().currentWallet.name);
+        // let response = await chain.get().getREXInfo(wallet.currentWallet.name);
         rexEOS = response['rows'][0]['vote_stake'];
         rexCount = response['rows'][0]['rex_balance'];
     }
-    const walletCaches = store.wallet().walletCaches;
+    const walletCaches = wallet.walletCaches;
     let currentWalletCaches =
-        walletCaches[
-            store.wallet().currentWallet?.name + '@' + store.wallet().currentWallet?.chainId
-        ];
+        walletCaches[wallet.currentWallet?.name + '@' + wallet.currentWallet?.chainId];
     if (!currentWalletCaches) return;
     currentWalletCaches['rexEOS'] = rexEOS;
     currentWalletCaches['rexCount'] = rexCount;

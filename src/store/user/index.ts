@@ -5,4 +5,11 @@ export default defineStore('user', {
         password: '',
         passwordHash: '',
     }),
+
+    actions: {
+        async setPasswordHash(hash: string) {
+            this.passwordHash = hash;
+            await localCache.set('passwordHash', hash);
+        },
+    },
 });

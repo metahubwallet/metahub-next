@@ -40,6 +40,7 @@ const addTokenHandle = async () => {
                 return;
             }
             store.wallet().userTokens.push(token);
+            store.wallet().setUserTokens(store.wallet().userTokens);
             emit('refreshTokens', true);
             window.msg.success(t('wallet.addTokenSuccessfully'));
             router.go(-1);

@@ -110,9 +110,11 @@ const addHandle = (e: any) => {
 // 添加自定义网络
 const addNetwork = (network: Network) => {
     store.chain().networks.push(network);
+    store.chain().setNetworks(store.chain().networks);
+
     const selectedRpc = store.chain().selectedRpc;
     selectedRpc[network.chainId] = network.endpoint;
-    store.chain().selectedRpc = selectedRpc;
+    store.chain().setSelectedRpc(selectedRpc);
 
     const customRpcs = store.chain().customRpcs;
     customRpcs[network.chainId] = [
@@ -121,7 +123,7 @@ const addNetwork = (network: Network) => {
             endpoint: network.endpoint,
         },
     ];
-    store.chain().customRpcs = customRpcs;
+    store.chain().setCustomRpcs(customRpcs);
 };
 </script>
 

@@ -28,9 +28,10 @@ const addHandle = (network: Network) => {
 // 新增网络
 const addNetwork = (network: Network) => {
     chainStore.networks.push(network);
+    chainStore.setNetworks(chainStore.networks);
     const selectedRpc = chainStore.selectedRpc;
     selectedRpc[network.chainId] = network.endpoint;
-    chainStore.selectedRpc = selectedRpc;
+    chainStore.setSelectedRpc(selectedRpc);
 
     const customRpcs = chainStore.customRpcs;
     customRpcs[network.chainId] = [
@@ -39,7 +40,7 @@ const addNetwork = (network: Network) => {
             endpoint: network.endpoint,
         },
     ];
-    chainStore.customRpcs = customRpcs;
+    chainStore.setCustomRpcs(customRpcs);
 };
 
 // 确定移除
@@ -66,12 +67,12 @@ const removeNetwork = (network: Network) => {
     if (index >= 0) {
         const networks = chainStore.networks;
         networks.splice(index, 1);
-        chainStore.networks = networks;
+        chainStore.setNetworks(networks);
 
         const customRpcs = chainStore.customRpcs;
         if (customRpcs[network.chainId]) {
             delete customRpcs[network.chainId];
-            chainStore.customRpcs = customRpcs;
+            chainStore.setCustomRpcs(customRpcs);
         }
     }
 };

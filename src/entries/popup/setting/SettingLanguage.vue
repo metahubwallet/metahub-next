@@ -17,7 +17,7 @@ const currentLanguage = computed(() => i18n.global.locale);
 const { locale } = useI18n();
 const changeLangHandle = async (value: any) => {
     locale.value = value;
-    await localCache.set('lang', value);
+    store.setting().setLang(value);
 };
 </script>
 

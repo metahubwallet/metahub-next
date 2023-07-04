@@ -99,16 +99,16 @@ const importWalletsFromData = async (content: string) => {
         }
     }
 
-    store.wallet().wallets = importData.wallets;
-    store.wallet().userTokens = importData.userTokens;
-    store.wallet().selectedIndex = importData.selectedIndex;
-    store.chain().networks = importData.networks;
-    store.chain().selectedRpc = importData.selectedRpc;
-    store.chain().customRpcs = importData.customRpcs;
+    store.wallet().setWallets(importData.wallets);
+    store.wallet().setUserTokens(importData.userTokens);
+    store.wallet().setSelectedIndex(importData.selectedIndex);
+    store.chain().setNetworks(importData.networks);
+    store.chain().setSelectedRpc(importData.selectedRpc);
+    store.chain().setCustomRpcs(importData.customRpcs);
     store.user().password = importData.password;
-    store.user().passwordHash = importData.passwordHash;
-    store.setting().isLock = true;
-    await localCache.set('lang', importData.language);
+    store.user().setPasswordHash(importData.passwordHash);
+    store.setting().setIsLock(true);
+    store.setting().setLang(importData.language);
 
     emits('refreshTokens', true);
     router.push({ name: 'index' });

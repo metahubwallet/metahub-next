@@ -11,12 +11,12 @@ const router = useRouter();
 
 // 确认销毁
 const showConfirmModal = ref(false);
-const confirmHandle = () => {
-    store.wallet().wallets = [];
-    store.wallet().userTokens = [];
+const confirmHandle = async () => {
+    store.wallet().setWallets([]);
+    store.wallet().setUserTokens([]);
     store.user().password = '';
-    store.user().passwordHash = '';
-    store.setting().isLock = true;
+    store.user().setPasswordHash('');
+    store.setting().setIsLock(true);
 
     router.push('/');
     window.msg.success(t('password.deleteSuccess'));

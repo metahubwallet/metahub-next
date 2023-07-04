@@ -128,10 +128,11 @@ const importWallet = async (wallets: any) => {
         // await chain.fetchPermissions(wallet.name, wallet.chainId);
     }
     store.wallet().wallets.sort(sortAccounts);
+    store.wallet().setWallets(store.wallet().wallets);
 
     const firstWallet = wallets[0];
     let index = store.wallet().wallets.indexOf(firstWallet);
-    store.wallet().selectedIndex = index >= 0 ? index : 0;
+    store.wallet().setSelectedIndex(index >= 0 ? index : 0);
 
     setTimeout(() => {
         emit('refreshTokens', true);

@@ -50,6 +50,7 @@ const pingEndpoints = async (endpoints: RPC[]) => {
 const recommendEndpoints = ref<RPC[]>([]);
 const selectNodeHandle = (item: RPC) => {
     store.chain().selectedRpc[chainId.value] = item.endpoint;
+    store.chain().setSelectedRpc(store.chain().selectedRpc);
     selectedHttpApi.value = item.endpoint;
 
     try {

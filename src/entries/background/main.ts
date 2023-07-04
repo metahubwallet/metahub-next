@@ -161,8 +161,11 @@ class Background {
                             (y) =>
                                 x.chainId == y.chainId &&
                                 x.name == y.name &&
-                                y.keys.findIndex((z) => z.permissions.indexOf(x.authority) >= 0) >=
-                                    0
+                                y.keys.findIndex((z) => {
+                                    return z.permissions.findIndex((item) => {
+                                        return item.perm_name === x.authority;
+                                    });
+                                }) >= 0
                         ) >= 0
                     );
                 });
@@ -536,12 +539,26 @@ class Background {
     static async requestRequiredKeys(availableKeys: string[]) {
         if (availableKeys.length == 1) return availableKeys;
 
-        // todo: find auths by transaction
         return [availableKeys[0]];
+    }
+
+    static async cacheChainInfoInterval() {
+        const wallets = (await localCache.get('wallets', [])) as Wallet[];
+        const selectedIndex = (await localCache.get('selectedIndex', -1)) as number;
+
+        if (wallets.length > 0 && selectedIndex >= 0) {
+            const currentWallet = wallets[selectedIndex];
+            const currentChainId = currentWallet.chainId;
+            this.cacheChainInfo(currentChainId);
+        }
+        setTimeout(() => {
+            this.cacheChainInfoInterval();
+        }, 1000 * 60); // 1 min
     }
 }
 
 new Background();
+Background.cacheChainInfoInterval();
 
 export const vars = {
     isLock: true,

@@ -4,9 +4,8 @@ import { Wallet } from '@/store/wallet/type';
 
 const props = defineProps<{ accountList: Wallet[] }>();
 
-const wallets = ref<Wallet[]>([]);
-
 // 初始化wallets
+const wallets = ref<Wallet[]>([]);
 onMounted(() => {
     let accounts = _.cloneDeep(props.accountList);
     accounts.forEach((item, index) => {

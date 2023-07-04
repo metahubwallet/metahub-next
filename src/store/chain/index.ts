@@ -29,4 +29,18 @@ export default defineStore('chain', {
             return network ? network.token.symbol : 'EOS';
         },
     },
+    actions: {
+        async setNetworks(networks: Network[]) {
+            this.networks = networks;
+            await localCache.set('networks', networks);
+        },
+        async setSelectedRpc(rpc: RPC) {
+            this.selectedRpc = rpc;
+            await localCache.set('selectedRpc', rpc);
+        },
+        async setCustomRpcs(rpcs: Record<string, RPC[]>) {
+            this.customRpcs = rpcs;
+            await localCache.set('customRpcs', rpcs);
+        },
+    },
 });

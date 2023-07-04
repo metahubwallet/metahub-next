@@ -22,7 +22,7 @@ const changePasswordHandle = async () => {
         return window.msg.warning(t('public.passwordNoSame'));
 
     // 密码存储
-    store.user().passwordHash = password2(passwordNew.value);
+    store.user().setPasswordHash(password2(passwordNew.value));
     // 秘钥重新加密。。。
     for (const wallet of store.wallet().wallets) {
         for (const key of wallet.keys) {
@@ -31,7 +31,7 @@ const changePasswordHandle = async () => {
         }
     }
     store.user().password = '';
-    store.setting().isLock = true;
+    store.setting().setIsLock(true);
 };
 </script>
 

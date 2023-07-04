@@ -15,6 +15,7 @@ const deleteWhiteListHandle = (list: WhiteItem[]) => {
                 store.wallet().whitelist.splice(index, 1);
         });
     });
+    store.wallet().setWhitelist(store.wallet().whitelist);
     getData();
 };
 

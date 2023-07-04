@@ -166,11 +166,12 @@ const removeAccountClicked = () => {
     //     wallet.currentWallet.chainId
     // ).index;
     wallet.wallets.splice(index, 1);
+    wallet.setWallets(wallet.wallets);
     if (wallet.wallets.length > 0) {
         const firstWallet = wallet.wallets[0];
         let index = wallet.wallets.indexOf(firstWallet);
-        wallet.selectedIndex = index >= 0 ? index : 0;
-    } else wallet.selectedIndex = 0;
+        wallet.setSelectedIndex(index >= 0 ? index : 0);
+    } else wallet.setSelectedIndex(0);
 
     emit('refreshTokens', true);
     router.go(-1);

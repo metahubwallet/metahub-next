@@ -5,12 +5,10 @@ import Windows from '@/common/lib/windows';
 const user = store.user();
 const setting = store.setting();
 onMounted(async () => {
-    await localCache.get('passwordHash').then(async (res: any) => {
-        store.user().passwordHash = res;
-        await localCache.get('isLock', true).then((res: any) => {
-            store.setting().isLock = res;
-        });
-    });
+    const passwordHash = await localCache.get('passwordHash');
+    store.user().setPasswordHash(passwordHash + '');
+    const isLock = (await localCache.get('isLock', true)) as boolean;
+    store.setting().setIsLock(isLock);
 });
 
 // 钱包选择

@@ -14,12 +14,13 @@ const emit = defineEmits(['close', 'importKey']);
 const handleLock = () => {
     emit('close');
     store.user().password = '';
-    store.setting().isLock = true;
+    store.setting().setIsLock(true);
 };
 
 // 获取网络图标
+const chain = store.chain();
+const activeChainId = ref(chain.currentChainId);
 const { networks } = store.chain();
-const activeChainId = ref(store.chain().currentChainId);
 const getNetworkIcon = (item: Network) => {
     return getNetworkLocalIcon(item.chain, item.chainId == activeChainId.value);
 };
@@ -31,14 +32,13 @@ const importKeyHandle = (chainId: string) => {
 
 // 搜索账号
 const searchName = ref('');
+const wallet = store.wallet();
 const accounts = computed(() => {
-    return store
-        .wallet()
-        .wallets.filter(
-            (x) =>
-                x.chainId == activeChainId.value &&
-                (searchName.value == '' || x.account.includes(searchName.value))
-        );
+    return wallet.wallets.filter(
+        (x) =>
+            x.chainId == activeChainId.value &&
+            (searchName.value == '' || x.account.includes(searchName.value))
+    );
 });
 
 // 账号模糊显示
@@ -49,13 +49,10 @@ const showAccount = (account: string) => {
 
 // 选择账号
 const accountSelectHandle = (account: Wallet) => {
-    let index = store.wallet().wallets.indexOf(account);
-    store.wallet().selectedIndex = index;
+    let index = wallet.wallets.indexOf(account);
+    wallet.setSelectedIndex(index);
     emit('close');
 };
-
-const wallet = store.wallet();
-const chain = store.chain();
 </script>
 
 <template>

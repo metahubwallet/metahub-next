@@ -8,5 +8,9 @@ export type CacheKey =
     | 'wallets'
     | 'authorizations'
     | 'selectedRpc'
+    | 'customRpcs'
     | 'networks'
-    | 'whitelist';
+    | 'whitelist'
+    | 'selectedIndex'
+    | 'allTokens'
+    | 'userTokens';

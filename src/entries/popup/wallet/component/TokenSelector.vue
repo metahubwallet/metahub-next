@@ -25,9 +25,10 @@ watch(
 );
 
 // 初始化token列表
+const wallet = store.wallet();
 const initTokens = () => {
     let tokens: Coin[] = [];
-    chainTokens = (store.wallet().allTokens[store.chain().currentChain] as Coin[]) || [];
+    chainTokens = (wallet.allTokens[store.chain().currentChain] as Coin[]) || [];
     for (const k in chainTokens) {
         const chainToken = chainTokens[k];
         if (chainToken.contract == 'eosio.token') continue;
@@ -35,14 +36,12 @@ const initTokens = () => {
         let token = {} as Coin;
         Object.assign(token, chainToken);
         token.isShow =
-            store
-                .wallet()
-                .userTokens.findIndex(
-                    (x: Token) => x.contract == token.contract && x.symbol == token.symbol
-                ) >= 0;
+            wallet.userTokens.findIndex(
+                (x: Token) => x.contract == token.contract && x.symbol == token.symbol
+            ) >= 0;
         tokens.push(token);
     }
-    for (const ut of store.wallet().userTokens) {
+    for (const ut of wallet.userTokens) {
         if (ut.contract == 'eosio.token') continue;
         if (tokens.findIndex((x) => x.contract == ut.contract && x.symbol == ut.symbol) >= 0)
             continue;
@@ -83,12 +82,10 @@ const searchTokens = () => {
 const emit = defineEmits(['close', 'refreshTokens']);
 const addTokenHandle = async (token: Coin) => {
     if (token.isShow) {
-        const index = store
-            .wallet()
-            .userTokens.findIndex(
-                (x: Token) => x.contract == token.contract && x.symbol == token.symbol
-            );
-        store.wallet().userTokens.splice(index, 1);
+        const index = wallet.userTokens.findIndex(
+            (x: Token) => x.contract == token.contract && x.symbol == token.symbol
+        );
+        wallet.userTokens.splice(index, 1);
         token.isShow = false;
     } else {
         const newToken = {
@@ -98,9 +95,10 @@ const addTokenHandle = async (token: Coin) => {
             symbol: token.symbol,
             precision: token.precision,
         };
-        store.wallet().userTokens.push(newToken);
+        wallet.userTokens.push(newToken);
         token.isShow = true;
     }
+    wallet.setUserTokens(wallet.userTokens);
     emit('refreshTokens', true);
 };
 </script>
