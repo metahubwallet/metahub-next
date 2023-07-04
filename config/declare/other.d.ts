@@ -6,3 +6,4 @@ declare interface Window {
 
 declare module 'eos-rc-parser';
 declare module 'eosjs-ecc';
+declare module 'vite-plugin-node-stdlib-browser';
