@@ -55,7 +55,7 @@ export default class EOS {
 
         if (cachedABI && cachedABI.expire && cachedABI.expire > nowTime) {
             const codeUpdateTime = new Date(
-                (await this.getAccount(contract))?.last_code_update + 'Z'
+                ((await this.getAccount(contract)) as any).last_code_update + 'Z'
             ).getTime();
             if (cachedABI.timestamp > codeUpdateTime) {
                 console.log('get abi from cached');
@@ -170,7 +170,8 @@ export default class EOS {
             chainId: this.chainId,
             httpEndpoint: this.endpoint,
         };
-        const eos = new EosJs(options);
+        const eos = null as any;
+        // const eos = new EosJs(options);
         await Promise.all(
             contracts.map(async (contract) => {
                 const abi = await this.getAbiJson(contract, 1);

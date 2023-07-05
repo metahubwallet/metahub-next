@@ -36,7 +36,7 @@ const submitHandle = () => {
 };
 
 // 导出钱包
-const background = chrome.extension.getBackgroundPage()?.background;
+const background = (chrome.extension.getBackgroundPage() as any).background;
 
 const exportWallet = () => {
     const { allTokens, ...wallet } = store.wallet().$state;

@@ -24,7 +24,7 @@ watch(
                     <div class="account">
                         <span>
                             {{
-                                currentWallet
+                                currentWallet.account
                                     ? briefAccount(currentWallet.account)
                                     : $t('public.noAccount')
                             }}

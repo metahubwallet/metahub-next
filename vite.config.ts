@@ -12,5 +12,8 @@ export default ({ mode }: ConfigEnv) => {
         plugins: setupPlugins(),
         resolve: { alias },
         css,
+        build: {
+            chunkSizeWarningLimit: 1600,
+        },
     };
 };
