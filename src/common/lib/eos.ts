@@ -1,5 +1,4 @@
 import { Api, JsonRpc } from 'eosjs';
-// import EosJs from 'eosjs1';
 import ecc from 'eosjs-ecc';
 import * as ricardianParser from 'eos-rc-parser';
 import { Payload } from './messages/message';
@@ -170,12 +169,9 @@ export default class EOS {
             chainId: this.chainId,
             httpEndpoint: this.endpoint,
         };
-        const eos = null as any;
-        // const eos = new EosJs(options);
         await Promise.all(
             contracts.map(async (contract) => {
-                const abi = await this.getAbiJson(contract, 1);
-                abis[contract] = eos.fc.abiCache.abi(contract, abi);
+                abis[contract] = (await this.getRawAbi(contract)).abi;
             })
         );
         return abis;
