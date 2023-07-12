@@ -16,6 +16,44 @@ export default class EOS {
         this.api = this.getAPI();
     }
 
+    // 查询私钥是否正确
+    isValidPrivate(privateKey: string) {
+        return ecc.isValidPrivate(privateKey);
+    }
+
+    // 私钥获取公钥
+    privateToPublic(privateKey: string) {
+        if (ecc.isValidPrivate(privateKey) == false) return '';
+        return ecc.privateToPublic(privateKey);
+    }
+
+    // 查询账户的EOS余额
+    async getCurrencyBalance(contract: string, account: string, symbol: string) {
+        try {
+            let res = await this.rpc.get_currency_balance(contract, account, symbol);
+            return res[0];
+        } catch (e) {
+            return '';
+        }
+    }
+
+    // 获取REX价格
+    async getREXInfo(account = '') {
+        try {
+            let res = await this.rpc.get_table_rows({
+                json: true,
+                code: 'eosio',
+                scope: 'eosio',
+                table: 'rexbal',
+                lower_bound: account,
+                limit: '1',
+            });
+            return res;
+        } catch (e) {
+            return null;
+        }
+    }
+
     getAPI() {
         const payload = { chainId: this.chainId };
         const options = {
@@ -57,7 +95,6 @@ export default class EOS {
                 ((await this.getAccount(contract)) as any).last_code_update + 'Z'
             ).getTime();
             if (cachedABI.timestamp > codeUpdateTime) {
-                console.log('get abi from cached');
                 return cachedABI.abi;
             }
         }

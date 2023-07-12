@@ -106,7 +106,7 @@ const loadData = async () => {
         }
         resourceData = data;
     } catch (e) {
-        console.log(e);
+        window.msg.error(e);
     }
     try {
         let rammarketData = await chain.get().getRamMarket();
@@ -114,7 +114,7 @@ const loadData = async () => {
         let balance2 = parseFloat(rammarketData.rows[0].base.balance);
         ramprice.value = (balance1 / balance2) * 1024;
     } catch (e) {
-        console.log('ramprice error');
+        window.msg.error('ramprice error');
     }
 };
 </script>

@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import Windows from '@/common/lib/windows';
+import { supportNetworks } from '@/common/util/network';
+import { Network } from '@/store/chain/type';
+import { Wallet } from '@/store/wallet/type';
 
-// 初始化钱包解锁情况
+// 初始化钱包情况
 const user = store.user();
 const setting = store.setting();
 onMounted(async () => {
-    const passwordHash = await localCache.get('passwordHash');
-    store.user().setPasswordHash(passwordHash + '');
-    const isLock = (await localCache.get('isLock', true)) as boolean;
-    store.setting().setIsLock(isLock);
+    store.chain().networks = (await localCache.get(
+        'networks',
+        supportNetworks.slice(0, 3)
+    )) as Network[];
+    store.wallet().wallets = (await localCache.get('wallets', [])) as Wallet[];
+    store.user().passwordHash = (await localCache.get('passwordHash', '')) as string;
+    store.setting().isLock = (await localCache.get('isLock', true)) as boolean;
 });
 
 // 钱包选择

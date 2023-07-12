@@ -44,7 +44,7 @@ const draw = () => {
         JSON.stringify(data),
         { errorCorrectionLevel: 'M', scale: 6, width: 210, margin: 1 },
         (error: any) => {
-            if (error) console.log(error);
+            if (error) window.msg.error(error);
             else canvas = document.getElementById('qrccode-canvas');
         }
     );

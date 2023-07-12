@@ -38,8 +38,7 @@ const addTokenHandle = async () => {
                 window.msg.error(t('wallet.addTokenExist'));
                 return;
             }
-            store.wallet().userTokens.push(token);
-            store.wallet().setUserTokens(store.wallet().userTokens);
+            store.wallet().setUserTokens([...store.wallet().userTokens, token]);
             emit('refreshTokens', true);
             window.msg.success(t('wallet.addTokenSuccessfully'));
             router.go(-1);

@@ -5,9 +5,8 @@ import moment from 'moment';
 export const tool = {
     // 账号模糊
     briefAccount: (account: string, prefixLength = 6, subfixLength = 5) => {
-        if (account.length <= 12) {
-            return account;
-        }
+        if (account.length <= 12) return account;
+
         return (
             account.substring(0, prefixLength) +
             '...' +

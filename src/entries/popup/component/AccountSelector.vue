@@ -48,7 +48,7 @@ const showAccount = (account: string) => {
 };
 
 // 选择账号
-const accountSelectHandle = (account: Wallet) => {
+const selectAccountHandle = (account: Wallet) => {
     let index = wallet.wallets.indexOf(account);
     wallet.setSelectedIndex(index);
     emit('close');
@@ -77,7 +77,7 @@ const accountSelectHandle = (account: Wallet) => {
                         </div>
                     </template>
                     <n-scrollbar class="full">
-                        <div class="accounts">
+                        <div class="accounts w-full">
                             <div class="title-cell" style="border: none">
                                 <span>{{ item.name }}</span>
 
@@ -109,10 +109,9 @@ const accountSelectHandle = (account: Wallet) => {
                                     +{{ $t('public.importKey') }}
                                 </n-button>
                             </div>
-
                             <div
                                 :key="item.index"
-                                @click="accountSelectHandle(item)"
+                                @click="selectAccountHandle(item)"
                                 class="account-cell"
                                 v-for="item in accounts"
                             >
@@ -138,6 +137,22 @@ const accountSelectHandle = (account: Wallet) => {
                             </div>
                         </div>
                     </n-scrollbar>
+                </n-tab-pane>
+
+                <n-tab-pane name="">
+                    <template #tab>
+                        <icon-add-one
+                            theme="outline"
+                            size="33"
+                            fill="#c8c8c8"
+                            :strokeWidth="3"
+                            class="ml-[5px] mt-[5px]"
+                            @click="
+                                $router.push({ name: 'network-manage' });
+                                $emit('close');
+                            "
+                        />
+                    </template>
                 </n-tab-pane>
             </n-tabs>
         </div>

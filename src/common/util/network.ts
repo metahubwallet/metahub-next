@@ -135,7 +135,7 @@ export const supportNetworks = [
     },
 ];
 
-export const getNetworkLocalIcon = (chain: string, active = true) => {
+export const getNetworkLocalIcon = (chain: string = 'eos', active = true) => {
     let network = chain.toLowerCase();
     if (network == 'jungle3') network = 'jungle';
     network = network.replace('-test', '');

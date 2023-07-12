@@ -3,8 +3,7 @@ import { Coin, Wallet, WalletState, WhiteItem } from './type';
 export default defineStore('wallet', {
     state: (): WalletState => ({
         wallets: [],
-        selectedIndex: -1,
-        currentWallet: {} as Wallet,
+        selectedIndex: 0,
         walletCaches: {},
         whitelist: [],
         recentTransations: [],
@@ -17,6 +16,9 @@ export default defineStore('wallet', {
             const chainToken = state.allTokens[coin.chain] || {};
             const k: any = `${coin.contract}-${coin.symbol}`;
             return chainToken[k] || {};
+        },
+        currentWallet: (state) => {
+            return state.wallets[state.selectedIndex];
         },
     },
 

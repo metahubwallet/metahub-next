@@ -27,8 +27,7 @@ const addHandle = (network: Network) => {
 
 // 新增网络
 const addNetwork = (network: Network) => {
-    chainStore.networks.push(network);
-    chainStore.setNetworks(chainStore.networks);
+    chainStore.setNetworks([...chainStore.networks, network]);
     const selectedRpc = chainStore.selectedRpc;
     selectedRpc[network.chainId] = network.endpoint;
     chainStore.setSelectedRpc(selectedRpc);

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Wallet } from '@/store/wallet/type';
 import { eosChainId, getNetworkLocalIcon } from '@/common/util/network';
-import { Network } from '@/store/chain/type';
 import { sha256, md5, encrypt } from '@/common/util/crypto';
 import bs58 from 'bs58';
 import { Address } from 'ethereumjs-util';
@@ -9,30 +8,27 @@ import chain from '@/common/lib/chain';
 import { getKeyAccounts, lightKey } from '@/common/lib/remote';
 
 const { t } = useI18n();
-
 const route = useRoute();
 
 // get network
-const networks = ref<Network[]>(store.chain().networks);
-const activeIndex = ref(0);
+const { networks } = store.chain();
 const chainId = ref(route.query.chainId ? (route.query.chainId as string) : eosChainId);
+const activeIndex = ref(networks.findIndex((item) => item.chainId === chainId.value));
 const getNetworkIcon = (chainId: string) => {
     const chain = store.chain().findNetwork(chainId)?.chain;
-    if (chain) return getNetworkLocalIcon(chain);
-    else return '';
+    return getNetworkLocalIcon(chain);
 };
 
 // select network
 const selectNetwork = (index: number) => {
     activeIndex.value = index;
-    chainId.value = networks.value[index].chainId;
-    store.chain().currentNetwork = networks.value[index];
+    chainId.value = networks[index].chainId;
+    store.chain().currentNetwork = networks[index];
 };
 
 // import wallet
 const checked = ref(true);
-const importAccountList = ref([]);
-const isShowChangeAccount = ref(false);
+const accountList = ref([] as Wallet[]);
 const importKeyHandle = async () => {
     /** 判断协议勾选 */
     if (!checked.value) return window.msg.warning('请仔细阅读协议,并勾选');
@@ -41,6 +37,7 @@ const importKeyHandle = async () => {
     const importAccounts = [];
     let tipMessage = t('public.noAccountForPrivateKey');
     let isKey = chain.get().isValidPrivate(privateKey.value);
+
     let ethAddress = '';
     if (!isKey && privateKey.value.length == 64) {
         const privateKeyHex = Buffer.from(privateKey.value, 'hex');
@@ -65,19 +62,18 @@ const importKeyHandle = async () => {
         chainAccount.blockchain = 'eos'; // eth, tron ...
         chainAccount.smoothMode = false; // 默认关闭顺畅模式
         const publicKey = chain.get(network?.chainId).privateToPublic(privateKey.value);
-        privateKey.value = encrypt(
+        const privateValue = encrypt(
             privateKey.value,
             md5(chainAccount.seed + store.user().password)
         );
-        const key = { publicKey, privateKey, permissions: [] };
+        const key = { publicKey, privateKey: privateValue, permissions: [] };
         chainAccount.keys = [key];
         try {
             let accounts: any = [];
-            try {
-                accounts = await getKeyAccounts(network?.chain as lightKey, publicKey);
-            } catch (e) {
+            accounts = await getKeyAccounts(network?.chain as lightKey, publicKey).catch(() => {
                 accounts = [];
-            }
+            });
+
             if (accounts.length == 0)
                 if (accounts.length == 0)
                     accounts = await chain.get(network?.chainId).getKeyAccounts(publicKey);
@@ -86,7 +82,7 @@ const importKeyHandle = async () => {
             for (let account of accounts) {
                 const newAccount = Object.assign({}, chainAccount);
                 newAccount.name = account; // real eos account
-                newAccount.account = ethAddress != '' ? ethAddress : account; // account (display)
+                newAccount.account = ethAddress != '' ? ethAddress : account;
 
                 let existed = false;
                 for (let i = 0; i < store.wallet().wallets.length; i++) {
@@ -103,32 +99,28 @@ const importKeyHandle = async () => {
                 else importAccounts.push(newAccount);
             }
         } catch (e) {
-            console.log(e);
+            window.msg.error(e);
         }
     } else tipMessage = t('public.invaildPrivateKey');
 
     importAccounts.sort(sortAccounts);
-
     if (importAccounts.length > 1) {
-        importAccountList.value = importAccounts as any;
-        isShowChangeAccount.value = true;
+        accountList.value = importAccounts;
+        isShowChoose.value = true;
     } else if (importAccounts.length == 1) {
         await importWallet(importAccounts);
-        return;
     } else window.msg.error(tipMessage);
 };
 
 // import wallet
 const router = useRouter();
-const privateKey = ref('');
+const privateKey = ref('5KcZiwRB9y1PgjzzDXVStAQkNMXdXeRFoaPjXzvoZ9tGCZXUvqU');
 const emit = defineEmits(['refreshTokens']);
-const importWallet = async (wallets: any) => {
+const importWallet = async (wallets: Wallet[]) => {
     for (const wallet of wallets) {
-        store.wallet().wallets.push(wallet);
         await chain.fetchPermissions(wallet.name, wallet.chainId);
     }
-    store.wallet().wallets.sort(sortAccounts);
-    store.wallet().setWallets(store.wallet().wallets);
+    store.wallet().setWallets([...store.wallet().wallets, ...wallets.sort(sortAccounts)]);
 
     const firstWallet = wallets[0];
     let index = store.wallet().wallets.indexOf(firstWallet);
@@ -145,7 +137,6 @@ const importWallet = async (wallets: any) => {
 
 // select wallet
 const isShowChoose = ref(false);
-const accountList = ref([]);
 const selectWalletHandle = async (selectWallets: Wallet[]) => {
     if (selectWallets.length < 1) return window.msg.warning(t('wallet.selectOneAtLeast'));
 };
@@ -210,10 +201,13 @@ const sortAccounts = (first: any, second: any) => {
                         :placeholder="$t('public.importKeyTip')"
                         class="import-key-input"
                         type="textarea"
-                        v-model="privateKey"
+                        v-model:value="privateKey"
                     ></n-input>
-                    <n-checkbox class="import-key-protocol" v-model="checked"></n-checkbox>
-                    <span class="check-tip text-center cursor-pointer ml-[4px]">
+                    <n-checkbox class="import-key-protocol" v-model:checked="checked"></n-checkbox>
+                    <span
+                        class="check-tip text-center cursor-pointer ml-[4px]"
+                        @click="checked = !checked"
+                    >
                         {{ $t('public.readAndAgree') }}
                         <span
                             @click="$router.push({ name: 'import-protocol' })"

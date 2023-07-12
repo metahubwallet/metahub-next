@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { currentWallet } = store.wallet();
+const wallet = store.wallet();
 const briefAccount = tool.briefAccount;
 
 // 路由动画
@@ -24,8 +24,8 @@ watch(
                     <div class="account">
                         <span>
                             {{
-                                currentWallet.account
-                                    ? briefAccount(currentWallet.account)
+                                wallet.currentWallet.account
+                                    ? briefAccount(wallet.currentWallet.account)
                                     : $t('public.noAccount')
                             }}
                         </span>

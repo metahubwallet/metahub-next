@@ -77,7 +77,6 @@ export const getKeyAccounts = async (chain: lightKey, publicKey: string) => {
         if (!lightApis[chain]) return [];
 
         let res = await axios.get(lightApis[chain] + '/api/key/' + publicKey);
-        console.log(res);
         if (res.status == 200 && res.data) {
             const ckey = chain.replace('-', '');
             if (res.data[ckey]) {

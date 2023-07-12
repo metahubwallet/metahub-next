@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import EOSIcon from '@/asset/img/eos_icon.png';
 import ErrorCoinImg from '@/asset/img/placeholder.png';
-import { Coin, Token } from '@/store/wallet/type';
+import { Coin } from '@/store/wallet/type';
 import { eosChainId } from '@/common/util/network';
 import { getBalanceList } from '@/common/lib/remote';
 import chain from '@/common/lib/chain';

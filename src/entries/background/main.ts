@@ -6,6 +6,7 @@ import Windows from '@/common/lib/windows';
 import Eos from '@/common/lib/eos';
 import { Network, RPC } from '@/store/chain/type';
 import { decrypt, md5 } from '@/common/util/crypto';
+import { supportNetworks } from '@/common/util/network';
 
 class Background {
     static cachedInfo: any;
@@ -434,7 +435,7 @@ class Background {
                 const signature = eos.signature(payload, privateKey);
                 return { signature };
             } else {
-                console.log('not match');
+                window.msg.error('not match');
             }
         }
         return new Promise((resolve) => {
@@ -545,12 +546,12 @@ class Background {
     static async cacheChainInfoInterval() {
         const wallets = (await localCache.get('wallets', [])) as Wallet[];
         const selectedIndex = (await localCache.get('selectedIndex', -1)) as number;
-
         if (wallets.length > 0 && selectedIndex >= 0) {
             const currentWallet = wallets[selectedIndex];
             const currentChainId = currentWallet.chainId;
             this.cacheChainInfo(currentChainId);
         }
+
         setTimeout(() => {
             this.cacheChainInfoInterval();
         }, 1000 * 60); // 1 min
