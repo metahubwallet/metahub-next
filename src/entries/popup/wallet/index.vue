@@ -1,9 +1,9 @@
 <script setup lang="ts">
 const wallet = store.wallet();
-
-const isSelectToken = ref(false);
 const assetUnit = ref('usd'); // 资产单位
 const assetAmount = ref(0); // 资产数量
+
+const isSelectToken = ref(false);
 </script>
 
 <template>

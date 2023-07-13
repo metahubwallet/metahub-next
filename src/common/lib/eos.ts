@@ -37,7 +37,7 @@ export default class EOS {
         }
     }
 
-    // 获取REX价格
+    // 获取REX信息
     async getREXInfo(account = '') {
         try {
             let res = await this.rpc.get_table_rows({
@@ -51,6 +51,41 @@ export default class EOS {
             return res;
         } catch (e) {
             return null;
+        }
+    }
+
+    // 获取EOS价格
+    async getEosPrice() {
+        try {
+            let res = await this.rpc.get_table_rows({
+                json: true,
+                code: 'swap.defi',
+                scope: 'swap.defi',
+                table: 'pairs',
+                lower_bound: 12,
+                upper_bound: 12,
+                limit: '1',
+            });
+            return parseFloat(res.rows[0].price0_last);
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    // 通过公钥查询账号
+    async getKeyAccounts(publicKey: string) {
+        try {
+            let result = await this.rpc.get_accounts_by_authorizers([], [publicKey]);
+            let accounts = [];
+            for (const account of result.accounts) {
+                accounts.push(account.account_name);
+            }
+            let filterAccounts = [...new Set(accounts)];
+            // todo: 原来的bug会导致刚注册的账号获取不到
+            return filterAccounts;
+        } catch (e: any) {
+            console.log(e.json);
+            return [];
         }
     }
 

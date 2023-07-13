@@ -12,6 +12,7 @@ onMounted(async () => {
         'networks',
         supportNetworks.slice(0, 3)
     )) as Network[];
+    store.chain().currentNetwork = (await localCache.get('currentNetwork', null)) as Network;
     store.wallet().wallets = (await localCache.get('wallets', [])) as Wallet[];
     store.user().passwordHash = (await localCache.get('passwordHash', '')) as string;
     store.setting().isLock = (await localCache.get('isLock', true)) as boolean;

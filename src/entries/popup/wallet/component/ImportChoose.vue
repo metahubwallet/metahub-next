@@ -2,23 +2,26 @@
 import _ from 'lodash';
 import { Wallet } from '@/store/wallet/type';
 
-const props = defineProps<{ accountList: Wallet[] }>();
+interface Props {
+    isShow: boolean;
+    accountList: Wallet[];
+}
+const props = withDefaults(defineProps<Props>(), {});
 
 // 初始化wallets
 const wallets = ref<Wallet[]>([]);
 onMounted(() => {
-    let accounts = _.cloneDeep(props.accountList);
-    accounts.forEach((item, index) => {
-        item.index = index;
-        let network = store.chain().findNetwork(item.chainId);
-        item.chainName = network ? network.name : 'Unknown';
-        item.isSelected = true;
-    });
-    wallets.value = accounts;
+    // props.accountList.forEach((item, index) => {
+    //     item.index = index;
+    //     let network = store.chain().findNetwork(item.chainId);
+    //     item.chainName = network ? network.name : 'Unknown';
+    //     item.isSelected = true;
+    // });
+    wallets.value = props.accountList;
 });
 
 // 导入wallet
-const emit = defineEmits(['import']);
+const emit = defineEmits(['import', 'close']);
 const importWalletHandle = () => {
     let selectedWallets = [];
     for (const wallet of wallets.value) {
@@ -46,46 +49,48 @@ const selectWalletHandle = (wallet: any) => {
 </script>
 
 <template>
-    <div @click="$event.stopPropagation()" class="box-container">
-        <!-- header -->
-        <div class="title-cell">
-            <div class="title">{{ $t('auth.chooseAccount') }}</div>
-            <div class="action">
-                <div @click="importWalletHandle" class="import-button">
-                    {{ $t('wallet.importSelectedWallets') }}
+    <popup-bottom :isCustom="true" :isShow="props.isShow" @close="$emit('close')">
+        <div @click="$event.stopPropagation()" class="box-container">
+            <!-- header -->
+            <div class="title-cell">
+                <div class="title">{{ $t('auth.chooseAccount') }}</div>
+                <div class="action">
+                    <div @click="importWalletHandle" class="import-button">
+                        {{ $t('wallet.importSelectedWallets') }}
+                    </div>
+                    <n-checkbox v-model:checked="isSelectAll" @change="allSelectHandle">
+                        {{ $t('public.selectAll') }}
+                    </n-checkbox>
                 </div>
-                <n-checkbox v-model:checked="isSelectAll" @change="allSelectHandle">
-                    {{ $t('public.selectAll') }}
-                </n-checkbox>
             </div>
-        </div>
 
-        <!-- list -->
-        <div class="list-container">
-            <div
-                :key="item.index"
-                @click="selectWalletHandle(item)"
-                class="account-cell"
-                v-for="item in wallets"
-            >
-                <div class="account-left">
-                    <div class="account-left-name">
-                        {{ item.chainName }}：
-                        <span style="color: #666666">{{ item.name }}</span>
+            <!-- list -->
+            <div class="list-container">
+                <div
+                    :key="item.index"
+                    @click="selectWalletHandle(item)"
+                    class="account-cell"
+                    v-for="item in wallets"
+                >
+                    <div class="account-left">
+                        <div class="account-left-name">
+                            {{ item.chainName }}：
+                            <span style="color: #666666">{{ item.name }}</span>
+                        </div>
+                        <div class="account-left-key">
+                            <div class="span-left">{{ item.publicKey }}</div>
+                            <div class="span-right">{{ item.publicKey }}</div>
+                        </div>
                     </div>
-                    <div class="account-left-key">
-                        <div class="span-left">{{ item.publicKey }}</div>
-                        <div class="span-right">{{ item.publicKey }}</div>
-                    </div>
+                    <img
+                        v-if="item.isSelected === true"
+                        class="close"
+                        src="@/asset/img/account_select@2x.png"
+                    />
                 </div>
-                <img
-                    v-if="item.isSelected === true"
-                    class="close"
-                    src="@/asset/img/account_select@2x.png"
-                />
             </div>
         </div>
-    </div>
+    </popup-bottom>
 </template>
 
 <style lang="scss" scoped>

@@ -20,11 +20,14 @@ const getNetworkIcon = (chainId: string) => {
 };
 
 // select network
-const selectNetwork = (index: number) => {
-    activeIndex.value = index;
-    chainId.value = networks[index].chainId;
-    store.chain().currentNetwork = networks[index];
-};
+watch(
+    activeIndex,
+    (index) => {
+        chainId.value = networks[index].chainId;
+        store.chain().setCurrentNetwork(networks[index]);
+    },
+    { immediate: true }
+);
 
 // import wallet
 const checked = ref(true);
@@ -62,6 +65,7 @@ const importKeyHandle = async () => {
         chainAccount.blockchain = 'eos'; // eth, tron ...
         chainAccount.smoothMode = false; // 默认关闭顺畅模式
         const publicKey = chain.get(network?.chainId).privateToPublic(privateKey.value);
+
         const privateValue = encrypt(
             privateKey.value,
             md5(chainAccount.seed + store.user().password)
@@ -99,11 +103,12 @@ const importKeyHandle = async () => {
                 else importAccounts.push(newAccount);
             }
         } catch (e) {
-            window.msg.error(e);
+            console.log(e);
         }
     } else tipMessage = t('public.invaildPrivateKey');
 
     importAccounts.sort(sortAccounts);
+
     if (importAccounts.length > 1) {
         accountList.value = importAccounts;
         isShowChoose.value = true;
@@ -114,7 +119,7 @@ const importKeyHandle = async () => {
 
 // import wallet
 const router = useRouter();
-const privateKey = ref('5KcZiwRB9y1PgjzzDXVStAQkNMXdXeRFoaPjXzvoZ9tGCZXUvqU');
+const privateKey = ref('5K6h7sgjv1wPaMbHvA6tDTH78RAdyoXBPu4cJTDRySAD41j43MW');
 const emit = defineEmits(['refreshTokens']);
 const importWallet = async (wallets: Wallet[]) => {
     for (const wallet of wallets) {
@@ -186,7 +191,7 @@ const sortAccounts = (first: any, second: any) => {
                             :key="index"
                             class="flex items-center !w-full py-[10px] pr-[90px] pl-[10px] duration-200"
                             :class="activeIndex === index ? 'bg-slate-200' : ''"
-                            @click="selectNetwork(index)"
+                            @click="activeIndex = index"
                         >
                             <img :src="getNetworkIcon(item.chainId)" class="icon-img mr-[6px]" />
                             <span style="color: #3a3949; font-size: 14px">
@@ -222,12 +227,12 @@ const sortAccounts = (first: any, second: any) => {
                 </div>
             </div>
 
-            <popup-bottom :isCustom="true" :isShow="isShowChoose" @close="isShowChoose = false">
-                <import-choose
-                    @import="selectWalletHandle"
-                    :accountList="accountList"
-                ></import-choose>
-            </popup-bottom>
+            <import-choose
+                :is-show="isShowChoose"
+                :accountList="accountList"
+                @close="isShowChoose = false"
+                @import="selectWalletHandle"
+            ></import-choose>
         </div>
     </div>
 </template>

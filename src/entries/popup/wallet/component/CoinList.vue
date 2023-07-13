@@ -9,10 +9,9 @@ import chain from '@/common/lib/chain';
 const chainStore = store.chain();
 const showAddToken = ref(false);
 
-const tokens = ref<Coin[]>([]);
-
 // 初始化Tokens
 let isLoad = ref(false);
+const tokens = ref<Coin[]>([]);
 const wallet = store.wallet();
 const loadTokens = async () => {
     if (isLoad.value) return;
@@ -21,6 +20,7 @@ const loadTokens = async () => {
     if (wallet.wallets.length == 0) return;
 
     const network = chainStore.currentNetwork;
+
     if (wallet.userTokens.length == 0) {
         wallet.setUserTokens([
             {

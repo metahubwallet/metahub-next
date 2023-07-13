@@ -34,6 +34,10 @@ export default defineStore('chain', {
             this.networks = networks;
             await localCache.set('networks', networks);
         },
+        async setCurrentNetwork(network: Network) {
+            this.currentNetwork = network;
+            await localCache.set('currentNetwork', network);
+        },
         async setSelectedRpc(rpc: RPC) {
             this.selectedRpc = rpc;
             await localCache.set('selectedRpc', rpc);

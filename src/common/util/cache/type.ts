@@ -10,6 +10,7 @@ export type CacheKey =
     | 'selectedRpc'
     | 'customRpcs'
     | 'networks'
+    | 'currentNetwork'
     | 'whitelist'
     | 'selectedIndex'
     | 'allTokens'
