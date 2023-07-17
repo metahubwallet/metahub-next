@@ -65,11 +65,16 @@ const getUserBalance = async () => {
     let userCoins = tokens.value.map((x: Coin) => {
         return { contract: x.contract, symbol: x.symbol };
     }) as Coin[];
-    await getBalanceList(store.wallet().currentWallet.name, userCoins, (coin: Coin) => {
+
+    await getBalanceList(store.wallet().currentWallet.account, userCoins, (coin: Coin) => {
         const selectedToken = tokens.value.find(
             (x) => x.contract === coin.contract && x.symbol == coin.symbol
         );
-        if (selectedToken) selectedToken.amount = coin.amount;
+
+        if (selectedToken) {
+            selectedToken.amount = coin.amount;
+            wallet.setUserTokens(wallet.userTokens);
+        }
     });
 };
 

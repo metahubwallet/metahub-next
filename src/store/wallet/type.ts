@@ -142,17 +142,15 @@ export interface Authorization {
     permission: string;
     actor: string;
     domain: string;
-    accounts: Account[];
-}
-
-export interface Account {
-    authorizations: Authorization[];
-    data: any;
-    account: any;
-    chainId: string;
-    name: string;
-    expire?: number;
-    authority: string;
-    publicKey: string;
-    address: string;
+    accounts: {
+        authorizations: Authorization[];
+        data: any;
+        account: any;
+        chainId: string;
+        name: string;
+        expire?: number;
+        authority: string;
+        publicKey: string;
+        address: string;
+    }[];
 }

@@ -8,15 +8,23 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {});
 
-// 初始化wallets
+// 初始化wallets(用onMount取不到值)
 const wallets = ref<Wallet[]>([]);
-onMounted(() => {
-    // props.accountList.forEach((item, index) => {
-    //     item.index = index;
-    //     let network = store.chain().findNetwork(item.chainId);
-    //     item.chainName = network ? network.name : 'Unknown';
-    //     item.isSelected = true;
-    // });
+watch(
+    () => props.accountList,
+    () => {
+        props.accountList.forEach((item, index) => {
+            item.index = index;
+            let network = store.chain().findNetwork(item.chainId);
+            item.chainName = network ? network.name : 'Unknown';
+            item.isSelected = true;
+        });
+        wallets.value = props.accountList;
+    },
+    { immediate: true }
+);
+
+nextTick(() => {
     wallets.value = props.accountList;
 });
 
@@ -50,7 +58,7 @@ const selectWalletHandle = (wallet: any) => {
 
 <template>
     <popup-bottom :isCustom="true" :isShow="props.isShow" @close="$emit('close')">
-        <div @click="$event.stopPropagation()" class="box-container">
+        <div class="box-container">
             <!-- header -->
             <div class="title-cell">
                 <div class="title">{{ $t('auth.chooseAccount') }}</div>

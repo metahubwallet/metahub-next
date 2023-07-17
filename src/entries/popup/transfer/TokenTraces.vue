@@ -83,7 +83,7 @@ const viewTransation = (item: Transation) => {
                         <div class="coin-icon">
                             <div class="icon-left">
                                 <img
-                                    :src="token.logo"
+                                    :src="token.logo ? token.logo : EOSIcon"
                                     class="icon-img"
                                     @error.once="($event.target as HTMLImageElement).src = EOSIcon"
                                 />

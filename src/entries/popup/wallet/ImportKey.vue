@@ -119,7 +119,7 @@ const importKeyHandle = async () => {
 
 // import wallet
 const router = useRouter();
-const privateKey = ref('5K6h7sgjv1wPaMbHvA6tDTH78RAdyoXBPu4cJTDRySAD41j43MW');
+const privateKey = ref('');
 const emit = defineEmits(['refreshTokens']);
 const importWallet = async (wallets: Wallet[]) => {
     for (const wallet of wallets) {
@@ -144,6 +144,8 @@ const importWallet = async (wallets: Wallet[]) => {
 const isShowChoose = ref(false);
 const selectWalletHandle = async (selectWallets: Wallet[]) => {
     if (selectWallets.length < 1) return window.msg.warning(t('wallet.selectOneAtLeast'));
+
+    await importWallet(selectWallets);
 };
 
 // sort account

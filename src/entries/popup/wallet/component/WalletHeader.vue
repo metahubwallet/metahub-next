@@ -8,7 +8,9 @@ const props = withDefaults(defineProps<Props>(), {});
 const totalValue = computed(() => {
     const prefix = props.type == 'usd' ? '$' : '';
     const subfix = props.type == 'usd' ? '' : props.type.toUpperCase();
-    return `${prefix} ${props.amount.toFixed(4)} ${subfix}`;
+    return `${prefix} ${
+        typeof props.amount === 'number' ? props.amount.toFixed(4) : props.amount
+    } ${subfix}`;
 });
 
 // 跳转至转账页

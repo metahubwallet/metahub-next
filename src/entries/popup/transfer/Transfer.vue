@@ -9,8 +9,8 @@ const recentVisible = ref(false);
 const selectTokenVisible = ref(false);
 
 const form = reactive({
-    sender: '111',
-    receiver: '222',
+    sender: '',
+    receiver: '',
     quantity: 0,
     memo: '',
     symbol: '',
@@ -20,8 +20,8 @@ const form = reactive({
 const targetCoin = reactive<Coin>({
     contract: '',
     symbol: 'eos',
-    precision: 0,
-    amount: 100,
+    precision: 4,
+    amount: 0,
     chain: '',
 });
 
@@ -131,7 +131,11 @@ const checkSubmit = () => {
                     <!-- from account -->
                     <div class="transfer-title">{{ $t('wallet.paymentAccount') }}</div>
                     <div class="transfer-input">
-                        <n-input :disabled="true" v-model:value="form.sender"></n-input>
+                        <n-input
+                            :disabled="true"
+                            v-model:value="form.sender"
+                            class="rounded-[22px] h-[46px] leading-[46px] pl-[5px]"
+                        ></n-input>
                     </div>
 
                     <!-- receiver account -->
@@ -147,7 +151,12 @@ const checkSubmit = () => {
                     </div>
                     <div class="transfer-input">
                         <div class="flex flex-col">
-                            <n-input @blur="checkReceiver" v-model:value="form.receiver"></n-input>
+                            <n-input
+                                @blur="checkReceiver"
+                                v-model:value="form.receiver"
+                                placeholder=""
+                                class="rounded-[22px] h-[46px] leading-[46px] pl-[5px]"
+                            ></n-input>
                             <span class="self-end mt-1 h-6 text-xs text-yellow-300">
                                 {{ receiverError }}
                             </span>
@@ -161,7 +170,10 @@ const checkSubmit = () => {
                     <div class="transfer-input">
                         <div class="flex flex-col">
                             <div class="flex justify-between">
-                                <n-button @click="selectTokenVisible = true" class="symbol-button">
+                                <n-button
+                                    @click="selectTokenVisible = true"
+                                    class="symbol-button rounded-tl-[22px] rounded-bl-[22px]"
+                                >
                                     {{ targetCoin.symbol }}
                                     <icon-down-one
                                         theme="filled"
@@ -182,6 +194,7 @@ const checkSubmit = () => {
                                         form.quantity = targetCoin.amount;
                                         checkQuantity();
                                     "
+                                    class="rounded-tr-[22px] rounded-br-[22px]"
                                 >
                                     {{ $t('wallet.all') }}
                                 </n-button>
@@ -197,7 +210,11 @@ const checkSubmit = () => {
                         {{ $t('wallet.remark') }}（Memo）
                     </div>
                     <div class="transfer-input" v-show="isShowMemo">
-                        <n-input v-model="form.memo"></n-input>
+                        <n-input
+                            v-model="form.memo"
+                            placeholder=""
+                            class="rounded-[22px] h-[46px] leading-[46px] pl-[5px] mb-[20px]"
+                        ></n-input>
                     </div>
 
                     <!-- submit -->

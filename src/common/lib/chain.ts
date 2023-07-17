@@ -196,17 +196,14 @@ export default class Chain {
      * @param {string} account 账户名称
      *
      */
-    static findLocalAccount(account: string, chainId: string): Wallet {
+    static findLocalAccount(account: string, chainId: string) {
         let wallets = store.wallet().wallets;
-        let i: number = 0;
         for (let index = 0; index < wallets.length; index++) {
             let wallet = wallets[index];
             if (wallet.name === account && wallet.chainId === chainId) {
-                i = index;
-                break;
+                return wallets[index];
             }
         }
-        return wallets[i];
     }
 
     /**
@@ -230,6 +227,7 @@ export default class Chain {
                 }
                 key.permissions = Array.from(permissions) as Perm[];
             }
+            store.wallet().setWallets(store.wallet().wallets);
             result.permissions = accinfo.permissions;
         } catch (e) {
             result.code = ErrorCode.HTTP_END_POINT_ERROR;
