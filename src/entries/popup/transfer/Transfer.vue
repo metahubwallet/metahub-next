@@ -237,13 +237,11 @@ const checkSubmit = () => {
         </popup-bottom>
 
         <!-- change token -->
-        <popup-bottom
+        <select-coin
             :isShow="selectTokenVisible"
-            :title="$t('wallet.symbols')"
             @close="selectTokenVisible = false"
-        >
-            <select-coin @changeToken="changeTokenHandle"></select-coin>
-        </popup-bottom>
+            @changeToken="changeTokenHandle"
+        ></select-coin>
 
         <!-- input password -->
         <popup-bottom
@@ -295,6 +293,14 @@ form {
         cursor: pointer;
         font-size: 10px;
         width: 45px;
+    }
+
+    :deep(.n-input__input-el) {
+        height: 46px !important;
+    }
+
+    :deep(.n-button--default-type) {
+        height: 46px !important;
     }
 }
 

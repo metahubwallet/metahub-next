@@ -106,8 +106,8 @@ const ownersArray = computed(() => {
         for (let i = 0; i < perms.length; i++) {
             if (perms[i].perm_name == 'owner') return perms[i].required_auth.keys;
         }
-        return [];
-    } else return [];
+    }
+    return [];
 });
 
 // 移除所有者
@@ -159,10 +159,9 @@ const activeRemoveHandle = (oldOperateKey: string) => {
 const showPasswordConfirm = ref(false);
 const emit = defineEmits(['refreshTokens']);
 const removeAccountClicked = () => {
-    let index = chain.findLocalAccount(
-        wallet.currentWallet.name,
-        wallet.currentWallet.chainId
-    ).index;
+    let index =
+        chain.findLocalAccount(wallet.currentWallet.name, wallet.currentWallet.chainId)?.index ||
+        -1;
     wallet.wallets.splice(index, 1);
     wallet.setWallets(wallet.wallets);
     if (wallet.wallets.length > 0) {

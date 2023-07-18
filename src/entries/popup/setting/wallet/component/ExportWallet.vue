@@ -36,17 +36,13 @@ const submitHandle = () => {
 };
 
 // 导出钱包
-const background = (chrome.extension.getBackgroundPage() as any).background;
-
 const exportWallet = () => {
     const { allTokens, ...wallet } = store.wallet().$state;
     const exportData = { ...wallet };
 
-    const password = background.vars.password;
-
     for (const wallet of exportData.wallets) {
         for (const key of wallet.keys) {
-            key.privateKey = decrypt(key.privateKey, md5(wallet.seed + password));
+            key.privateKey = decrypt(key.privateKey, md5(wallet.seed + store.user().password));
         }
     }
 
