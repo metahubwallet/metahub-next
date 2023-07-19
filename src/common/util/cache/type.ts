@@ -14,4 +14,5 @@ export type CacheKey =
     | 'whitelist'
     | 'selectedIndex'
     | 'allTokens'
-    | 'userTokens';
+    | 'userTokens'
+    | 'updateAt';

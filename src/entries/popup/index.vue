@@ -2,7 +2,8 @@
 import Windows from '@/common/lib/windows';
 import { supportNetworks } from '@/common/util/network';
 import { Network } from '@/store/chain/type';
-import { Wallet } from '@/store/wallet/type';
+import { Token, Wallet } from '@/store/wallet/type';
+import localTokens from '@/asset/json/tokens.json';
 
 // 初始化钱包情况
 const user = store.user();
@@ -13,10 +14,50 @@ onMounted(async () => {
         supportNetworks.slice(0, 3)
     )) as Network[];
     store.chain().currentNetwork = (await localCache.get('currentNetwork', null)) as Network;
+    if (store.chain().currentNetwork) {
+        store.chain().currentChainId = store.chain().currentNetwork.chainId;
+    }
     store.wallet().wallets = (await localCache.get('wallets', [])) as Wallet[];
     store.user().passwordHash = (await localCache.get('passwordHash', '')) as string;
     store.setting().isLock = (await localCache.get('isLock', true)) as boolean;
+
+    initTokens();
 });
+
+// 更新token
+const wallet = store.wallet();
+const initTokens = async () => {
+    // get tokens form local
+    if (!wallet.allTokens || !wallet.allTokens.tokens) {
+        wallet.allTokens = getTokenMapFromArray(localTokens);
+    }
+
+    // update tokens
+    setInterval(async () => {
+        await http
+            .get('https://cdn.jsdelivr.net/gh/metahubwallet/eos-tokens@master/tokens.json')
+            .then((res) => {
+                const tokenArray = typeof res == 'string' ? JSON.parse(res) : res;
+                const tokenMap = getTokenMapFromArray(tokenArray);
+                wallet.setAllTokens(tokenMap);
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    }, 1000 * 60 * 60 * 24);
+};
+
+const getTokenMapFromArray = (tokenArray: any[]) => {
+    let tokenMap = {} as any;
+    for (const token of tokenArray) {
+        if (!tokenMap[token.chain]) tokenMap[token.chain] = {};
+        const k = `${token.contract}-${token.symbol}`;
+        const name = `${token.chain}/${k}.png`.toLowerCase();
+        token.logo = 'https://cdn.jsdelivr.net/gh/metahubwallet/eos-tokens@master/logos/' + name;
+        tokenMap[token.chain][k] = token;
+    }
+    return tokenMap;
+};
 
 // 钱包选择
 const showAccountSelector = ref(false);

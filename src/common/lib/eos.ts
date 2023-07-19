@@ -89,6 +89,12 @@ export default class EOS {
         }
     }
 
+    // 测试节点
+    async testHttpEndpoint(endpoint = '') {
+        let rpc = new JsonRpc(endpoint);
+        return await rpc.get_info();
+    }
+
     getAPI() {
         const payload = { chainId: this.chainId };
         const options = {

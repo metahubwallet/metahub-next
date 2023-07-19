@@ -19,25 +19,21 @@ const loadTokens = async () => {
     isLoad.value = true;
     if (wallet.wallets.length == 0) return;
 
-    const network = chainStore.currentNetwork;
-
     if (wallet.userTokens.length == 0) {
         wallet.setUserTokens([
             {
                 amount: 0,
-                chain: network.chain,
-                ...network.token,
+                ...chainStore.currentNetwork.token,
+                chain: chainStore.currentChain,
             },
         ]);
     }
     tokens.value = wallet.userTokens.concat();
 
     getCoinsLogo(tokens.value);
-
     await getUserBalance();
     await handleGetEosPrice();
     await getWalletCache();
-
     isLoad.value = false;
 };
 onMounted(async () => {
@@ -82,9 +78,11 @@ const getUserBalance = async () => {
 const emit = defineEmits(['setUnit', 'setAmount']);
 const handleGetEosPrice = async () => {
     const eosToken = tokens.value.find((i) => i.contract === 'eosio.token' && i.symbol === 'EOS');
+
     if (eosToken) {
         emit('setUnit', eosToken.symbol);
         emit('setAmount', eosToken.amount);
+
         if (eosToken.chain == 'eos') {
             const eosPrice = await chain.get().getEosPrice();
             emit('setUnit', 'usd');
