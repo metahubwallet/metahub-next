@@ -3,7 +3,7 @@ import EOSIcon from '@/asset/img/eos_icon.png';
 import ErrorCoinImg from '@/asset/img/placeholder.png';
 import { Coin } from '@/store/wallet/type';
 import { eosChainId } from '@/common/util/network';
-import { getBalanceList } from '@/common/lib/remote';
+import { getBalanceList, isSupportChain } from '@/common/lib/remote';
 import chain from '@/common/lib/chain';
 
 const chainStore = store.chain();
@@ -119,6 +119,8 @@ const getWalletCache = async () => {
 // 查看coin详情
 const router = useRouter();
 const viewCoinHandle = (item: Coin) => {
+    if (!isSupportChain(chainStore.currentChain)) return;
+
     const token = item.contract + '-' + item.symbol;
     router.push({
         name: 'token-traces',

@@ -56,8 +56,8 @@ type hyperionKey =
     | 'wax-test'
     | 'proton-test';
 
-export const isSupportChain = (chain: hyperionKey) => {
-    return hyperionApis[chain] ? true : false;
+export const isSupportChain = (chain: string) => {
+    return hyperionApis[chain as hyperionKey] ? true : false;
 };
 
 export const getEndpoints = async (chainId = store.chain().currentChainId) => {

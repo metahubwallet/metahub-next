@@ -22,6 +22,8 @@ const chain = store.chain();
 const activeChainId = ref(chain.currentChainId);
 const { networks } = store.chain();
 const getNetworkIcon = (item: Network) => {
+    console.log(item.chain, item.chainId == activeChainId.value);
+
     return getNetworkLocalIcon(item.chain, item.chainId == activeChainId.value);
 };
 
@@ -47,10 +49,18 @@ const showAccount = (account: string) => {
     return account.substring(0, 10) + '...' + account.substring(-8, 8);
 };
 
+// 选择网络
+const selectedNetwork = ref();
+const selectNetworkHandle = (item: Network) => {
+    activeChainId.value = item.chainId;
+    selectedNetwork.value = item;
+};
+
 // 选择账号
 const selectAccountHandle = (account: Wallet) => {
     let index = wallet.wallets.indexOf(account);
     wallet.setSelectedIndex(index);
+    store.chain().setCurrentNetwork(selectedNetwork.value);
     emit('close');
 };
 </script>
@@ -72,7 +82,7 @@ const selectAccountHandle = (account: Wallet) => {
             >
                 <n-tab-pane v-for="item in networks" :key="item.chainId" :name="item.chainId">
                     <template #tab>
-                        <div @click="activeChainId = item.chainId">
+                        <div @click="selectNetworkHandle(item)">
                             <img :src="getNetworkIcon(item)" class="icon-img m-[7px]" />
                         </div>
                     </template>

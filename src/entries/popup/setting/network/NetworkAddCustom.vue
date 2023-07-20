@@ -86,7 +86,6 @@ const rules: FormRules = {
 const formRef = ref<any>(null);
 const { networks } = store.chain();
 const addHandle = (e: any) => {
-    e.preventDefault();
     formRef.value.validate((errors: any) => {
         if (errors) return;
         const exists = supportNetworks.find((x) => x.chainId == network.chainId);
@@ -96,6 +95,7 @@ const addHandle = (e: any) => {
             router.go(-1);
             return;
         }
+
         let old = networks.find((x) => x.name == network.name);
         if (old) return window.msg.error(t('setting.alreadyExistNetwork'));
         old = networks.find((x) => x.chainId == network.chainId);

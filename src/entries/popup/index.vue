@@ -7,25 +7,28 @@ import localTokens from '@/asset/json/tokens.json';
 
 // 初始化钱包情况
 const user = store.user();
+const chain = store.chain();
+const wallet = store.wallet();
 const setting = store.setting();
 onMounted(async () => {
-    store.chain().networks = (await localCache.get(
-        'networks',
-        supportNetworks.slice(0, 3)
-    )) as Network[];
-    store.chain().currentNetwork = (await localCache.get('currentNetwork', null)) as Network;
-    if (store.chain().currentNetwork) {
-        store.chain().currentChainId = store.chain().currentNetwork.chainId;
+    chain.networks = (await localCache.get('networks', supportNetworks.slice(0, 3))) as Network[];
+    chain.currentNetwork = (await localCache.get('currentNetwork', null)) as Network;
+    wallet.wallets = (await localCache.get('wallets', [])) as Wallet[];
+    wallet.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
+    user.passwordHash = (await localCache.get('passwordHash', '')) as string;
+    setting.isLock = (await localCache.get('isLock', true)) as boolean;
+
+    const currentWallet = wallet.wallets[wallet.selectedIndex];
+    if (currentWallet) {
+        const network = chain.networks.find((x) => x.chainId == currentWallet.chainId);
+        if (network) chain.currentChain = network.chain;
+        chain.currentChainId = chain.currentNetwork.chainId;
     }
-    store.wallet().wallets = (await localCache.get('wallets', [])) as Wallet[];
-    store.user().passwordHash = (await localCache.get('passwordHash', '')) as string;
-    store.setting().isLock = (await localCache.get('isLock', true)) as boolean;
 
     initTokens();
 });
 
 // 更新token
-const wallet = store.wallet();
 const initTokens = async () => {
     // get tokens form local
     if (!wallet.allTokens || !wallet.allTokens.tokens) {

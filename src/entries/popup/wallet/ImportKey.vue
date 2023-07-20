@@ -25,6 +25,8 @@ watch(
     (index) => {
         chainId.value = networks[index].chainId;
         store.chain().setCurrentNetwork(networks[index]);
+        store.chain().currentChain = networks[index].chain;
+        store.chain().currentChainId = networks[index].chainId;
     },
     { immediate: true }
 );

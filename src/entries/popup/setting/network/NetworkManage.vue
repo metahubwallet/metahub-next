@@ -20,14 +20,15 @@ const removeHandle = (item: Network) => {
 
 // 移除网络
 const { networks } = store.chain();
-const removeNetwork = (network: Network) => {
+const removeNetwork = async (network: Network) => {
     const widx = store.wallet().wallets.findIndex((x) => x.chainId == network.chainId);
     if (widx >= 0) return alert(t('setting.alreadyExistAccount'));
 
     const idx = networks.findIndex((x) => x.chainId == network.chainId);
     if (idx >= 0) {
         networks.splice(idx, 1);
-        store.chain().setNetworks(networks);
+        store.chain().networks = [...networks];
+        await localCache.set('networks', [...networks]);
         if (store.chain().customRpcs[network.chainId]) {
             delete store.chain().customRpcs[network.chainId];
             store.chain().setCustomRpcs(store.chain().customRpcs);

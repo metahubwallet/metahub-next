@@ -62,11 +62,11 @@ export interface Token {
     symbol: string;
     contract: string;
     precision: number;
-    chain: string;
     logo?: string;
 }
 
 export interface Coin extends Token {
+    chain: string;
     amount: number;
 
     [key: string]: any; // 自定义属性
