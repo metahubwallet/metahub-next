@@ -2,10 +2,10 @@
 interface Props {
     isShow: boolean;
     title: string;
-    isCusFooter?: boolean;
+    cusFooter?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
-    isCusFooter: false,
+    cusFooter: false,
 });
 </script>
 
@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
             <slot></slot>
 
             <template #footer>
-                <div class="dialog-foot flex justify-end" v-if="!props.isCusFooter">
+                <div class="dialog-foot flex justify-end" v-if="!props.cusFooter">
                     <n-button @click="$emit('close')" class="mr-2">
                         {{ $t('public.cancel') }}
                     </n-button>

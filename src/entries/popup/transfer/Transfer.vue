@@ -228,13 +228,11 @@ const checkSubmit = () => {
         </div>
 
         <!-- recent transfer -->
-        <popup-bottom
+        <recent-transfer
             :isShow="recentVisible"
-            :title="$t('wallet.recentTransfers')"
+            @select="selectTransferHandle"
             @close="recentVisible = false"
-        >
-            <recent-transfer @select="selectTransferHandle"></recent-transfer>
-        </popup-bottom>
+        ></recent-transfer>
 
         <!-- change token -->
         <select-coin

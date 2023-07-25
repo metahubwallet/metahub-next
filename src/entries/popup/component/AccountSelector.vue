@@ -22,8 +22,6 @@ const chain = store.chain();
 const activeChainId = ref(chain.currentChainId);
 const { networks } = store.chain();
 const getNetworkIcon = (item: Network) => {
-    console.log(item.chain, item.chainId == activeChainId.value);
-
     return getNetworkLocalIcon(item.chain, item.chainId == activeChainId.value);
 };
 

@@ -10,12 +10,7 @@ const wallet = store.wallet();
 </script>
 
 <template>
-    <modal
-        :isShow="props.isShow"
-        :title="$t('wallet.symbols')"
-        @close="$emit('close')"
-        :isCusFooter="true"
-    >
+    <modal :isShow="props.isShow" :title="$t('wallet.symbols')" @close="$emit('close')" cus-footer>
         <n-scrollbar>
             <div class="grid grid-cols-12 border-y py-[8px] border-gray-200">
                 <span class="col-span-3"></span>
@@ -33,14 +28,14 @@ const wallet = store.wallet();
                     <img class="icon-img w-10 h-10" :src="coin.logo ? coin.logo : EOSIcon" />
                 </div>
 
-                <div class="col-span-8 flex flex-col ml-[12px]">
+                <div class="col-span-6 flex flex-col ml-[12px]">
                     <div class="coin-symbol text-[16px]">{{ coin.symbol }}</div>
                     <div class="coin-contract text-[12px]">
                         {{ coin.contract }}
                     </div>
                 </div>
 
-                <div class="col-span-2 text-right pr-[12px]">{{ coin.amount }}</div>
+                <div class="col-span-4 text-right pr-[12px]">{{ coin.amount }}</div>
             </div>
         </n-scrollbar>
     </modal>

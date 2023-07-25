@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import EOSIcon from '@/asset/img/eos_icon.png';
+import ErrorIcon from '@/asset/img/placeholder.png';
 import ErrorCoinImg from '@/asset/img/placeholder.png';
 import { Coin } from '@/store/wallet/type';
 import { eosChainId } from '@/common/util/network';
@@ -54,6 +55,7 @@ const getCoinsLogo = (coins: Coin[]) => {
             if (t.logo) coin.logo = t.logo;
         }
     }
+    console.log(coins);
 };
 
 // 获取余额
@@ -164,6 +166,8 @@ const viewCoinHandle = (item: Coin) => {
                             chainStore.currentChain == 'eos' && item.contract === 'eosio.token'
                                 ? EOSIcon
                                 : item.logo
+                                ? item.logo
+                                : ErrorIcon
                         "
                         class="w-[36px] h-[36px] rounded-[50%]"
                         @error.once="($event.target as HTMLImageElement).src = ErrorCoinImg"

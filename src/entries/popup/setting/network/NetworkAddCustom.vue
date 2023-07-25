@@ -100,9 +100,10 @@ const addHandle = (e: any) => {
         if (old) return window.msg.error(t('setting.alreadyExistNetwork'));
         old = networks.find((x) => x.chainId == network.chainId);
         if (old) return window.msg.error(t('setting.alreadyExist'));
+
         const newNetwork = _.clone(network);
         newNetwork.chain = 'ch' + tool.randomInt(10000, 99999);
-        addNetwork(network);
+        addNetwork(newNetwork);
         router.go(-1);
     });
 };

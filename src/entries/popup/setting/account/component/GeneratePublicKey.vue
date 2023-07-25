@@ -39,7 +39,7 @@ const useKeyHandle = () => {
     <modal
         :is-show="props.isShow"
         :title="$t('setting.generatePublicKey')"
-        :is-cus-footer="true"
+        cus-footer
         @close="$emit('close')"
     >
         <div class="dialog-box">
