@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
+import { eosChainId } from '@/common/util/network';
 import { ResourceData } from '@/store/wallet/type';
 import { toInteger } from 'lodash';
 
-const showResBox = ref(true);
-
 // 初始化
-onMounted(async () => {
-    await localCache.get('smoothMode', false).then((res) => {
-        smoothMode.value = Boolean(res);
+const showResBox = ref(true);
+const wallet = store.wallet();
+onBeforeMount(async () => {
+    showResBox.value = store.chain().currentChainId == eosChainId;
+    loadData();
+    if (wallet.currentWallet.smoothMode) smoothMode.value = true;
+
+    await api.resource.getTime(wallet.currentWallet.name).then((res: any) => {
+        if (res.code == 200) smoothModeCPU.value = Math.floor(res.result / 1000) + ' ms';
     });
 });
 
@@ -16,7 +21,9 @@ onMounted(async () => {
 const smoothMode = ref(false);
 const smoothModeCPU = ref('~');
 const changeSmoothMode = async () => {
-    await localCache.set('smoothMode', smoothMode.value);
+    wallet.wallets[wallet.selectedIndex].smoothMode = smoothMode.value;
+    await localCache.set('wallets', [...wallet.wallets]);
+    smoothMode.value = smoothMode.value;
 };
 
 // 新标签页跳转
@@ -26,13 +33,24 @@ const toLink = (url: string) => {
 
 // 获取数据
 const stakeList = ref([]);
-const wallet = store.wallet();
 const ramprice = ref(0);
-let resourceData = reactive({} as ResourceData);
+let resourceData = reactive({
+    total_resources: {
+        cpu_weight: 0,
+        net_weight: 0,
+    } as any,
+    ram_quota: 0,
+    ram_usage: 0,
+    stakeForOthersCPU: 0,
+    stakeForOthersNET: 0,
+    stakeCpuMax: 0,
+    stakeNetMax: 0,
+} as ResourceData);
 const loadData = async () => {
     try {
         stakeList.value = await chain.get().getDelegatebwList(wallet.currentWallet.name);
         const data: ResourceData = await chain.get().getAccount(wallet.currentWallet.name);
+
         data.cpu_limit.percentage =
             data.cpu_limit.max > 0
                 ? parseInt((data.cpu_limit.used / data.cpu_limit.max) * 100 + '')
@@ -105,7 +123,10 @@ const loadData = async () => {
                     : '-';
         }
         resourceData = data;
+
+        console.log(resourceData);
     } catch (e) {
+        console.log(e);
         window.msg.error(e);
     }
     try {

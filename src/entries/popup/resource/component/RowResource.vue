@@ -9,6 +9,8 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {});
 
+// console.log(props.resourceData);
+
 // 使用数据
 const key = (props.type + '_limit') as 'cpu_limit' | 'net_limit';
 const resoureUsed = computed(() => {
@@ -129,7 +131,7 @@ const getPowupState = async () => {
 };
 
 // 提交
-const receiver = ref('');
+const receiver = ref(wallet.currentWallet.name);
 const transfer = ref(false);
 const submitHandle = async () => {
     let cpu = formatValue(cpuValue.value);
@@ -196,6 +198,7 @@ const submitHandle = async () => {
                     :percentage="resourePercentage"
                     :show-text="false"
                     :stroke-width="9"
+                    :show-indicator="false"
                     class="progress"
                 ></n-progress>
             </div>
@@ -230,7 +233,8 @@ const submitHandle = async () => {
                         {{
                             (props.type === 'cpu'
                                 ? props.resourceData.stakeForOthersCPU
-                                : props.resourceData.stakeForOthersNET) +
+                                : props.resourceData.stakeForOthersNET
+                            ).toFixed(4) +
                             ' ' +
                             currentSymbol
                         }}
@@ -298,32 +302,29 @@ const submitHandle = async () => {
             :title="$t('resource.stakeInfo')"
             @close="showStakedOtherDetail = false"
         >
+            123123
             <staked-other-detail
                 @loadData="$emit('loadData')"
                 :type="props.type"
             ></staked-other-detail>
         </popup-bottom>
 
-        <popup-bottom
+        <resource-option
             :is-show="centerDialogVisible"
-            :title="modalTitle"
+            :modalTitle="modalTitle"
+            v-model:receiver="receiver"
+            v-model:cpu-value="cpuValue"
+            v-model:net-value="netValue"
+            v-model:transfer="transfer"
+            :receiver-visible="receiverVisible"
+            :cpu-placeholder="cpuPlaceholder"
+            :net-placeholder="netPlaceholder"
+            :action="action"
+            :estimated-cost="estimatedCost"
+            :transfer-visible="transferVisible"
             @close="centerDialogVisible = false"
-        >
-            <resource-option
-                v-model:receiver="receiver"
-                v-model:cpu-value="cpuValue"
-                v-model:net-value="netValue"
-                v-model:transfer="transfer"
-                :receiver-visible="receiverVisible"
-                :cpu-placeholder="cpuPlaceholder"
-                :net-placeholder="netPlaceholder"
-                :action="action"
-                :estimated-cost="estimatedCost"
-                :transfer-visible="transferVisible"
-                @close="centerDialogVisible = false"
-                @submit="submitHandle"
-            ></resource-option>
-        </popup-bottom>
+            @submit="submitHandle"
+        ></resource-option>
     </div>
 </template>
 

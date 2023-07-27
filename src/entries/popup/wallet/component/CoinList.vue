@@ -55,7 +55,6 @@ const getCoinsLogo = (coins: Coin[]) => {
             if (t.logo) coin.logo = t.logo;
         }
     }
-    console.log(coins);
 };
 
 // 获取余额

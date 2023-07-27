@@ -1,5 +1,7 @@
 <script setup lang="ts">
 interface Props {
+    isShow: boolean;
+    modalTitle: string;
     receiverVisible: boolean;
     cpuPlaceholder: string;
     cpuValue: number;
@@ -15,11 +17,11 @@ const props = withDefaults(defineProps<Props>(), {});
 </script>
 
 <template>
-    <div>
+    <modal :is-show="props.isShow" :title="props.modalTitle" cus-footer @close="$emit('close')">
         <div class="dialog-item" v-show="props.receiverVisible">
             <span class="label">{{ $t('resource.stakeReceiver') }}</span>
             <n-input
-                :model-value="props.receiver"
+                :value="props.receiver"
                 @update:value="$emit('update:receiver', $event)"
             ></n-input>
         </div>
@@ -28,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {});
             <span class="label">CPU {{ $t('resource.amount') }}</span>
             <n-input-number
                 :placeholder="props.cpuPlaceholder"
-                :model-value="props.cpuValue"
+                :value="props.cpuValue"
                 :min="0"
                 @keyup.native="$emit('number')"
                 @update:value="$emit('update:cpuValue', $event)"
@@ -40,7 +42,7 @@ const props = withDefaults(defineProps<Props>(), {});
             <span class="label">NET {{ $t('resource.amount') }}</span>
             <n-input-number
                 :placeholder="props.netPlaceholder"
-                :model-value="props.netValue"
+                :value="props.netValue"
                 :min="0"
                 @keyup.native="$emit('number')"
                 @update:value="$emit('update:netValue', $event)"
@@ -64,7 +66,7 @@ const props = withDefaults(defineProps<Props>(), {});
                 {{ $t('public.ok') }}
             </n-button>
         </div>
-    </div>
+    </modal>
 </template>
 
 <style lang="scss" scoped>

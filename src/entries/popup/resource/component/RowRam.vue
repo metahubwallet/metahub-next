@@ -103,6 +103,7 @@ const onSubmit = async () => {
                     :percentage="resourceData.ram_percentage"
                     :show-text="false"
                     :stroke-width="9"
+                    :show-indicator="false"
                     class="progress"
                 ></n-progress>
             </div>
@@ -127,10 +128,10 @@ const onSubmit = async () => {
         </div>
 
         <!-- submit form -->
-        <popup-bottom :is-show="modalVisible" :title="modalTitle" @close="modalVisible = false">
+        <modal :is-show="modalVisible" :title="modalTitle" @close="modalVisible = false">
             <div class="dialog-item p-4">
                 <span class="label">{{ $t('resource.stakeReceiver') }}</span>
-                <n-input v-model="receiver"></n-input>
+                <n-input v-model:value="receiver"></n-input>
             </div>
             <div class="dialog-item px-4">
                 <span class="label">{{ $t('resource.amount') }}</span>
@@ -148,7 +149,7 @@ const onSubmit = async () => {
                     {{ $t('public.ok') }}
                 </n-button>
             </div>
-        </popup-bottom>
+        </modal>
     </div>
 </template>
 

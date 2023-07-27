@@ -1,3 +1,3 @@
-import cpu from './cpu';
+import resource from './resource';
 
-export const api = { cpu };
+export const api = { resource };

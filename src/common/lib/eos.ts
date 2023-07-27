@@ -95,6 +95,36 @@ export default class EOS {
         return await rpc.get_info();
     }
 
+    // EOS RAM价格
+    async getRamMarket() {
+        try {
+            let res = await this.rpc.get_table_rows({
+                json: true,
+                code: 'eosio',
+                scope: 'eosio',
+                table: 'rammarket',
+            });
+            return res;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    //  EOS 为他人抵押列表
+    async getDelegatebwList(from: string) {
+        try {
+            let res = await this.rpc.get_table_rows({
+                json: true,
+                code: 'eosio',
+                scope: from,
+                table: 'delband',
+            });
+            return res.rows;
+        } catch (e) {
+            return [];
+        }
+    }
+
     getAPI() {
         const payload = { chainId: this.chainId };
         const options = {
