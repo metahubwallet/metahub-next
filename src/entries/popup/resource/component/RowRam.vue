@@ -128,7 +128,12 @@ const onSubmit = async () => {
         </div>
 
         <!-- submit form -->
-        <modal :is-show="modalVisible" :title="modalTitle" @close="modalVisible = false">
+        <modal
+            :is-show="modalVisible"
+            :title="modalTitle"
+            @close="modalVisible = false"
+            @submit="onSubmit()"
+        >
             <div class="dialog-item p-4">
                 <span class="label">{{ $t('resource.stakeReceiver') }}</span>
                 <n-input v-model:value="receiver"></n-input>
@@ -140,14 +145,6 @@ const onSubmit = async () => {
                     v-model:value="inputValue"
                     clearable
                 ></n-input-number>
-            </div>
-            <div class="dialog-foot px-4">
-                <n-button class="mr-2" @click="modalVisible = false">
-                    {{ $t('public.cancel') }}
-                </n-button>
-                <n-button type="primary" @click="onSubmit()" :loading="submitLoading">
-                    {{ $t('public.ok') }}
-                </n-button>
             </div>
         </modal>
     </div>

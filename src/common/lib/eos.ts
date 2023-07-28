@@ -5,6 +5,7 @@ import { Payload } from './messages/message';
 import { ErrorCode } from '../util/type';
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
 import _ from 'lodash';
+import { Authorization } from '@/store/wallet/type';
 
 export default class EOS {
     public rpc;
@@ -125,6 +126,158 @@ export default class EOS {
         }
     }
 
+    // 获取powerup状态
+    async getPowupState() {
+        try {
+            let res = await this.rpc.get_table_rows({
+                code: 'eosio',
+                scope: '',
+                table: 'powup.state',
+                json: true,
+                limit: 1,
+            });
+            return res && res.rows && res.rows.length ? res.rows[0] : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // 抵押CPU和NET
+    async delegatebw(
+        from: string,
+        receiver: string,
+        stake_net_quantity = '0.0000 EOS',
+        stake_cpu_quantity = '0.0000 EOS',
+        transfer = 0,
+        auth: Authorization
+    ) {
+        const result = await this.transact(
+            {
+                actions: [
+                    {
+                        account: 'eosio',
+                        name: 'delegatebw',
+                        authorization: [auth],
+                        data: {
+                            from,
+                            receiver,
+                            stake_net_quantity,
+                            stake_cpu_quantity,
+                            transfer,
+                        },
+                    },
+                ],
+            },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            }
+        );
+
+        return result;
+    }
+
+    // 赎回CPU和NET
+    async undelegatebw(
+        from: string,
+        receiver: string,
+        unstake_net_quantity = '0.0000 EOS',
+        unstake_cpu_quantity = '0.0000 EOS',
+        auth: Authorization
+    ) {
+        const result = await this.transact(
+            {
+                actions: [
+                    {
+                        account: 'eosio',
+                        name: 'undelegatebw',
+                        authorization: [auth],
+                        data: {
+                            from,
+                            receiver,
+                            unstake_net_quantity,
+                            unstake_cpu_quantity,
+                        },
+                    },
+                ],
+            },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            }
+        );
+        return result;
+    }
+
+    // 立即取回赎回中的资源
+    async refund(owner: string, auth: Authorization) {
+        const result = await this.transact(
+            {
+                actions: [
+                    {
+                        account: 'eosio',
+                        name: 'refund',
+                        authorization: [auth],
+                        data: {
+                            owner,
+                        },
+                    },
+                ],
+            },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            }
+        );
+        return result;
+    }
+
+    async transact(transaction: any, options: any) {
+        let currentAccount = this.chain.currentAccount();
+        let isProxy = currentAccount.smoothMode;
+
+        // 是否为充值CPU
+        if (
+            transaction.actions[0].name == 'transfer' &&
+            transaction.actions[0].account == 'eosio.token'
+        ) {
+            if (transaction.actions[0].data.to == '1stbillpayer') isProxy = true;
+        }
+        if (options.ignoreCPUProxy) isProxy = false;
+
+        if (!isProxy) return this.api.transact(transaction, options);
+
+        for (const action of transaction.actions) {
+            action.authorization.unshift({
+                actor: '1stbillpayer',
+                permission: 'active',
+            });
+        }
+        // 顺畅模式下执行免CPU操作
+        options.broadcast = false;
+        options.sign = true;
+        let signedTrx = (await this.api.transact(transaction, options)) as any;
+        const trx = this.api.deserializeTransaction(signedTrx.serializedTransaction) as any;
+        trx.signatures = [signedTrx.signatures[0]];
+
+        let data = { signed: JSON.stringify(trx) };
+        let res = await api.resource.pushTx(data);
+        if (res && res.data && res.data.code == 200) {
+            const serverSignature = res.data.result.signature;
+            const signatures = [serverSignature, signedTrx.signatures[0]];
+            return this.rpc.push_transaction({
+                signatures,
+                serializedTransaction: signedTrx.serializedTransaction,
+                serializedContextFreeData: signedTrx.serializedContextFreeData,
+            });
+        } else {
+            let msg = 'unkonwn error';
+            if (res && res.data && res.data.message) msg = res.data.message;
+            console.log('error', msg);
+            throw new Error(msg);
+        }
+    }
+
     getAPI() {
         const payload = { chainId: this.chainId };
         const options = {
@@ -146,17 +299,18 @@ export default class EOS {
 
     async getRawAbi(accountName: string) {
         const abi = await this.getAbiJson(accountName);
-        const rawAbi: any = this.api.jsonToRawAbi(abi);
+        const rawAbi: any = this.api.jsonToRawAbi(abi as any);
         return { accountName, abi: rawAbi };
     }
 
     async getAbiJson(contract: string, version = 2) {
         if (contract == 'eosio') {
-            if (version == 1) return require('@/asset/abi/eosio1.abi.json');
-            else return require('@/asset/abi/eosio.abi.json');
+            if (version == 1) return import('@/asset/abi/eosio1.abi.json');
+            if (version == 1) return import('@/asset/abi/eosio1.abi.json');
+            else return import('@/asset/abi/eosio.abi.json');
         } else if (contract == 'eosio.token') {
-            if (version == 1) return require('@/asset/abi/eosio.token1.abi.json');
-            else return require('@/asset/abi/eosio.token.abi.json');
+            if (version == 1) return import('@/asset/abi/eosio.token1.abi.json');
+            else return import('@/asset/abi/eosio.token.abi.json');
         }
         const cachedABI = await tool.getCachedABI(this.chainId, contract);
         const nowTime = new Date().getTime();

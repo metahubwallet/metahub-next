@@ -123,8 +123,6 @@ const loadData = async () => {
                     : '-';
         }
         resourceData = data;
-
-        console.log(resourceData);
     } catch (e) {
         console.log(e);
         window.msg.error(e);

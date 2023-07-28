@@ -4,6 +4,7 @@ import { supportNetworks } from '@/common/util/network';
 import { Network } from '@/store/chain/type';
 import { Token, Wallet } from '@/store/wallet/type';
 import localTokens from '@/asset/json/tokens.json';
+import { isArray } from 'lodash';
 
 // 初始化钱包情况
 const user = store.user();
@@ -15,6 +16,17 @@ onMounted(async () => {
     chain.currentNetwork = (await localCache.get('currentNetwork', null)) as Network;
     wallet.wallets = (await localCache.get('wallets', [])) as Wallet[];
     wallet.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
+    wallet.wallets.forEach((item) => {
+        if (!isArray(item.keys)) {
+            item.keys = Object.values(JSON.parse(JSON.stringify(item.keys)));
+            item.keys.forEach((keys) => {
+                if (!isArray(keys.permissions)) {
+                    keys.permissions = Object.values(JSON.parse(JSON.stringify(keys.permissions)));
+                }
+            });
+        }
+    });
+
     user.passwordHash = (await localCache.get('passwordHash', '')) as string;
     setting.isLock = (await localCache.get('isLock', true)) as boolean;
 

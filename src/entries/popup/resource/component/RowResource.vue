@@ -9,8 +9,6 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {});
 
-// console.log(props.resourceData);
-
 // 使用数据
 const key = (props.type + '_limit') as 'cpu_limit' | 'net_limit';
 const resoureUsed = computed(() => {
@@ -56,6 +54,9 @@ const centerDialogVisible = ref(false);
 const cpuPlaceholder = ref('');
 const netPlaceholder = ref('');
 const modalTitle = ref('');
+const estimatedCost = ref('~');
+const cpuValue = ref(0);
+const netValue = ref(0);
 const { currentSymbol } = store.chain();
 const beforeSubmit = async (value: string) => {
     action.value = value;
@@ -83,7 +84,15 @@ const beforeSubmit = async (value: string) => {
         cpuValue.value = 5000;
         netValue.value = 500;
         modalTitle.value = t('resource.rent') + t('resource.resources');
-        number();
+
+        let parms = powerup(
+            '',
+            '',
+            formatValue(cpuValue.value),
+            formatValue(netValue.value),
+            await getPowupState()
+        );
+        estimatedCost.value = parms.max_payment;
     }
 
     centerDialogVisible.value = true;
@@ -95,39 +104,20 @@ const formatValue = (value: number) => {
     return value.toFixed(precision) + ' ' + currentSymbol;
 };
 
-// 数字化
-const cpuValue = ref(0);
-const netValue = ref(0);
-const estimatedCost = ref('~');
-const number = async () => {
-    if (action.value == 'rent') {
-        let parms = powerup(
-            '',
-            '',
-            formatValue(cpuValue.value),
-            formatValue(netValue.value),
-            await getPowupState()
-        );
-        estimatedCost.value = parms.max_payment;
-    }
-};
-
 // 获取弹出状态
 const getPowupState = async () => {
-    let state = (await localCache.get('powupState', null)) as any;
-    if (state == null || (state && Date.now() - state.timestamp > 86400000)) {
-        // 1 day
-        const result = '';
-        // const result = await chain.get().getPowupState();
+    let powupState = (await localCache.get('powupState', null)) as any;
+    if (powupState == null || (powupState && Date.now() - powupState.timestamp > 86400000)) {
+        const result = await chain.get().getPowupState();
         if (result) {
-            state = {
+            powupState = {
                 state: result,
                 timestamp: Date.now(),
             };
-            await localCache.set('powupState', state);
+            await localCache.set('powupState', powupState);
         }
     }
-    return state.state;
+    return powupState?.state;
 };
 
 // 提交
@@ -147,8 +137,8 @@ const submitHandle = async () => {
                 .delegatebw(
                     wallet.currentWallet.name,
                     receiver.value,
-                    netValue,
-                    cpuValue,
+                    netValue.value,
+                    cpuValue.value,
                     transfer.value,
                     chain.getAuth()
                 );
@@ -158,8 +148,8 @@ const submitHandle = async () => {
                 .undelegatebw(
                     wallet.currentWallet.name,
                     receiver.value,
-                    netValue,
-                    cpuValue,
+                    netValue.value,
+                    cpuValue.value,
                     chain.getAuth()
                 );
         } else if (action.value == 'rent') {
@@ -302,7 +292,6 @@ const submitHandle = async () => {
             :title="$t('resource.stakeInfo')"
             @close="showStakedOtherDetail = false"
         >
-            123123
             <staked-other-detail
                 @loadData="$emit('loadData')"
                 :type="props.type"
