@@ -7,13 +7,13 @@ const wallets = computed(() => {
     let ws: any = [];
     store
         .wallet()
-        .wallets.filter((x) => x.chainId == chainId.value)
+        .wallets.filter((x) => x.chainId === chainId.value)
         .map((x) => {
             const wallet = _.clone(x);
             wallet.symbol = store.chain().findNetwork(x.chainId)?.token.symbol || '';
             ws.push(wallet);
         });
-    return store.wallet().wallets;
+    return ws;
 });
 
 // 查看账号详情

@@ -9,20 +9,7 @@ interface Params {
     operateType: string;
     oldOperateKey: string;
 }
-let perms = [
-    {
-        perm_name: 'owner',
-        required_auth: {
-            keys: [{ key: '1', isCurrent: true }],
-        },
-    },
-    {
-        perm_name: 'active',
-        required_auth: {
-            keys: [{ key: '1', isCurrent: true }],
-        },
-    },
-] as Perm[];
+let perms = ref([] as Perm[]);
 
 const route = useRoute();
 const account = ref(JSON.parse(route.query.account + '') as Wallet);
@@ -45,6 +32,8 @@ onMounted(async () => {
         wallet.currentWallet.name,
         wallet.currentWallet.chainId
     );
+    console.log(result);
+
     if (result.code != 200) return window.msg.error(result.msg);
 
     for (const p of result.permissions) {
@@ -52,7 +41,8 @@ onMounted(async () => {
             k.isCurrent = k.key == wallet.currentWallet.keys[0].publicKey;
         }
     }
-    perms = result.permissions;
+
+    perms.value = result.permissions;
 });
 
 // 跳转操作
@@ -61,7 +51,7 @@ const chainId = ref(route.query.chainId + '');
 const viewAccountChange = (authType: string, operateType: string, oldOperateKey?: string) => {
     let params = {} as Params;
     params.account = account.value;
-    params.perms = perms;
+    params.perms = perms.value;
     params.authType = authType;
     params.operateType = operateType;
     if (oldOperateKey) params.oldOperateKey = oldOperateKey;
@@ -103,11 +93,15 @@ const handleRemove = async (
 /** owner */
 const ownersArray = computed(() => {
     if (perms) {
-        for (let i = 0; i < perms.length; i++) {
-            if (perms[i].perm_name == 'owner') return perms[i].required_auth.keys;
+        for (let i = 0; i < perms.value.length; i++) {
+            if (perms.value[i].perm_name == 'owner') return perms.value[i].required_auth.keys;
         }
     }
     return [];
+});
+
+const hiddenRemoveOwnerBtn = computed(() => {
+    return ownersArray.value.length > 1 ? true : false;
 });
 
 // 移除所有者
@@ -127,16 +121,19 @@ const handleOrderRemove = (oldOperateKey: string) => {
 /** active */
 const activesArray = computed(() => {
     if (perms) {
-        for (let i = 0; i < perms.length; i++) {
-            if (perms[i].perm_name == 'active') return perms[i].required_auth.keys;
+        for (let i = 0; i < perms.value.length; i++) {
+            if (perms.value[i].perm_name == 'active') return perms.value[i].required_auth.keys;
         }
         return [];
     } else return [];
 });
+const hiddenRemoveActiveBtn = computed(() => {
+    return activesArray.value.length > 1 ? true : false;
+});
 
 // 移除激活项
 const walleAuthType = computed(() => {
-    const flag = permissions.value.findIndex((item) => {
+    const flag = perms.value.findIndex((item) => {
         return item.perm_name === 'owner';
     });
     if (flag != -1) return 'owner';
@@ -239,7 +236,7 @@ const removeAccountClicked = () => {
                                         <div
                                             @click="handleOrderRemove(item.key)"
                                             class="account-change-btn"
-                                            v-if="walleAuthType === 'owner'"
+                                            v-if="hiddenRemoveOwnerBtn && walleAuthType === 'owner'"
                                         >
                                             {{ $t('setting.remove') }}
                                         </div>
@@ -287,6 +284,7 @@ const removeAccountClicked = () => {
                                         <div
                                             @click="handleActiveRemove(item.key)"
                                             class="account-change-btn"
+                                            v-if="hiddenRemoveActiveBtn"
                                         >
                                             {{ $t('setting.remove') }}
                                         </div>

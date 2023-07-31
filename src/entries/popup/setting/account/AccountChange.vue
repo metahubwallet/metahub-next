@@ -15,7 +15,7 @@ onBeforeMount(() => {
 
 const route = useRoute();
 const { t } = useI18n();
-const params: any = route.query.params;
+const params = JSON.parse(route.query.params + '');
 const oldOperateKey = ref(params?.oldOperateKey);
 const newOperateKey = ref('');
 const showGeneratePublicKey = ref(false);
@@ -51,7 +51,7 @@ const onSubmit = async () => {
         perms.value = newPerms;
         window.msg.success(t('public.executeSuccess'));
     } catch (e) {
-        window.msg.success(chain.getErrorMsg(e));
+        window.msg.error(chain.getErrorMsg(e));
     }
 };
 </script>

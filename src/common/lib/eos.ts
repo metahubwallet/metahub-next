@@ -5,7 +5,7 @@ import { Payload } from './messages/message';
 import { ErrorCode } from '../util/type';
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
 import _ from 'lodash';
-import { Authorization } from '@/store/wallet/type';
+import { Authorization, Perm, Wallet } from '@/store/wallet/type';
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 
 export default class EOS {
@@ -101,6 +101,106 @@ export default class EOS {
     updateHttpEndpoint(endpoint: string) {
         this.endpoint = endpoint;
         this.rpc.endpoint = endpoint;
+    }
+
+    // 获取新私钥公钥
+    async getRandomPairKey() {
+        const privateKey = await ecc.randomKey();
+        const publicKey = ecc.privateToPublic(privateKey);
+        return { privateKey, publicKey };
+    }
+
+    // 查询公钥是否正确
+    isValidPublic(publicKey: string) {
+        return ecc.isValidPublic(publicKey);
+    }
+
+    /**
+     * 根据实际需求更新 sourcePerms
+     * @param {string} sourcePerms 账户权限说明
+     * @param {string} authType 操作类型: owner/active
+     * @param {string} operateType 操作方式: add/modify/remove
+     * @param {string} oldOperateKey 针对操作的 pubkey
+     * @param {string} newOperateKey 需要新增的 pubkey
+     *
+     */
+    updateNewPermissions(
+        sourcePerms: any[],
+        authType: string,
+        operateType: string,
+        oldOperateKey: string,
+        newOperateKey: string
+    ) {
+        let perms = _.cloneDeep(sourcePerms);
+        for (let i = 0; i < perms.length; i++) {
+            if (perms[i].perm_name == authType) {
+                switch (operateType) {
+                    case 'add':
+                        let item = {
+                            key: newOperateKey,
+                            weight: 1,
+                        };
+                        perms[i].required_auth.keys.push(item);
+                        console.log('add invoked');
+                        break;
+                    case 'modify':
+                        for (let j = 0; j < perms[i].required_auth.keys.length; j++) {
+                            if (perms[i].required_auth.keys[j].key == oldOperateKey) {
+                                perms[i].required_auth.keys[j].key = newOperateKey;
+                            }
+                        }
+                        break;
+                    case 'remove':
+                        for (let j = 0; j < perms[i].required_auth.keys.length; j++) {
+                            if (
+                                perms[i].required_auth.keys[j].key == oldOperateKey &&
+                                perms[i].required_auth.keys.length > 1
+                            ) {
+                                perms[i].required_auth.keys.splice(j, 1);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        for (const p of perms) {
+            for (const k of p.required_auth.keys) {
+                delete k.isCurrent;
+            }
+        }
+        return perms;
+    }
+
+    // 权限更新操作
+    async updatePerms(operateUser: Wallet, perms: any[], auth: Authorization) {
+        let accountName = operateUser.name;
+        const actions = [];
+        for (const perm of perms) {
+            actions.push({
+                account: 'eosio',
+                name: 'updateauth',
+                authorization: [auth],
+                data: {
+                    account: accountName,
+                    permission: perm.perm_name,
+                    parent: perm.parent,
+                    auth: perm.required_auth,
+                },
+            });
+        }
+        // 变更权限无法免CPU
+        const result = await this.transact(
+            { actions },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+                ignoreCPUProxy: true,
+            }
+        );
+
+        return result;
     }
 
     // EOS RAM价格
