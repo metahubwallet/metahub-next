@@ -69,7 +69,7 @@ const checkReceiver = async () => {
 };
 
 // 选择最近记录
-const selectTransferHandle = (transfer: Transation) => {
+const handleSelectTransfer = (transfer: Transation) => {
     recentVisible.value = false;
     form.receiver = transfer.receiver;
     form.memo = transfer.memo;
@@ -87,7 +87,7 @@ const checkQuantity = () => {
 };
 
 // 切换token
-const changeTokenHandle = (coin: Coin) => {
+const handleChangeToken = (coin: Coin) => {
     targetCoin.amount = coin.amount;
     targetCoin.chain = coin.chain;
     targetCoin.contract = coin.contract;
@@ -230,7 +230,7 @@ const checkSubmit = () => {
         <!-- recent transfer -->
         <recent-transfer
             :isShow="recentVisible"
-            @select="selectTransferHandle"
+            @select="handleSelectTransfer"
             @close="recentVisible = false"
         ></recent-transfer>
 
@@ -238,7 +238,7 @@ const checkSubmit = () => {
         <select-coin
             :isShow="selectTokenVisible"
             @close="selectTokenVisible = false"
-            @changeToken="changeTokenHandle"
+            @changeToken="handleChangeToken"
         ></select-coin>
 
         <!-- input password -->

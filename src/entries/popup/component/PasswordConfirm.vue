@@ -12,7 +12,7 @@ const { t } = useI18n();
 // 输入密码
 const password = ref('');
 const emit = defineEmits(['close', 'confirm']);
-const submitHandle = () => {
+const handleSubmit = () => {
     if (password2(password.value) != store.user().passwordHash)
         return window.msg.error(t('password.error'));
 
@@ -26,7 +26,7 @@ const submitHandle = () => {
         :is-show="props.isShow"
         :title="props.title"
         @close="$emit('close')"
-        @submit="submitHandle"
+        @submit="handleSubmit"
     >
         <n-input
             type="password"

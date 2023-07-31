@@ -8,11 +8,15 @@ export default defineStore('chain', {
         rpcs: {},
         selectedRpc: {} as RPC,
         customRpcs: {},
-        currentChain: 'eos',
-        currentChainId: eosChainId,
     }),
 
     getters: {
+        currentChain: (state) => {
+            return state.currentNetwork.chain || 'eos';
+        },
+        currentChainId: (state) => {
+            return state.currentNetwork.chainId || eosChainId;
+        },
         findNetwork: (state) => (chainId: string) => {
             return state.networks.find((x) => x.chainId == chainId);
         },
@@ -25,7 +29,9 @@ export default defineStore('chain', {
             return selectedRpc;
         },
         currentSymbol: (state) => {
-            const network = state.networks.find((x: Network) => x.chainId == state.currentChainId);
+            const network = state.networks.find(
+                (x: Network) => x.chainId == state.currentNetwork.chainId
+            );
             return network ? network.token.symbol : 'EOS';
         },
     },

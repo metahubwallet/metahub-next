@@ -28,7 +28,7 @@ const isShowMemo = computed(() => {
 
 // 转账
 const wallet = store.wallet();
-const submitHandle = async () => {
+const handleSubmit = async () => {
     try {
         let receiver = props.transfer.receiver;
         let memo = props.transfer.memo;
@@ -91,7 +91,7 @@ const submitHandle = async () => {
                 </span>
             </div>
         </div>
-        <n-button type="primary" @click="submitHandle" class="submit-button">
+        <n-button type="primary" @click="handleSubmit" class="submit-button">
             {{ $t('wallet.transfer') }}
         </n-button>
     </div>

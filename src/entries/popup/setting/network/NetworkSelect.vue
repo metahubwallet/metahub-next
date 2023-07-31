@@ -4,7 +4,7 @@ const router = useRouter();
 
 // 选择网络
 const type = ref(useRoute().query.type);
-const nodeSelectHandle = (chainId: string) => {
+const handleNodeSelect = (chainId: string) => {
     if (type.value === 'node') {
         router.push({
             name: 'setting-node',
@@ -30,7 +30,7 @@ const nodeSelectHandle = (chainId: string) => {
                         <!-- network item -->
                         <div
                             :key="item.chainId"
-                            @click="nodeSelectHandle(item.chainId)"
+                            @click="handleNodeSelect(item.chainId)"
                             class="setting-item"
                             v-for="item in networks"
                         >

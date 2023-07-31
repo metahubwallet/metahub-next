@@ -5,7 +5,7 @@ const wallet = store.wallet();
 const trx = ref<any>(useRoute().query.trx);
 const token = ref<any>(useRoute().query.token);
 
-const queryHandle = (url: string) => {
+const handleQuery = (url: string) => {
     url = url + trx.value.trx_id;
     chrome.tabs.create({ url });
 };
@@ -85,23 +85,23 @@ const queryHandle = (url: string) => {
                                 <div class="item">
                                     <div class="item-title">{{ $t('wallet.moreDetail') }}</div>
                                     <div class="item-search">
-                                        <div @click="queryHandle('https://bloks.io/transaction/')">
+                                        <div @click="handleQuery('https://bloks.io/transaction/')">
                                             <img src="@/asset/img/bloks.png" />
                                             <span>bloks</span>
                                         </div>
-                                        <div @click="queryHandle('https://eosflare.io/tx/')">
+                                        <div @click="handleQuery('https://eosflare.io/tx/')">
                                             <img src="@/asset/img/eosflare.png" />
                                             <span>eosflare</span>
                                         </div>
                                     </div>
                                     <div class="item-search">
-                                        <div @click="queryHandle('https://www.eosx.io/tx/')">
+                                        <div @click="handleQuery('https://www.eosx.io/tx/')">
                                             <img src="@/asset/img/eosx.png" />
                                             <span>eosx</span>
                                         </div>
                                         <div
                                             @click="
-                                                queryHandle('https://eos.eosq.eosnation.io/tx/')
+                                                handleQuery('https://eos.eosq.eosnation.io/tx/')
                                             "
                                         >
                                             <img src="@/asset/img/eosq.png" />

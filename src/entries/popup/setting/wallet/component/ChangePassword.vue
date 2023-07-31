@@ -11,7 +11,7 @@ const passwordNew = ref('');
 const passwordConfirm = ref('');
 
 const { t } = useI18n();
-const changePasswordHandle = async () => {
+const handleChangePassword = async () => {
     if (password2(passwordOld.value) != store.user().passwordHash)
         return window.msg.warning(t('password.error'));
 
@@ -40,7 +40,7 @@ const changePasswordHandle = async () => {
         :is-show="props.isShow"
         :title="$t('setting.changePassword')"
         @close="$emit('close')"
-        @submit="changePasswordHandle"
+        @submit="handleChangePassword"
     >
         <!-- old password -->
         <div class="dialog-title">

@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<Props>(), {});
 watch(
     () => props.isShow,
     () => {
-        if (props.isShow) generateKeyHandle();
+        if (props.isShow) handleGenerateKey();
     },
     { immediate: true }
 );
@@ -19,7 +19,7 @@ watch(
 // 生成key
 const publicKey = ref('');
 const privateKey = ref('');
-const generateKeyHandle = async () => {
+const handleGenerateKey = async () => {
     let keypair = await chain.get(props.chainId).getRandomPairKey();
     if (keypair) {
         publicKey.value = keypair.publicKey;
@@ -29,7 +29,7 @@ const generateKeyHandle = async () => {
 
 // 使用key
 const emit = defineEmits(['close', 'setOperateKey']);
-const useKeyHandle = () => {
+const handleUseKey = () => {
     emit('setOperateKey', publicKey.value);
     emit('close');
 };
@@ -65,10 +65,10 @@ const useKeyHandle = () => {
 
             <!-- button -->
             <div class="flex justify-between mt-3">
-                <n-button @click="generateKeyHandle" class="dialog-change-button">
+                <n-button @click="handleGenerateKey" class="dialog-change-button">
                     {{ $t('setting.refresh') }}
                 </n-button>
-                <n-button type="primary" @click="useKeyHandle" class="dialog-change-button">
+                <n-button type="primary" @click="handleUseKey" class="dialog-change-button">
                     {{ $t('setting.useIt') }}
                 </n-button>
             </div>

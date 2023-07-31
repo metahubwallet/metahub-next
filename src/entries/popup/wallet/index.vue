@@ -2,6 +2,7 @@
 const wallet = store.wallet();
 const assetUnit = ref('usd'); // 资产单位
 const assetAmount = ref(0); // 资产数量
+const isLoad = ref(false);
 
 const isSelectToken = ref(false);
 </script>
@@ -9,9 +10,13 @@ const isSelectToken = ref(false);
 <template>
     <div>
         <n-scrollbar class="full" v-if="wallet.wallets.length > 0">
-            <wallet-header :type="assetUnit" :amount="assetAmount"></wallet-header>
+            <wallet-header :type="assetUnit" :amount="assetAmount" :isLoad="isLoad"></wallet-header>
 
-            <coin-list @setUnit="assetUnit = $event" @setAmount="assetAmount = $event"></coin-list>
+            <coin-list
+                @setUnit="assetUnit = $event"
+                @setAmount="assetAmount = $event"
+                @isLoad="isLoad = $event"
+            ></coin-list>
         </n-scrollbar>
 
         <no-account v-else></no-account>

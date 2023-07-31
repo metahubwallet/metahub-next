@@ -8,7 +8,7 @@ export default defineStore('wallet', {
         whitelist: [],
         recentTransations: [],
         allTokens: {},
-        userTokens: [],
+        userTokens: {},
     }),
 
     getters: {
@@ -19,6 +19,14 @@ export default defineStore('wallet', {
         },
         currentWallet: (state) => {
             return state.wallets[state.selectedIndex];
+        },
+        currentWalletKey(): string {
+            const account = this.currentWallet;
+            return account.name + '@' + account.chainId.substring(0, 16);
+        },
+        currentUserTokens(state): Coin[] {
+            const key = this.currentWalletKey;
+            return state.userTokens[key] ? state.userTokens[key] : [];
         },
     },
 
@@ -35,9 +43,13 @@ export default defineStore('wallet', {
             this.allTokens = tokens;
             await localCache.set('allTokens', tokens);
         },
-        async setUserTokens(coins: Coin[]) {
-            this.userTokens = coins;
-            await localCache.set('userTokens', coins);
+        async setUserTokens(tokens: Record<string, Coin[]>) {
+            this.userTokens = tokens;
+            await localCache.set('userTokens', tokens);
+        },
+        async setCurrentUserTokens(tokens: Coin[]) {
+            this.userTokens[this.currentWalletKey] = tokens;
+            await localCache.set('userTokens', this.userTokens);
         },
         async setWhitelist(list: WhiteItem[]) {
             this.whitelist = list;

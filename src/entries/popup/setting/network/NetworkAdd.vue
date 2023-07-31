@@ -11,7 +11,7 @@ const supportNets = ref(supportNetworks);
 
 // 添加网络前置操作
 const chainStore = store.chain();
-const addHandle = (network: Network) => {
+const handleAdd = (network: Network) => {
     window.dialog.warning({
         title: t('public.tip'),
         content: t('setting.sureAddPrefix') + network.name + t('setting.sureAddSuffix'),
@@ -43,7 +43,7 @@ const addNetwork = (network: Network) => {
 };
 
 // 确定移除
-const removeHandle = (item: Network) => {
+const handleRemove = (item: Network) => {
     window.dialog.warning({
         title: t('public.tip'),
         content: t('setting.sureDeletePrefix') + item.name + t('setting.sureDeleteSuffix'),
@@ -108,7 +108,7 @@ const removeNetwork = (network: Network) => {
                                         :strokeWidth="3"
                                         class="cursor-pointer"
                                         v-show="!chainStore.findNetwork(network.chainId)"
-                                        @click="addHandle(network)"
+                                        @click="handleAdd(network)"
                                     />
                                     <!-- remove  -->
                                     <icon-delete
@@ -121,7 +121,7 @@ const removeNetwork = (network: Network) => {
                                             chainStore.findNetwork(network.chainId) &&
                                             network.chainId != eChainId
                                         "
-                                        @click="removeHandle(network)"
+                                        @click="handleRemove(network)"
                                     />
                                 </td>
                             </tr>

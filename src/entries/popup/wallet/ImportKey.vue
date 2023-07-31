@@ -24,19 +24,23 @@ watch(
     activeIndex,
     (index) => {
         chainId.value = networks[index].chainId;
-        store.chain().setCurrentNetwork(networks[index]);
-        store.chain().currentChain = networks[index].chain;
-        store.chain().currentChainId = networks[index].chainId;
     },
     { immediate: true }
 );
 
 // import wallet
 const checked = ref(true);
+const isLoad = ref(false);
 const accountList = ref([] as Wallet[]);
-const importKeyHandle = async () => {
+const handleImportKey = async () => {
+    if (isLoad.value) return;
+    isLoad.value = true;
+
     /** 判断协议勾选 */
-    if (!checked.value) return window.msg.warning('请仔细阅读协议,并勾选');
+    if (!checked.value) {
+        isLoad.value = false;
+        return window.msg.warning('请仔细阅读协议,并勾选');
+    }
 
     /** 循环遍历需要取的协议 */
     const importAccounts = [];
@@ -106,6 +110,8 @@ const importKeyHandle = async () => {
             }
         } catch (e) {
             console.log(e);
+            window.msg.error(e);
+            isLoad.value = false;
         }
     } else tipMessage = t('public.invaildPrivateKey');
 
@@ -116,7 +122,10 @@ const importKeyHandle = async () => {
         isShowChoose.value = true;
     } else if (importAccounts.length == 1) {
         await importWallet(importAccounts);
-    } else window.msg.error(tipMessage);
+    } else {
+        window.msg.error(tipMessage);
+        isLoad.value = false;
+    }
 };
 
 // import wallet
@@ -124,6 +133,8 @@ const router = useRouter();
 const privateKey = ref('');
 const emit = defineEmits(['refreshTokens']);
 const importWallet = async (wallets: Wallet[]) => {
+    isLoad.value = true;
+
     for (const wallet of wallets) {
         await chain.fetchPermissions(wallet.name, wallet.chainId);
     }
@@ -132,19 +143,21 @@ const importWallet = async (wallets: Wallet[]) => {
     const firstWallet = wallets[0];
     let index = store.wallet().wallets.indexOf(firstWallet);
     store.wallet().setSelectedIndex(index >= 0 ? index : 0);
+    store.chain().setCurrentNetwork(networks[activeIndex.value]);
 
     setTimeout(() => {
         emit('refreshTokens', true);
     }, 100);
 
     window.msg.success(t('wallet.importSuccess'));
+    isLoad.value = false;
     privateKey.value = '';
     router.go(-1);
 };
 
 // select wallet
 const isShowChoose = ref(false);
-const selectWalletHandle = async (selectWallets: Wallet[]) => {
+const handleSelectWallet = async (selectWallets: Wallet[]) => {
     if (selectWallets.length < 1) return window.msg.warning(t('wallet.selectOneAtLeast'));
 
     await importWallet(selectWallets);
@@ -225,7 +238,7 @@ const sortAccounts = (first: any, second: any) => {
                             {{ $t('public.readAndAgreeProtocols') }}
                         </span>
                     </span>
-                    <n-button @click="importKeyHandle" class="import-key-btn">
+                    <n-button @click="handleImportKey" :loading="isLoad" class="import-key-btn">
                         {{ $t('public.importKey') }}
                     </n-button>
                 </div>
@@ -234,8 +247,11 @@ const sortAccounts = (first: any, second: any) => {
             <import-choose
                 :is-show="isShowChoose"
                 :accountList="accountList"
-                @close="isShowChoose = false"
-                @import="selectWalletHandle"
+                @close="
+                    isShowChoose = false;
+                    isLoad = false;
+                "
+                @import="handleSelectWallet"
             ></import-choose>
         </div>
     </div>

@@ -37,7 +37,7 @@ watch(
 // 获取文件信息
 const beforeUpload = (e: any) => {
     values.uploadName = e.file.name;
-    backUpFile = e.file;
+    backUpFile = e.file.file;
 };
 // 清空文件信息
 const removeUpload = () => {
@@ -99,16 +99,17 @@ const importWalletsFromData = async (content: string) => {
         }
     }
 
-    store.wallet().setWallets(importData.wallets);
-    store.wallet().setUserTokens(importData.userTokens);
-    store.wallet().setSelectedIndex(importData.selectedIndex);
     store.chain().setNetworks(importData.networks);
+    store.chain().setCurrentNetwork(importData.currentNetwork);
     store.chain().setSelectedRpc(importData.selectedRpc);
     store.chain().setCustomRpcs(importData.customRpcs);
+    store.wallet().setWallets(importData.wallets);
+    store.wallet().setSelectedIndex(importData.selectedIndex);
+    store.wallet().setUserTokens(importData.userTokens);
     store.user().password = importData.password;
     store.user().setPasswordHash(importData.passwordHash);
-    store.setting().setIsLock(true);
     store.setting().setLang(importData.language);
+    store.setting().setIsLock(true);
 
     emits('refreshTokens', true);
     router.push({ name: 'index' });

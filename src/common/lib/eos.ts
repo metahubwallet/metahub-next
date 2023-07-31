@@ -6,6 +6,7 @@ import { ErrorCode } from '../util/type';
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
 import _ from 'lodash';
 import { Authorization } from '@/store/wallet/type';
+import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 
 export default class EOS {
     public rpc;
@@ -94,6 +95,12 @@ export default class EOS {
     async testHttpEndpoint(endpoint = '') {
         let rpc = new JsonRpc(endpoint);
         return await rpc.get_info();
+    }
+
+    // 更新节点
+    updateHttpEndpoint(endpoint: string) {
+        this.endpoint = endpoint;
+        this.rpc.endpoint = endpoint;
     }
 
     // EOS RAM价格
@@ -232,7 +239,76 @@ export default class EOS {
         return result;
     }
 
-    async transact(transaction: any, options: any) {
+    // 租用
+    async powerup(parms: any, auth: Authorization) {
+        const result = await this.transact(
+            {
+                actions: [
+                    {
+                        account: 'eosio',
+                        name: 'powerup',
+                        data: parms,
+                        authorization: [auth],
+                    },
+                ],
+            },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            }
+        );
+        return result;
+    }
+
+    // 购买RAM
+    async buyRam(payer: string, receiver: string, quant: string, auth: Authorization) {
+        const result = await this.transact(
+            {
+                actions: [
+                    {
+                        account: 'eosio',
+                        name: 'buyram',
+                        authorization: [auth],
+                        data: {
+                            payer,
+                            receiver,
+                            quant,
+                        },
+                    },
+                ],
+            },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            }
+        );
+        return result;
+    }
+
+    // 出售RAM
+    async sellRam(account: string, bytes: number, auth: Authorization) {
+        const result = await this.transact(
+            {
+                actions: [
+                    {
+                        account: 'eosio',
+                        name: 'sellram',
+                        authorization: [auth],
+                        data: {
+                            account,
+                            bytes,
+                        },
+                    },
+                ],
+            },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            }
+        );
+    }
+
+    async transact(transaction: Transaction, options: any) {
         let currentAccount = this.chain.currentAccount();
         let isProxy = currentAccount.smoothMode;
 
@@ -245,7 +321,9 @@ export default class EOS {
         }
         if (options.ignoreCPUProxy) isProxy = false;
 
-        if (!isProxy) return this.api.transact(transaction, options);
+        if (!isProxy) {
+            return this.api.transact(transaction, options);
+        }
 
         for (const action of transaction.actions) {
             action.authorization.unshift({

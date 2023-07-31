@@ -14,14 +14,27 @@ const showAddToken = ref(false);
 let isLoad = ref(false);
 const tokens = ref<Coin[]>([]);
 const wallet = store.wallet();
+const emit = defineEmits(['isLoad', 'setUnit', 'setAmount']);
+onMounted(async () => {
+    await loadTokens();
+});
+watch(
+    () => wallet.currentWallet.account,
+    async (v) => {
+        await loadTokens();
+    }
+);
+watch(isLoad, () => {
+    emit('isLoad', isLoad.value);
+});
+
+// 加载tokens
 const loadTokens = async () => {
     if (isLoad.value) return;
-
     isLoad.value = true;
-    if (wallet.wallets.length == 0) return;
 
-    if (wallet.userTokens.length == 0) {
-        wallet.setUserTokens([
+    if (wallet.currentUserTokens.length == 0) {
+        wallet.setCurrentUserTokens([
             {
                 amount: 0,
                 ...chainStore.currentNetwork.token,
@@ -29,7 +42,7 @@ const loadTokens = async () => {
             },
         ]);
     }
-    tokens.value = wallet.userTokens.concat();
+    tokens.value = wallet.currentUserTokens;
 
     getCoinsLogo(tokens.value);
     await getUserBalance();
@@ -37,23 +50,12 @@ const loadTokens = async () => {
     await getWalletCache();
     isLoad.value = false;
 };
-onMounted(async () => {
-    await loadTokens();
-});
-watch(
-    () => wallet.selectedIndex,
-    (newValue, oldValue) => {
-        if (newValue !== oldValue) loadTokens();
-    }
-);
 
 // 获取Coin图标
 const getCoinsLogo = (coins: Coin[]) => {
     for (const coin of coins) {
-        if (!coin.logo) {
-            const t = wallet.getCoin(coin);
-            if (t.logo) coin.logo = t.logo;
-        }
+        const t = wallet.getCoin(coin);
+        if (t.logo) coin.logo = t.logo;
     }
 };
 
@@ -76,7 +78,6 @@ const getUserBalance = async () => {
 };
 
 // 获取价格
-const emit = defineEmits(['setUnit', 'setAmount']);
 const handleGetEosPrice = async () => {
     const eosToken = tokens.value.find((i) => i.contract === 'eosio.token' && i.symbol === 'EOS');
 
@@ -84,8 +85,9 @@ const handleGetEosPrice = async () => {
         emit('setUnit', eosToken.symbol);
         emit('setAmount', eosToken.amount);
 
-        if (eosToken.chain == 'eos') {
+        if (eosToken.chain === 'eos') {
             const eosPrice = await chain.get().getEosPrice();
+
             emit('setUnit', 'usd');
             emit(
                 'setAmount',
@@ -119,7 +121,7 @@ const getWalletCache = async () => {
 
 // 查看coin详情
 const router = useRouter();
-const viewCoinHandle = (item: Coin) => {
+const handleViewCoin = (item: Coin) => {
     if (!isSupportChain(chainStore.currentChain)) return;
 
     const token = item.contract + '-' + item.symbol;
@@ -154,7 +156,7 @@ const viewCoinHandle = (item: Coin) => {
         <!-- body -->
         <n-scrollbar style="max-height: 277px">
             <div
-                @click="viewCoinHandle(item)"
+                @click="handleViewCoin(item)"
                 class="resource-item"
                 v-for="(item, index) of tokens"
                 :key="index"

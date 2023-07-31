@@ -7,7 +7,7 @@ const showChangePassword = ref(false);
 
 // 账号管理
 const router = useRouter();
-const accountManageHandle = () => {
+const handleAccountManage = () => {
     // 直接跳转当前账号公链的账号列表
     let currentChainId = store.chain().currentChainId;
     if (!currentChainId) currentChainId = eosChainId;
@@ -20,7 +20,7 @@ const accountManageHandle = () => {
 
 // 清除缓存
 const { t } = useI18n();
-const clearCacheHandle = async () => {
+const handleClearCache = async () => {
     await localCache.remove('cachedAbis');
     window.msg.success(t('public.executeSuccess'));
 };
@@ -35,7 +35,7 @@ const clearCacheHandle = async () => {
                 <n-scrollbar class="full">
                     <div class="setting-group">
                         <!-- account manager -->
-                        <div @click="accountManageHandle" class="setting-item">
+                        <div @click="handleAccountManage" class="setting-item">
                             <div class="setting-item-left">
                                 <div class="item-title">{{ $t('setting.managePermissions') }}</div>
                             </div>
@@ -75,7 +75,7 @@ const clearCacheHandle = async () => {
                         </div>
 
                         <!-- clear cache -->
-                        <div @click="clearCacheHandle" class="setting-item">
+                        <div @click="handleClearCache" class="setting-item">
                             <div class="setting-item-left">
                                 <div class="item-title">{{ $t('setting.clearAbiCache') }}</div>
                             </div>

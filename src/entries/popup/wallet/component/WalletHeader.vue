@@ -2,6 +2,7 @@
 export interface Props {
     type: string;
     amount: number;
+    isLoad: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {});
 
@@ -16,7 +17,7 @@ const totalValue = computed(() => {
 // 跳转至转账页
 const wallet = store.wallet();
 const router = useRouter();
-const viewTransferHandle = () => {
+const handleViewTransfer = () => {
     const eosToken = wallet.userTokens.find(
         (i) => i.contract === 'eosio.token' && i.symbol === 'EOS'
     );
@@ -35,11 +36,12 @@ const viewTransferHandle = () => {
         <div class="wallet-header-div">
             <div class="my-asset-tip">{{ $t('wallet.assets') }}</div>
             <div class="my-asset-number">
-                <span class="asset-number-left">{{ totalValue }}</span>
+                <span v-if="!props.isLoad" class="asset-number-left">{{ totalValue }}</span>
+                <n-spin v-else :size="18" stroke="#fff" class="ml-[10px] mb-[3px]" />
             </div>
         </div>
         <div class="bottom-btn-container">
-            <div @click="viewTransferHandle" class="one-btn-container">
+            <div @click="handleViewTransfer" class="one-btn-container">
                 <img src="@/asset/img/wallet_transfer@2x.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('wallet.transfer') }}</div>
             </div>

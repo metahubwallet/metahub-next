@@ -13,7 +13,9 @@ export interface WalletState {
     allTokens: {
         [key: string]: Coin[]; // 链: Coins
     };
-    userTokens: Coin[];
+    userTokens: {
+        [key: string]: Coin[]; // 链: Coins
+    };
 }
 
 export interface Wallet {

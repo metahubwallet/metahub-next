@@ -8,7 +8,7 @@ const contract = ref('');
 const { t } = useI18n();
 const router = useRouter();
 const emit = defineEmits(['refreshTokens']);
-const addTokenHandle = async () => {
+const handleAddToken = async () => {
     try {
         const newContract = contract.value.toLowerCase();
         const symbol = code.value.toUpperCase();
@@ -69,7 +69,7 @@ const addTokenHandle = async () => {
                     </div>
                 </div>
                 <div class="bottom-container">
-                    <n-button @click="addTokenHandle" class="submit-btn" type="primary">
+                    <n-button @click="handleAddToken" class="submit-btn" type="primary">
                         {{ $t('wallet.submit') }}
                     </n-button>
                 </div>

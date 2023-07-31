@@ -1,12 +1,11 @@
 import { Message, Payload } from '@/common/lib/messages/message';
 import * as MessageTypes from '@/common/lib/messages/types';
-import { Account, Authorization, Wallet, WhiteItem } from '@/store/wallet/type';
+import { Authorization, Wallet, WhiteItem } from '@/store/wallet/type';
 import SdkError from '@/common/lib/sdkError';
 import Windows from '@/common/lib/windows';
 import Eos from '@/common/lib/eos';
 import { Network, RPC } from '@/store/chain/type';
 import { decrypt, md5 } from '@/common/util/crypto';
-import { supportNetworks } from '@/common/util/network';
 
 class Background {
     static cachedInfo: any;
@@ -193,7 +192,7 @@ class Background {
         return [];
     }
 
-    static generateIdengity(accounts: Account[]) {
+    static generateIdengity(accounts: any[]) {
         return {
             accounts: accounts.map((x) => {
                 const id = {

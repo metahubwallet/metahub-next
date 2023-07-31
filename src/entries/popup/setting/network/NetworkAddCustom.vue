@@ -85,7 +85,7 @@ const rules: FormRules = {
 // 添加前处理
 const formRef = ref<any>(null);
 const { networks } = store.chain();
-const addHandle = (e: any) => {
+const handleAdd = (e: any) => {
     formRef.value.validate((errors: any) => {
         if (errors) return;
         const exists = supportNetworks.find((x) => x.chainId == network.chainId);
@@ -109,21 +109,26 @@ const addHandle = (e: any) => {
 };
 
 // 添加自定义网络
-const addNetwork = (network: Network) => {
+const addNetwork = async (network: Network) => {
     store.chain().setNetworks([...store.chain().networks, network]);
 
     const selectedRpc = store.chain().selectedRpc;
     selectedRpc[network.chainId] = network.endpoint;
     store.chain().setSelectedRpc(selectedRpc);
 
-    const customRpcs = store.chain().customRpcs;
-    customRpcs[network.chainId] = [
-        {
-            name: network.name,
-            endpoint: network.endpoint,
-        },
-    ];
+    const customRpcs = {
+        ...store.chain().customRpcs,
+        [network.chainId]: [
+            {
+                name: network.name,
+                endpoint: network.endpoint,
+            },
+        ],
+    };
     store.chain().setCustomRpcs(customRpcs);
+
+    console.log(await localCache.get('customRpcs'));
+    console.log(await localCache.get('selectedRpc'));
 };
 </script>
 
@@ -194,7 +199,7 @@ const addNetwork = (network: Network) => {
 
                     <!-- footer -->
                     <div class="footer mt-2">
-                        <n-button type="primary" class="button" @click="addHandle">
+                        <n-button type="primary" class="button" @click="handleAdd">
                             {{ $t('password.submit') }}
                         </n-button>
                     </div>

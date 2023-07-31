@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Windows from '@/common/lib/windows';
 import { supportNetworks } from '@/common/util/network';
-import { Network } from '@/store/chain/type';
+import { Network, RPC } from '@/store/chain/type';
 import { Token, Wallet } from '@/store/wallet/type';
 import localTokens from '@/asset/json/tokens.json';
 import { isArray } from 'lodash';
@@ -14,28 +14,12 @@ const setting = store.setting();
 onMounted(async () => {
     chain.networks = (await localCache.get('networks', supportNetworks.slice(0, 3))) as Network[];
     chain.currentNetwork = (await localCache.get('currentNetwork', null)) as Network;
+    chain.selectedRpc = (await localCache.get('selectedRpc', null)) as any;
+    chain.customRpcs = (await localCache.get('customRpcs', null)) as any;
     wallet.wallets = (await localCache.get('wallets', [])) as Wallet[];
     wallet.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
-    wallet.wallets.forEach((item) => {
-        if (!isArray(item.keys)) {
-            item.keys = Object.values(JSON.parse(JSON.stringify(item.keys)));
-            item.keys.forEach((keys) => {
-                if (!isArray(keys.permissions)) {
-                    keys.permissions = Object.values(JSON.parse(JSON.stringify(keys.permissions)));
-                }
-            });
-        }
-    });
-
     user.passwordHash = (await localCache.get('passwordHash', '')) as string;
     setting.isLock = (await localCache.get('isLock', true)) as boolean;
-
-    const currentWallet = wallet.wallets[wallet.selectedIndex];
-    if (currentWallet) {
-        const network = chain.networks.find((x) => x.chainId == currentWallet.chainId);
-        if (network) chain.currentChain = network.chain;
-        chain.currentChainId = chain.currentNetwork.chainId;
-    }
 
     initTokens();
 });
@@ -77,7 +61,7 @@ const getTokenMapFromArray = (tokenArray: any[]) => {
 // 钱包选择
 const showAccountSelector = ref(false);
 const router = useRouter();
-const importKeyHandle = (chainId: string) => {
+const handleImportKey = (chainId: string) => {
     router.push({
         name: 'import-key',
         query: { chainId },
@@ -126,7 +110,7 @@ watch(
                 :is-show="showAccountSelector"
                 v-model="showAccountSelector"
                 @close="showAccountSelector = false"
-                @importKey="importKeyHandle"
+                @importKey="handleImportKey"
             ></account-selector>
         </div>
 

@@ -15,7 +15,7 @@ const walletPassowrd = ref('');
 const encryptPassword = ref('');
 
 // 确认提交
-const submitHandle = () => {
+const handleSubmit = () => {
     if (password2(walletPassowrd.value) != store.user().passwordHash)
         return window.msg.error(t('password.error'));
 
@@ -37,8 +37,11 @@ const submitHandle = () => {
 
 // 导出钱包
 const exportWallet = () => {
-    const { allTokens, ...wallet } = store.wallet().$state;
-    const exportData = { ...wallet };
+    const exportData = {
+        ...store.wallet().$state,
+        ...store.chain().$state,
+        language: store.setting().language,
+    };
 
     for (const wallet of exportData.wallets) {
         for (const key of wallet.keys) {
@@ -65,7 +68,7 @@ const exportWallet = () => {
         :is-show="props.isShow"
         :title="$t('setting.exportWallet')"
         @close="$emit('close')"
-        @submit="submitHandle"
+        @submit="handleSubmit"
     >
         <!-- wallet passowrd -->
         <div class="dialog-title">

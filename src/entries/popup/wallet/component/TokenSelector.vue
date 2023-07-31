@@ -80,7 +80,7 @@ const searchTokens = () => {
 
 // 新增token
 const emit = defineEmits(['close', 'refreshTokens']);
-const addTokenHandle = async (token: Coin) => {
+const handleAddToken = async (token: Coin) => {
     if (token.isShow) {
         const index = wallet.userTokens.findIndex(
             (x: Token) => x.contract == token.contract && x.symbol == token.symbol
@@ -142,7 +142,7 @@ const addTokenHandle = async (token: Coin) => {
                         <img
                             :src="token.isShow ? CoinAddSelected : CoinAdd"
                             class="icon-img border-none w-[25px] h-[25px]"
-                            @mouseup="addTokenHandle(token)"
+                            @mouseup="handleAddToken(token)"
                         />
                     </div>
                 </div>

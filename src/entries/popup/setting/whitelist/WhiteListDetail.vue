@@ -8,7 +8,7 @@ onBeforeMount(() => {
 
 // 删除白名单
 const domain = ref(Number(useRoute().query.domain));
-const deleteWhiteListHandle = (list: WhiteItem[]) => {
+const handleDeleteWhiteList = (list: WhiteItem[]) => {
     store.wallet().whitelist.forEach((item1, index) => {
         list.forEach((item2) => {
             if (JSON.stringify(item1) === JSON.stringify(item2))
@@ -68,7 +68,7 @@ const getData = () => {
                                 <div class="account-type">
                                     <div class="account-type-left">{{ codeKey }}</div>
                                     <div
-                                        @click="deleteWhiteListHandle(whiteList)"
+                                        @click="handleDeleteWhiteList(whiteList)"
                                         class="account-type-right"
                                     >
                                         {{ $t('setting.whiteListCancel2') }}
@@ -84,7 +84,7 @@ const getData = () => {
                                             {{ whiteItem.action }}
                                         </div>
                                         <div
-                                            @click="deleteWhiteListHandle([whiteItem])"
+                                            @click="handleDeleteWhiteList([whiteItem])"
                                             class="account-type-right"
                                         >
                                             {{ $t('setting.whiteListCancel') }}

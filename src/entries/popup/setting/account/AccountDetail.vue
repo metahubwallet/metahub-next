@@ -74,7 +74,7 @@ const viewAccountChange = (authType: string, operateType: string, oldOperateKey?
 
 // 移除操作
 const { t } = useI18n();
-const removeHandle = async (
+const handleRemove = async (
     perms: any,
     authType: string,
     operateType: string,
@@ -111,14 +111,14 @@ const ownersArray = computed(() => {
 });
 
 // 移除所有者
-const orderRemoveHandle = (oldOperateKey: string) => {
+const handleOrderRemove = (oldOperateKey: string) => {
     window.dialog.warning({
         title: t('public.tip'),
         content: t('setting.confirmRemove'),
         positiveText: t('public.ok'),
         negativeText: t('public.cancel'),
         onPositiveClick: () => {
-            removeHandle(perms, 'owner', 'remove', oldOperateKey, 'owner');
+            handleRemove(perms, 'owner', 'remove', oldOperateKey, 'owner');
         },
         onNegativeClick: () => {},
     });
@@ -142,14 +142,14 @@ const walleAuthType = computed(() => {
     if (flag != -1) return 'owner';
     else return 'active';
 });
-const activeRemoveHandle = (oldOperateKey: string) => {
+const handleActiveRemove = (oldOperateKey: string) => {
     window.dialog.warning({
         title: t('public.tip'),
         content: t('setting.confirmRemove'),
         positiveText: t('public.ok'),
         negativeText: t('public.cancel'),
         onPositiveClick: () => {
-            removeHandle(perms, 'active', 'remove', oldOperateKey, walleAuthType.value);
+            handleRemove(perms, 'active', 'remove', oldOperateKey, walleAuthType.value);
         },
         onNegativeClick: () => {},
     });
@@ -237,7 +237,7 @@ const removeAccountClicked = () => {
                                         </div>
                                         <!-- remove -->
                                         <div
-                                            @click="orderRemoveHandle(item.key)"
+                                            @click="handleOrderRemove(item.key)"
                                             class="account-change-btn"
                                             v-if="walleAuthType === 'owner'"
                                         >
@@ -285,7 +285,7 @@ const removeAccountClicked = () => {
                                         </div>
                                         <!-- remove -->
                                         <div
-                                            @click="activeRemoveHandle(item.key)"
+                                            @click="handleActiveRemove(item.key)"
                                             class="account-change-btn"
                                         >
                                             {{ $t('setting.remove') }}

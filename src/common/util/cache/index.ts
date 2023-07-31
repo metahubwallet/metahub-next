@@ -9,7 +9,7 @@ interface CacheData {
 export const localCache = {
     async set(key: CacheKey, value: any, liveSeconds?: number) {
         new Promise(() => {
-            let data: CacheData = { value };
+            let data: CacheData = { value: JSON.stringify(value) };
             if (liveSeconds) data.expire = new Date().getTime() + liveSeconds * 1000;
             chrome.storage.local.set({ [key]: data }, () => {});
         });
@@ -25,7 +25,10 @@ export const localCache = {
                         localCache.remove(key).then(() => {
                             resolve(defaultValue);
                         });
-                    } else resolve(data.value);
+                    } else {
+                        if (typeof data.value === 'undefined') resolve(defaultValue);
+                        else resolve(JSON.parse(data.value));
+                    }
                 } else resolve(defaultValue);
             });
         });

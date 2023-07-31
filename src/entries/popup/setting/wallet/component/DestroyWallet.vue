@@ -11,7 +11,7 @@ const router = useRouter();
 
 // 确认销毁
 const showConfirmModal = ref(false);
-const confirmHandle = async () => {
+const handleConfirm = async () => {
     store.wallet().setWallets([]);
     store.wallet().setUserTokens([]);
     store.user().password = '';
@@ -36,7 +36,7 @@ const confirmHandle = async () => {
         :is-show="showConfirmModal"
         :title="$t('setting.reconfirm')"
         @close="$emit('close')"
-        @submit="confirmHandle"
+        @submit="handleConfirm"
     >
         <div>{{ $t('setting.confirmDestroy') }}</div>
     </modal>

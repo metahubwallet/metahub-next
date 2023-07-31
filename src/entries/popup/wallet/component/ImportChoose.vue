@@ -30,7 +30,7 @@ nextTick(() => {
 
 // 导入wallet
 const emit = defineEmits(['import', 'close']);
-const importWalletHandle = () => {
+const handleImportWallet = () => {
     let selectedWallets = [];
     for (const wallet of wallets.value) {
         if (wallet.isSelected) selectedWallets.push(props.accountList[wallet.index]);
@@ -40,14 +40,14 @@ const importWalletHandle = () => {
 
 // 全选wallet
 const isSelectAll = ref(false);
-const allSelectHandle = () => {
+const handleAllSelect = () => {
     for (const wallet of wallets.value) {
         wallet.isSelected = isSelectAll.value;
     }
 };
 
 // 选择wallet
-const selectWalletHandle = (wallet: any) => {
+const handleSelectWallet = (wallet: any) => {
     wallet.isSelected = !wallet.isSelected;
     const flag = wallets.value.findIndex((item) => {
         return item.isSelected === false;
@@ -63,10 +63,10 @@ const selectWalletHandle = (wallet: any) => {
             <div class="title-cell">
                 <div class="title">{{ $t('auth.chooseAccount') }}</div>
                 <div class="action">
-                    <div @click="importWalletHandle" class="import-button">
+                    <div @click="handleImportWallet" class="import-button">
                         {{ $t('wallet.importSelectedWallets') }}
                     </div>
-                    <n-checkbox v-model:checked="isSelectAll" @change="allSelectHandle">
+                    <n-checkbox v-model:checked="isSelectAll" @change="handleAllSelect">
                         {{ $t('public.selectAll') }}
                     </n-checkbox>
                 </div>
@@ -76,7 +76,7 @@ const selectWalletHandle = (wallet: any) => {
             <div class="list-container">
                 <div
                     :key="item.index"
-                    @click="selectWalletHandle(item)"
+                    @click="handleSelectWallet(item)"
                     class="account-cell"
                     v-for="item in wallets"
                 >

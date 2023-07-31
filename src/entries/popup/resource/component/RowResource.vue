@@ -123,11 +123,11 @@ const getPowupState = async () => {
 // 提交
 const receiver = ref(wallet.currentWallet.name);
 const transfer = ref(false);
-const submitHandle = async () => {
-    let cpu = formatValue(cpuValue.value);
-    let net = formatValue(netValue.value);
+const handleSubmit = async () => {
+    let cpuQuantity = formatValue(cpuValue.value);
+    let netQuantity = formatValue(netValue.value);
 
-    if (cpu == formatValue(0) && net == formatValue(0))
+    if (cpuQuantity == formatValue(0) && netQuantity == formatValue(0))
         return window.msg.warning(t('resource.valueError'));
     try {
         let result = {};
@@ -137,8 +137,8 @@ const submitHandle = async () => {
                 .delegatebw(
                     wallet.currentWallet.name,
                     receiver.value,
-                    netValue.value,
-                    cpuValue.value,
+                    netQuantity,
+                    cpuQuantity,
                     transfer.value,
                     chain.getAuth()
                 );
@@ -148,13 +148,19 @@ const submitHandle = async () => {
                 .undelegatebw(
                     wallet.currentWallet.name,
                     receiver.value,
-                    netValue.value,
-                    cpuValue.value,
+                    netQuantity,
+                    cpuQuantity,
                     chain.getAuth()
                 );
         } else if (action.value == 'rent') {
             const powupState = await getPowupState();
-            let parms = powerup(wallet.currentWallet.name, receiver.value, cpu, net, powupState);
+            let parms = powerup(
+                wallet.currentWallet.name,
+                receiver.value,
+                cpuQuantity,
+                netQuantity,
+                powupState
+            );
             result = await chain.get().powerup(parms, chain.getAuth());
         }
         window.msg.success(t('resource.stakeSuccess'));
@@ -279,24 +285,19 @@ const submitHandle = async () => {
         </div>
 
         <!-- popup -->
-        <popup-bottom
+        <staked-detail
             :is-show="showStakedDetail"
-            :title="$t('resource.stakeInfo')"
             @close="showStakedDetail = false"
-        >
-            <staked-detail :resourceData="resourceData" :type="props.type"></staked-detail>
-        </popup-bottom>
+            :resourceData="resourceData"
+            :type="props.type"
+        ></staked-detail>
 
-        <popup-bottom
+        <staked-other-detail
             :is-show="showStakedOtherDetail"
-            :title="$t('resource.stakeInfo')"
             @close="showStakedOtherDetail = false"
-        >
-            <staked-other-detail
-                @loadData="$emit('loadData')"
-                :type="props.type"
-            ></staked-other-detail>
-        </popup-bottom>
+            @loadData="$emit('loadData')"
+            :type="props.type"
+        ></staked-other-detail>
 
         <resource-option
             :is-show="centerDialogVisible"
@@ -312,7 +313,7 @@ const submitHandle = async () => {
             :estimated-cost="estimatedCost"
             :transfer-visible="transferVisible"
             @close="centerDialogVisible = false"
-            @submit="submitHandle"
+            @submit="handleSubmit"
         ></resource-option>
     </div>
 </template>

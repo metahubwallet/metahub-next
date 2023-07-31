@@ -9,6 +9,19 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {});
 
+// 获取初始当前网络
+const chain = store.chain();
+const activeChainId = ref(chain.currentChainId);
+watch(
+    () => props.isShow,
+    (v) => {
+        if (v) {
+            activeChainId.value = chain.currentChainId;
+        }
+    },
+    { immediate: true }
+);
+
 // 锁屏
 const emit = defineEmits(['close', 'importKey']);
 const handleLock = () => {
@@ -18,15 +31,12 @@ const handleLock = () => {
 };
 
 // 获取网络图标
-const chain = store.chain();
-const activeChainId = ref(chain.currentChainId);
-const { networks } = store.chain();
 const getNetworkIcon = (item: Network) => {
     return getNetworkLocalIcon(item.chain, item.chainId == activeChainId.value);
 };
 
 // 导入密钥
-const importKeyHandle = (chainId: string) => {
+const handleImportKey = (chainId: string) => {
     emit('importKey', chainId);
 };
 
@@ -49,13 +59,13 @@ const showAccount = (account: string) => {
 
 // 选择网络
 const selectedNetwork = ref();
-const selectNetworkHandle = (item: Network) => {
+const handleSelectNetwork = (item: Network) => {
     activeChainId.value = item.chainId;
     selectedNetwork.value = item;
 };
 
 // 选择账号
-const selectAccountHandle = (account: Wallet) => {
+const handleSelectAccount = (account: Wallet) => {
     let index = wallet.wallets.indexOf(account);
     wallet.setSelectedIndex(index);
     store.chain().setCurrentNetwork(selectedNetwork.value);
@@ -68,19 +78,18 @@ const selectAccountHandle = (account: Wallet) => {
         <template #headLeft>
             <img @click="handleLock" class="lock-icon" src="@/asset/img/lock.png" />
         </template>
-
         <div class="list-container">
             <n-tabs
                 placement="left"
-                v-model="activeChainId"
+                v-model:value="activeChainId"
                 type="line"
                 animated
                 size="small"
                 style="height: 400px"
             >
-                <n-tab-pane v-for="item in networks" :key="item.chainId" :name="item.chainId">
+                <n-tab-pane v-for="item in chain.networks" :key="item.chainId" :name="item.chainId">
                     <template #tab>
-                        <div @click="selectNetworkHandle(item)">
+                        <div @click="handleSelectNetwork(item)">
                             <img :src="getNetworkIcon(item)" class="icon-img m-[7px]" />
                         </div>
                     </template>
@@ -102,7 +111,7 @@ const selectAccountHandle = (account: Wallet) => {
                                     </div>
                                     <img
                                         v-show="searchName != '' || accounts.length"
-                                        @click="importKeyHandle(item.chainId)"
+                                        @click="handleImportKey(item.chainId)"
                                         class="add-icon"
                                         src="@/asset/img/account_add.png"
                                     />
@@ -111,7 +120,7 @@ const selectAccountHandle = (account: Wallet) => {
 
                             <div v-show="accounts.length == 0">
                                 <n-button
-                                    @click="importKeyHandle(item.chainId)"
+                                    @click="handleImportKey(item.chainId)"
                                     class="import-key-btn"
                                 >
                                     +{{ $t('public.importKey') }}
@@ -119,7 +128,7 @@ const selectAccountHandle = (account: Wallet) => {
                             </div>
                             <div
                                 :key="item.index"
-                                @click="selectAccountHandle(item)"
+                                @click="handleSelectAccount(item)"
                                 class="account-cell"
                                 v-for="item in accounts"
                             >

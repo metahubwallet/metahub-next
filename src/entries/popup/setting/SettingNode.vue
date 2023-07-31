@@ -10,12 +10,11 @@ const network = ref(store.chain().findNetwork(chainId.value));
 
 // 初始化
 const selectedHttpApi = ref('');
-onMounted(() => {
+onMounted(async () => {
     const customRpcs = store.chain().customRpcs[chainId.value];
     customEndpoints.value = Array.isArray(customRpcs) ? customRpcs : [];
-    selectedHttpApi.value = store.chain().getSelectedRpc(chainId.value) + '';
-
-    loadRecommendEndpoints();
+    selectedHttpApi.value = store.chain().selectedRpc[chainId.value];
+    await loadRecommendEndpoints();
     pingEndpoints(customEndpoints.value);
 });
 
@@ -48,22 +47,23 @@ const pingEndpoints = async (endpoints: RPC[]) => {
 
 // 选择节点
 const recommendEndpoints = ref<RPC[]>([]);
-const selectNodeHandle = (item: RPC) => {
+const handleSelectNode = (item: RPC) => {
     store.chain().selectedRpc[chainId.value] = item.endpoint;
     store.chain().setSelectedRpc(store.chain().selectedRpc);
     selectedHttpApi.value = item.endpoint;
 
+    // 更新URL
     try {
-        // 更新URL
         chain.get(chainId.value).updateHttpEndpoint(item.endpoint);
-        window.msg.success(t('public.executeSuccess'));
     } catch (error) {
+        console.log(error);
         window.msg.error(error);
     }
 };
 
-// 移除节点前操作
+// 移除节点
 const { t } = useI18n();
+const customEndpoints = ref<RPC[]>([]);
 const handleDeleteClick = (item: RPC) => {
     window.dialog.warning({
         title: t('public.tip'),
@@ -71,21 +71,14 @@ const handleDeleteClick = (item: RPC) => {
         positiveText: t('public.ok'),
         negativeText: t('public.cancel'),
         onPositiveClick: () => {
-            removeCustomEndpoint(item);
+            const index = customEndpoints.value.findIndex((obj) => {
+                return item.endpoint === obj.endpoint;
+            });
+            customEndpoints.value.splice(index, 1);
+            saveNode();
         },
         onNegativeClick: () => {},
     });
-};
-
-// 移除节点
-const customEndpoints = ref<RPC[]>([]);
-const removeCustomEndpoint = async (item: RPC) => {
-    const index = customEndpoints.value.findIndex((obj) => {
-        return item.endpoint === obj.endpoint;
-    });
-    customEndpoints.value.splice(index, 1);
-
-    saveNode();
 };
 
 // 保存节点数据
@@ -96,6 +89,7 @@ const saveNode = () => {
     let allCustomRpcs = store.chain().customRpcs;
     if (!allCustomRpcs) allCustomRpcs = {};
     allCustomRpcs[chainId.value] = endpoints;
+    store.chain().setCustomRpcs(allCustomRpcs);
 };
 
 // 新增节点
@@ -137,13 +131,13 @@ const addCustomEndpoint = async () => {
         <div class="full-inner">
             <page-header :title="network?.name + ''"></page-header>
 
-            <div class="cover-content _effect">
+            <div class="cover-content _effect pb-[47px]">
                 <n-scrollbar class="full">
                     <!-- select default node -->
                     <div class="title">{{ $t('setting.defaultNodes') }}</div>
                     <div class="setting-group default-rpcs">
                         <div
-                            @click="selectNodeHandle(item)"
+                            @click="handleSelectNode(item)"
                             class="setting-item cursor-pointer"
                             v-for="(item, index) of recommendEndpoints"
                             :key="index"
@@ -159,7 +153,7 @@ const addCustomEndpoint = async () => {
                             </div>
                         </div>
 
-                        <n-empty v-show="recommendEndpoints.length == 0" class="m-auto mt-[50%]" />
+                        <n-empty v-show="recommendEndpoints.length == 0" class="m-auto mt-[10%]" />
                     </div>
 
                     <!-- select custom node -->
@@ -172,7 +166,7 @@ const addCustomEndpoint = async () => {
                             class="setting-item cursor-pointer flex items-center"
                             v-for="item in customEndpoints"
                         >
-                            <div @click="selectNodeHandle(item)" class="setting-title">
+                            <div @click="handleSelectNode(item)" class="setting-title">
                                 {{ item.endpoint }}
                             </div>
                             <div class="setting-delete">
@@ -195,17 +189,17 @@ const addCustomEndpoint = async () => {
                             </div>
                         </div>
                     </div>
-                    <div @click="showAddNode = true" class="bottom-btn cursor-pointer">
-                        {{ $t('setting.addNode') }}
-                    </div>
                 </n-scrollbar>
+                <div @click="showAddNode = true" class="bottom-btn cursor-pointer">
+                    {{ $t('setting.addNode') }}
+                </div>
             </div>
 
             <!-- add node -->
             <modal
                 :is-show="showAddNode"
                 :title="$t('setting.addNode')"
-                @close="$emit('close')"
+                @close="showAddNode = false"
                 @submit="addCustomEndpoint"
             >
                 <n-input

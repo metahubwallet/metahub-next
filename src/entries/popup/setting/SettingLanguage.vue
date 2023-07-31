@@ -15,7 +15,7 @@ const currentLanguage = computed(() => i18n.global.locale);
 
 // 切换语言
 const { locale } = useI18n();
-const changeLangHandle = async (value: any) => {
+const handleChangeLang = async (value: any) => {
     locale.value = value;
     store.setting().setLang(value);
 };
@@ -30,7 +30,7 @@ const changeLangHandle = async (value: any) => {
                 <div class="setting-group">
                     <div
                         :key="item.name"
-                        @click="changeLangHandle(item.value)"
+                        @click="handleChangeLang(item.value)"
                         class="setting-item cursor-pointer"
                         v-for="item in lang"
                     >

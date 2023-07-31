@@ -2,6 +2,7 @@
 import chain from '@/common/lib/chain';
 
 interface Props {
+    isShow: boolean;
     type: string;
 }
 const props = withDefaults(defineProps<Props>(), {});
@@ -73,45 +74,47 @@ const loadOtherDetailData = async () => {
 </script>
 
 <template>
-    <div class="list-container">
-        <!-- cpu -->
-        <div v-if="props.type == 'cpu'">
-            <div :key="item.id" v-for="item in otherCPU">
-                <div class="info-cell">
-                    <span class="info-cell-key">{{ item.to }}：</span>
-                    <span class="info-cell-value">
-                        {{ item.cpu_weight }}
-                    </span>
-                    <n-button @click="submit(item)">
-                        {{ $t('resource.unstake') }}
-                    </n-button>
+    <popup-bottom :is-show="props.isShow" :title="$t('resource.stakeInfo')" @close="$emit('close')">
+        <div class="list-container">
+            <!-- cpu -->
+            <div v-if="props.type == 'cpu'">
+                <div :key="item.id" v-for="item in otherCPU">
+                    <div class="info-cell">
+                        <span class="info-cell-key">{{ item.to }}：</span>
+                        <span class="info-cell-value">
+                            {{ item.cpu_weight }}
+                        </span>
+                        <n-button @click="submit(item)">
+                            {{ $t('resource.unstake') }}
+                        </n-button>
+                    </div>
+                </div>
+
+                <div v-if="otherCPU.length === 0" class="empty-cell">
+                    <span>{{ $t('resource.noStakeForOthers') }}</span>
                 </div>
             </div>
 
-            <div v-if="otherCPU.length === 0" class="empty-cell">
-                <span>{{ $t('resource.noStakeForOthers') }}</span>
-            </div>
-        </div>
+            <!-- net -->
+            <div v-if="props.type == 'net'">
+                <div :key="item.id" v-for="item in otherNET">
+                    <div class="info-cell">
+                        <span class="info-cell-key">{{ item.to }}：</span>
+                        <span class="info-cell-value">
+                            {{ item.net_weight }}
+                        </span>
+                        <n-button @click="submit(item)" size="tiny">
+                            {{ $t('resource.unstake') }}
+                        </n-button>
+                    </div>
+                </div>
 
-        <!-- net -->
-        <div v-if="props.type == 'net'">
-            <div :key="item.id" v-for="item in otherNET">
-                <div class="info-cell">
-                    <span class="info-cell-key">{{ item.to }}：</span>
-                    <span class="info-cell-value">
-                        {{ item.net_weight }}
-                    </span>
-                    <n-button @click="submit(item)" size="tiny">
-                        {{ $t('resource.unstake') }}
-                    </n-button>
+                <div v-if="otherNET.length === 0" class="empty-cell">
+                    <span>{{ $t('resource.noStakeForOthers') }}</span>
                 </div>
             </div>
-
-            <div v-if="otherNET.length === 0" class="empty-cell">
-                <span>{{ $t('resource.noStakeForOthers') }}</span>
-            </div>
         </div>
-    </div>
+    </popup-bottom>
 </template>
 
 <style lang="scss" scoped>

@@ -8,16 +8,16 @@ export const metahubKey = 'YM4BqViCkPs2qt3tTdTuP3ABUimU7sBU';
 
 //解密方法
 export const decrypt = (word: string, seed = key) => {
+    const encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+    const srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
     const parseSeed = CryptoJS.enc.Utf8.parse(seed);
-    let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
-    let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
-    let decrypt = CryptoJS.AES.decrypt(srcs, parseSeed, {
+    const decrypt = CryptoJS.AES.decrypt(srcs, parseSeed, {
         iv: iv,
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7,
     });
-    let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-    return decryptedStr.toString();
+
+    return decrypt.toString(CryptoJS.enc.Utf8);
 };
 
 //加密方法

@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 // 确定移除
 const { t } = useI18n();
-const removeHandle = (item: Network) => {
+const handleRemove = (item: Network) => {
     window.dialog.warning({
         title: t('public.tip'),
         content: t('setting.sureDeletePrefix') + item.name + t('setting.sureDeleteSuffix'),
@@ -66,7 +66,7 @@ const removeNetwork = async (network: Network) => {
                                 fill="#e53e30"
                                 :strokeWidth="3"
                                 v-show="item.chainId != eosChainId"
-                                @click="removeHandle(item)"
+                                @click="handleRemove(item)"
                             />
                         </div>
                     </div>

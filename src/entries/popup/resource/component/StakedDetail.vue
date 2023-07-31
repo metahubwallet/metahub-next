@@ -2,6 +2,7 @@
 import { ResourceData } from '@/store/wallet/type';
 
 interface Props {
+    isShow: boolean;
     resourceData: ResourceData;
     type: string;
 }
@@ -9,35 +10,41 @@ const props = withDefaults(defineProps<Props>(), {});
 </script>
 
 <template>
-    <div class="list-container">
-        <!-- cpu -->
-        <div v-if="props.type == 'cpu'">
-            <div class="info-cell">
-                <span class="info-cell-key">{{ $t('resource.selfStake') }}：</span>
-                <span class="info-cell-value">
-                    {{ props.resourceData.self_delegated_bandwidth?.cpu_weight }}
-                </span>
+    <popup-bottom :is-show="props.isShow" :title="$t('resource.stakeInfo')" @close="$emit('close')">
+        <div class="list-container">
+            <!-- cpu -->
+            <div v-if="props.type == 'cpu'">
+                <div class="info-cell">
+                    <span class="info-cell-key">{{ $t('resource.selfStake') }}：</span>
+                    <span class="info-cell-value">
+                        {{ props.resourceData.self_delegated_bandwidth?.cpu_weight }}
+                    </span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-cell-key">{{ $t('resource.otherStake') }}：</span>
+                    <span class="info-cell-value">
+                        {{ props.resourceData.stakeForUserCPU }} EOS
+                    </span>
+                </div>
             </div>
-            <div class="info-cell">
-                <span class="info-cell-key">{{ $t('resource.otherStake') }}：</span>
-                <span class="info-cell-value">{{ props.resourceData.stakeForUserCPU }} EOS</span>
-            </div>
-        </div>
 
-        <!-- net -->
-        <div v-if="props.type == 'net'">
-            <div class="info-cell">
-                <span class="info-cell-key">{{ $t('resource.selfStake') }}：</span>
-                <span class="info-cell-value">
-                    {{ props.resourceData.self_delegated_bandwidth?.net_weight }}
-                </span>
-            </div>
-            <div class="info-cell">
-                <span class="info-cell-key">{{ $t('resource.otherStake') }}：</span>
-                <span class="info-cell-value">{{ props.resourceData.stakeForUserNET }} EOS</span>
+            <!-- net -->
+            <div v-if="props.type == 'net'">
+                <div class="info-cell">
+                    <span class="info-cell-key">{{ $t('resource.selfStake') }}：</span>
+                    <span class="info-cell-value">
+                        {{ props.resourceData.self_delegated_bandwidth?.net_weight }}
+                    </span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-cell-key">{{ $t('resource.otherStake') }}：</span>
+                    <span class="info-cell-value">
+                        {{ props.resourceData.stakeForUserNET }} EOS
+                    </span>
+                </div>
             </div>
         </div>
-    </div>
+    </popup-bottom>
 </template>
 
 <style lang="scss" scoped>
