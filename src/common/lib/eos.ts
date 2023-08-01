@@ -422,6 +422,8 @@ export default class EOS {
         if (options.ignoreCPUProxy) isProxy = false;
 
         if (!isProxy) {
+            console.log(transaction);
+            console.log(this.api.transact);
             return this.api.transact(transaction, options);
         }
 

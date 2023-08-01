@@ -1,23 +1,18 @@
 <script lang="ts" setup>
-import chain from '@/common/lib/chain';
-
 // 初始化
 const wallet = store.wallet();
 onMounted(async () => {
-    await localCache.get('smoothMode', false).then((res) => {
-        smoothMode.value = Boolean(res);
-    });
-
-    await api.cpu.getTime(wallet.currentWallet.name).then((res) => {
+    await api.resource.getTime(wallet.currentWallet.name).then((res) => {
         if (res && res.data.code == 200) smoothModeCPU.value = res.data.result / 1000 + ' ms';
     });
 });
 
 // 切换顺畅模式
-const smoothMode = ref(false);
+const smoothMode = ref(wallet.currentWallet.smoothMode);
 const smoothModeCPU = ref('~');
 const changeSmoothMode = async () => {
-    await localCache.set('smoothMode', smoothMode.value);
+    wallet.wallets[wallet.selectedIndex].smoothMode = smoothMode.value;
+    wallet.setWallets(wallet.wallets);
 };
 
 // 选择充值数量

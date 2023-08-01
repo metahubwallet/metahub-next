@@ -14,7 +14,7 @@ let token = reactive({} as Coin);
 const wallet = store.wallet();
 onBeforeMount(() => {
     const [contract, symbol] = (useRoute().params.token as any).split('-');
-    token = wallet.userTokens.find(
+    token = wallet.currentUserTokens.find(
         (x: Coin) => x.contract == contract && x.symbol == symbol
     ) as Coin;
 });

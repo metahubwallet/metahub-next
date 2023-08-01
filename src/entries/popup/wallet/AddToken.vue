@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
-import { Coin, Token } from '@/store/wallet/type';
+import { Coin } from '@/store/wallet/type';
 
 const code = ref('');
 const contract = ref('');
@@ -28,7 +28,7 @@ const handleAddToken = async () => {
             const tokenExists =
                 store
                     .wallet()
-                    .userTokens.findIndex(
+                    .currentUserTokens.findIndex(
                         (x: Coin) =>
                             x.chain == token.chain &&
                             x.contract == token.contract &&
@@ -38,7 +38,7 @@ const handleAddToken = async () => {
                 window.msg.error(t('wallet.addTokenExist'));
                 return;
             }
-            store.wallet().setUserTokens([...store.wallet().userTokens, token]);
+            store.wallet().setCurrentUserTokens([...store.wallet().currentUserTokens, token]);
             emit('refreshTokens', true);
             window.msg.success(t('wallet.addTokenSuccessfully'));
             router.go(-1);

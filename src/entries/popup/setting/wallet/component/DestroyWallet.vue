@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { password2 } from '@/common/util/crypto';
-
 interface Props {
     isShow: boolean;
 }
@@ -13,7 +11,7 @@ const router = useRouter();
 const showConfirmModal = ref(false);
 const handleConfirm = async () => {
     store.wallet().setWallets([]);
-    store.wallet().setUserTokens([]);
+    store.wallet().setUserTokens({});
     store.user().password = '';
     store.user().setPasswordHash('');
     store.setting().setIsLock(true);

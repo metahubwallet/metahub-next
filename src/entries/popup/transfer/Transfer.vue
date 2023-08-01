@@ -37,7 +37,7 @@ onBeforeMount(() => {
     if (!targetCoin.amount) targetCoin.amount = 0;
     if (!targetCoin.precision) targetCoin.precision = 4;
 
-    wallet.userTokens.forEach((row) => {
+    wallet.currentUserTokens.forEach((row) => {
         if (row.contract == targetCoin.contract && row.symbol == targetCoin.symbol) {
             targetCoin.amount = row.amount;
             targetCoin.precision = row.precision;
@@ -219,7 +219,12 @@ const checkSubmit = () => {
 
                     <!-- submit -->
                     <div class="transfer-buttons">
-                        <n-button type="primary" @click="checkSubmit" class="primary-button">
+                        <n-button
+                            type="primary"
+                            @click="checkSubmit"
+                            round
+                            class="primary-button mt-[70px]"
+                        >
                             {{ $t('wallet.transfer') }}
                         </n-button>
                     </div>

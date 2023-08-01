@@ -36,12 +36,12 @@ const initTokens = () => {
         let token = {} as Coin;
         Object.assign(token, chainToken);
         token.isShow =
-            wallet.userTokens.findIndex(
+            wallet.currentUserTokens.findIndex(
                 (x: Token) => x.contract == token.contract && x.symbol == token.symbol
             ) >= 0;
         tokens.push(token);
     }
-    for (const ut of wallet.userTokens) {
+    for (const ut of wallet.currentUserTokens) {
         if (ut.contract == 'eosio.token') continue;
         if (tokens.findIndex((x) => x.contract == ut.contract && x.symbol == ut.symbol) >= 0)
             continue;
@@ -82,10 +82,10 @@ const searchTokens = () => {
 const emit = defineEmits(['close', 'refreshTokens']);
 const handleAddToken = async (token: Coin) => {
     if (token.isShow) {
-        const index = wallet.userTokens.findIndex(
+        const index = wallet.currentUserTokens.findIndex(
             (x: Token) => x.contract == token.contract && x.symbol == token.symbol
         );
-        wallet.userTokens.splice(index, 1);
+        wallet.currentUserTokens.splice(index, 1);
         token.isShow = false;
     } else {
         const newToken = {
@@ -95,7 +95,7 @@ const handleAddToken = async (token: Coin) => {
             symbol: token.symbol,
             precision: token.precision,
         };
-        wallet.userTokens.push(newToken);
+        wallet.setCurrentUserTokens([...wallet.currentUserTokens, newToken]);
         token.isShow = true;
     }
     wallet.setUserTokens(wallet.userTokens);

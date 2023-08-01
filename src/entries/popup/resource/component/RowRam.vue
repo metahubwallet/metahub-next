@@ -74,6 +74,7 @@ const onSubmit = async () => {
         emit('loadData');
         emit('refreshTokens', true);
     } catch (e) {
+        console.log(e);
         window.msg.error(chain.getErrorMsg(e));
     } finally {
         modalVisible.value = false;

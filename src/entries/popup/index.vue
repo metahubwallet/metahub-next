@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import Windows from '@/common/lib/windows';
 import { supportNetworks } from '@/common/util/network';
-import { Network, RPC } from '@/store/chain/type';
-import { Token, Wallet } from '@/store/wallet/type';
+import { Network } from '@/store/chain/type';
+import { Wallet } from '@/store/wallet/type';
 import localTokens from '@/asset/json/tokens.json';
-import { isArray } from 'lodash';
 
 // 初始化钱包情况
 const user = store.user();
