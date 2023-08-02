@@ -46,7 +46,7 @@ export interface CacheABI {
 export interface Key {
     publicKey: string;
     privateKey: string;
-    permissions: Perm[];
+    permissions: string[];
 }
 
 export interface Perm {

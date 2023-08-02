@@ -130,9 +130,8 @@ const handleSubmit = async () => {
     if (cpuQuantity == formatValue(0) && netQuantity == formatValue(0))
         return window.msg.warning(t('resource.valueError'));
     try {
-        let result = {};
         if (action.value == 'stake') {
-            result = await chain
+            await chain
                 .get()
                 .delegatebw(
                     wallet.currentWallet.name,
@@ -143,7 +142,7 @@ const handleSubmit = async () => {
                     chain.getAuth()
                 );
         } else if (action.value == 'refund') {
-            result = await chain
+            await chain
                 .get()
                 .undelegatebw(
                     wallet.currentWallet.name,
@@ -161,7 +160,7 @@ const handleSubmit = async () => {
                 netQuantity,
                 powupState
             );
-            result = await chain.get().powerup(parms, chain.getAuth());
+            await chain.get().powerup(parms, chain.getAuth());
         }
         window.msg.success(t('resource.stakeSuccess'));
 
@@ -169,6 +168,7 @@ const handleSubmit = async () => {
         emit('loadData');
         emit('refreshTokens', true);
     } catch (e) {
+        console.log(e);
         window.msg.error(chain.getErrorMsg(e));
     } finally {
         cpuValue.value = 0;

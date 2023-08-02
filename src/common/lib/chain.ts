@@ -10,6 +10,7 @@ export default class Chain {
     static getCurrentPrivateKey() {
         if (store.wallet().wallets.length == 0) return '';
         const account = this.currentAccount();
+
         return decrypt(account.privateKey, md5(account.seed + store.user().password));
     }
 
@@ -34,13 +35,16 @@ export default class Chain {
                 permission: as[1] ? as[1] : 'active',
             };
         }
+
         const wallet = store
             .wallet()
             .wallets.find((x) => x.chainId === chainId && x.name === authorization.actor);
+
         if (wallet) {
             for (const key of wallet.keys) {
-                if (key.permissions.indexOf(authorization.permission) >= 0)
+                if (key.permissions.indexOf(authorization.permission) >= 0) {
                     return decrypt(key.privateKey, md5(wallet.seed + store.user().password));
+                }
             }
         }
         return false;
@@ -50,19 +54,19 @@ export default class Chain {
         const wallet = store
             .wallet()
             .wallets.find((x) => x.chainId === chainId && x.name === actor);
+
         if (wallet) {
             for (const key of wallet.keys) {
-                const flag = key.permissions.findIndex((item) => {
-                    return item.perm_name === permission;
-                });
-                if (flag != -1) return key.publicKey;
+                if (key.permissions.indexOf(permission) >= 0) {
+                    return key.publicKey;
+                }
             }
         }
         return null;
     }
 
     static currentAccount() {
-        return store.wallet().wallets[store.wallet().selectedIndex];
+        return store.wallet().currentWallet;
     }
 
     static get(chainId: string = '') {
@@ -80,14 +84,12 @@ export default class Chain {
     static getAuth() {
         let permission = 'active';
         for (let key of this.currentAccount().keys) {
-            const flag = key.permissions.findIndex((item) => {
-                return item.perm_name === 'owner';
-            });
-            if (flag != -1) {
+            if (key.permissions.indexOf('owner') > -1) {
                 permission = 'owner';
                 break;
             }
         }
+
         return {
             actor: this.currentAccount().name,
             permission,
@@ -134,7 +136,9 @@ export default class Chain {
 
     static authorityProvider(chainId: string) {
         return {
-            getRequiredKeys: async (transaction: any, availableKeys: Array<string>) => {
+            getRequiredKeys: async (params: any) => {
+                const { transaction } = params;
+
                 const permissions = new Set();
                 for (let action of transaction.actions) {
                     for (let auth of action.authorization)
@@ -173,6 +177,7 @@ export default class Chain {
                         Buffer.from(new Uint8Array(32)),
                     ]),
                 };
+
                 const signatures = transaction.requiredKeys.map((pub: string) => {
                     const privateKey = Chain.getPrivateKeyByPublicKey(pub);
                     const signature = Chain.get(chainId).signature(
@@ -183,6 +188,7 @@ export default class Chain {
                     );
                     return signature;
                 });
+
                 return {
                     signatures,
                     serializedTransaction: transaction.serializedTransaction,
@@ -214,10 +220,15 @@ export default class Chain {
     static async fetchPermissions(account: string, chainId: string) {
         let result = { code: ErrorCode.OK, permissions: [] as Perm[], msg: '' };
 
-        let wallet = this.findLocalAccount(account, chainId) as Wallet;
+        const index = store.wallet().wallets.findIndex((item) => {
+            return item.account === account && item.chainId === chainId;
+        });
+        let wallet = store.wallet().wallets[index];
+
         try {
             const accinfo = await this.get(chainId).getAccount(account);
             if (!accinfo) throw new Error('fetch account eror');
+            result.permissions = accinfo.permissions;
 
             for (const key of wallet.keys) {
                 let permissions = new Set();
@@ -225,10 +236,11 @@ export default class Chain {
                     if (perm.required_auth.keys.findIndex((x: any) => x.key == key.publicKey) >= 0)
                         permissions.add(perm.perm_name);
                 }
-                key.permissions = Array.from(permissions) as Perm[];
+                key.permissions = Array.from(permissions) as any;
             }
+
+            store.wallet().wallets[index] = wallet;
             store.wallet().setWallets(store.wallet().wallets);
-            result.permissions = accinfo.permissions;
         } catch (e) {
             result.code = ErrorCode.HTTP_END_POINT_ERROR;
             result.msg = i18n.global.t('public.requestHttpEndpointTimeout');

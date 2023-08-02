@@ -135,10 +135,10 @@ const emit = defineEmits(['refreshTokens']);
 const importWallet = async (wallets: Wallet[]) => {
     isLoad.value = true;
 
+    store.wallet().setWallets([...wallets.sort(sortAccounts), ...store.wallet().wallets]);
     for (const wallet of wallets) {
         await chain.fetchPermissions(wallet.name, wallet.chainId);
     }
-    store.wallet().setWallets([...store.wallet().wallets, ...wallets.sort(sortAccounts)]);
 
     const firstWallet = wallets[0];
     let index = store.wallet().wallets.indexOf(firstWallet);

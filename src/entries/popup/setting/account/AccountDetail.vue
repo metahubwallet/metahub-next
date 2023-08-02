@@ -16,7 +16,7 @@ const account = ref(JSON.parse(route.query.account + '') as Wallet);
 
 // 初始化
 const wallet = store.wallet();
-const permissions = ref([] as Perm[]);
+const permissions = ref([] as string[]);
 onBeforeMount(() => {
     let perms = new Set();
     for (const key of wallet.currentWallet.keys) {
@@ -24,7 +24,7 @@ onBeforeMount(() => {
             perms.add(perm);
         }
     }
-    permissions.value = Array.from(perms) as Perm[];
+    permissions.value = Array.from(perms) as string[];
 });
 
 onMounted(async () => {
@@ -32,7 +32,6 @@ onMounted(async () => {
         wallet.currentWallet.name,
         wallet.currentWallet.chainId
     );
-    console.log(result);
 
     if (result.code != 200) return window.msg.error(result.msg);
 
@@ -133,11 +132,11 @@ const hiddenRemoveActiveBtn = computed(() => {
 
 // 移除激活项
 const walleAuthType = computed(() => {
-    const flag = perms.value.findIndex((item) => {
-        return item.perm_name === 'owner';
-    });
-    if (flag != -1) return 'owner';
-    else return 'active';
+    if (permissions.value.indexOf('owner') > -1) {
+        return 'owner';
+    } else {
+        return 'active';
+    }
 });
 const handleActiveRemove = (oldOperateKey: string) => {
     window.dialog.warning({
@@ -166,6 +165,11 @@ const removeAccountClicked = () => {
         let index = wallet.wallets.indexOf(firstWallet);
         wallet.setSelectedIndex(index >= 0 ? index : 0);
     } else wallet.setSelectedIndex(0);
+
+    const network = store.chain().networks.find((item) => {
+        return item.chainId === wallet.currentWallet.chainId;
+    });
+    if (network) store.chain().setCurrentNetwork(network);
 
     emit('refreshTokens', true);
     router.go(-1);
@@ -228,7 +232,7 @@ const removeAccountClicked = () => {
                                         <div
                                             @click="viewAccountChange('owner', 'modify', item.key)"
                                             class="account-change-btn"
-                                            v-if="walleAuthType === 'owner'"
+                                            v-if="permissions.indexOf('owner') > -1"
                                         >
                                             {{ $t('setting.modify') }}
                                         </div>
@@ -236,7 +240,10 @@ const removeAccountClicked = () => {
                                         <div
                                             @click="handleOrderRemove(item.key)"
                                             class="account-change-btn"
-                                            v-if="hiddenRemoveOwnerBtn && walleAuthType === 'owner'"
+                                            v-if="
+                                                hiddenRemoveOwnerBtn &&
+                                                permissions.indexOf('owner') > -1
+                                            "
                                         >
                                             {{ $t('setting.remove') }}
                                         </div>

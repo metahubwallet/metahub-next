@@ -126,9 +126,6 @@ const addNetwork = async (network: Network) => {
         ],
     };
     store.chain().setCustomRpcs(customRpcs);
-
-    console.log(await localCache.get('customRpcs'));
-    console.log(await localCache.get('selectedRpc'));
 };
 </script>
 

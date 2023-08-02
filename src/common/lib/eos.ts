@@ -141,7 +141,6 @@ export default class EOS {
                             weight: 1,
                         };
                         perms[i].required_auth.keys.push(item);
-                        console.log('add invoked');
                         break;
                     case 'modify':
                         for (let j = 0; j < perms[i].required_auth.keys.length; j++) {
@@ -218,7 +217,7 @@ export default class EOS {
         }
     }
 
-    //  EOS 为他人抵押列表
+    // EOS 为他人抵押列表
     async getDelegatebwList(from: string) {
         try {
             let res = await this.rpc.get_table_rows({
@@ -258,7 +257,7 @@ export default class EOS {
         transfer = 0,
         auth: Authorization
     ) {
-        const result = await this.transact(
+        return await this.transact(
             {
                 actions: [
                     {
@@ -280,8 +279,6 @@ export default class EOS {
                 expireSeconds: 30,
             }
         );
-
-        return result;
     }
 
     // 赎回CPU和NET
@@ -292,7 +289,7 @@ export default class EOS {
         unstake_cpu_quantity = '0.0000 EOS',
         auth: Authorization
     ) {
-        const result = await this.transact(
+        return await this.transact(
             {
                 actions: [
                     {
@@ -313,12 +310,11 @@ export default class EOS {
                 expireSeconds: 30,
             }
         );
-        return result;
     }
 
     // 立即取回赎回中的资源
     async refund(owner: string, auth: Authorization) {
-        const result = await this.transact(
+        return await this.transact(
             {
                 actions: [
                     {
@@ -336,12 +332,11 @@ export default class EOS {
                 expireSeconds: 30,
             }
         );
-        return result;
     }
 
     // 租用
     async powerup(parms: any, auth: Authorization) {
-        const result = await this.transact(
+        return await this.transact(
             {
                 actions: [
                     {
@@ -357,12 +352,11 @@ export default class EOS {
                 expireSeconds: 30,
             }
         );
-        return result;
     }
 
     // 购买RAM
     async buyRam(payer: string, receiver: string, quant: string, auth: Authorization) {
-        const result = await this.transact(
+        return await this.transact(
             {
                 actions: [
                     {
@@ -382,12 +376,11 @@ export default class EOS {
                 expireSeconds: 30,
             }
         );
-        return result;
     }
 
     // 出售RAM
     async sellRam(account: string, bytes: number, auth: Authorization) {
-        const result = await this.transact(
+        return await this.transact(
             {
                 actions: [
                     {
@@ -421,11 +414,7 @@ export default class EOS {
         }
         if (options.ignoreCPUProxy) isProxy = false;
 
-        if (!isProxy) {
-            console.log(transaction);
-            console.log(this.api.transact);
-            return this.api.transact(transaction, options);
-        }
+        if (!isProxy) return this.api.transact(transaction, options);
 
         for (const action of transaction.actions) {
             action.authorization.unshift({
@@ -433,6 +422,7 @@ export default class EOS {
                 permission: 'active',
             });
         }
+
         // 顺畅模式下执行免CPU操作
         options.broadcast = false;
         options.sign = true;
@@ -459,7 +449,6 @@ export default class EOS {
     }
 
     getAPI() {
-        const payload = { chainId: this.chainId };
         const options = {
             rpc: this.rpc,
             abiProvider: {
@@ -467,13 +456,15 @@ export default class EOS {
                     return await this.getRawAbi(accountName);
                 },
             },
+            chainId: this.chainId,
             authorityProvider: null,
             signatureProvider: null,
         };
         if (this.chain) {
-            options.authorityProvider = this.chain.authorityProvider(payload);
-            options.signatureProvider = this.chain.signatureProvider(payload);
+            options.authorityProvider = this.chain.authorityProvider(this.chainId);
+            options.signatureProvider = this.chain.signatureProvider(this.chainId);
         }
+
         return new Api(options as any);
     }
 
@@ -550,9 +541,9 @@ export default class EOS {
         }));
 
         payload.buf = Buffer.concat([
-            new Buffer(transaction.chainId, 'hex'), // Chain ID
+            Buffer.from(transaction.chainId, 'hex'), // Chain ID
             buffer, // Transaction
-            new Buffer(new Uint8Array(32)), // Context free actions
+            Buffer.from(new Uint8Array(32)), // Context free actions
         ]);
         return actions;
     }
@@ -564,7 +555,7 @@ export default class EOS {
         const abis = await this.getAbis(contracts);
 
         return await Promise.all(
-            transaction.actions.map(async (action, index) => {
+            transaction.actions.map(async (action) => {
                 const contractAccountName = action.account;
 
                 let abi = abis[contractAccountName];
@@ -607,10 +598,6 @@ export default class EOS {
 
     async getAbis(contracts: string[]) {
         const abis = {} as any;
-        const options = {
-            chainId: this.chainId,
-            httpEndpoint: this.endpoint,
-        };
         await Promise.all(
             contracts.map(async (contract) => {
                 abis[contract] = (await this.getRawAbi(contract)).abi;
