@@ -6,7 +6,7 @@ import { ErrorCode } from '../util/type';
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
 import _ from 'lodash';
 import { Authorization, Perm, Wallet } from '@/store/wallet/type';
-import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
+import { TransactConfig, Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 
 export default class EOS {
     public rpc;
@@ -195,8 +195,8 @@ export default class EOS {
             {
                 blocksBehind: 3,
                 expireSeconds: 30,
-                ignoreCPUProxy: true,
-            }
+            },
+            true
         );
 
         return result;
@@ -263,7 +263,7 @@ export default class EOS {
                     {
                         account: 'eosio',
                         name: 'delegatebw',
-                        authorization: [auth],
+                        authorization: [ auth ],
                         data: {
                             from,
                             receiver,
@@ -401,7 +401,7 @@ export default class EOS {
         );
     }
 
-    async transact(transaction: Transaction, options: any) {
+    async transact(transaction: Transaction, options: any = {}, ignoreCPUProxy:boolean = false) {
         let currentAccount = this.chain.currentAccount();
         let isProxy = currentAccount.smoothMode;
 
@@ -410,11 +410,22 @@ export default class EOS {
             transaction.actions[0].name == 'transfer' &&
             transaction.actions[0].account == 'eosio.token'
         ) {
-            if (transaction.actions[0].data.to == '1stbillpayer') isProxy = true;
+            if (transaction.actions[0].data.to == '1stbillpayer') {
+                isProxy = true;
+            }
         }
-        if (options.ignoreCPUProxy) isProxy = false;
-
-        if (!isProxy) return this.api.transact(transaction, options);
+        if (!options.broadcast || ignoreCPUProxy) {
+            isProxy = false;
+        }
+        if (!isProxy) {
+            // 以下测试固定数据用
+            // transaction.expiration = '2023-08-04T11:00:00.000';
+            // transaction.ref_block_num = 43492;
+            // transaction.ref_block_prefix = 2225954522;
+            const trx = await this.api.transact(transaction, {});
+            console.log(trx);
+            return trx;
+        }
 
         for (const action of transaction.actions) {
             action.authorization.unshift({
@@ -607,15 +618,18 @@ export default class EOS {
     }
 
     signature(payload: Payload, privateKey: string, arbitrary = false, isHash = false) {
-        if (!privateKey) return null;
-
+        if (!privateKey) {
+            return null;
+        }
         let sig;
-        if (arbitrary && isHash) sig = ecc.Signature.signHash(payload.data, privateKey).toString();
-        else
+        if (arbitrary && isHash) {
+            sig = ecc.Signature.signHash(payload.data, privateKey).toString();
+        } else {
             sig = ecc.sign(
-                Buffer.from((arbitrary ? payload.data : payload.buf).toString(), 'utf8'),
-                privateKey
-            );
+                arbitrary ? Buffer.from(payload.data, 'hex') : payload.buf,
+                privateKey,
+                'utf8');
+        }
         return sig;
     }
 }

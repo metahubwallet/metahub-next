@@ -3,6 +3,7 @@ import { decrypt, md5 } from '@/common/util/crypto';
 import { ErrorCode } from '@/common/util/type';
 import { Perm, Wallet } from '@/store/wallet/type';
 import { i18n } from '../plugin/lang';
+import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 
 export default class Chain {
     static chains: any = {};
@@ -36,9 +37,7 @@ export default class Chain {
             };
         }
 
-        const wallet = store
-            .wallet()
-            .wallets.find((x) => x.chainId === chainId && x.name === authorization.actor);
+        const wallet = store.wallet().wallets.find((x) => x.chainId === chainId && x.name === authorization.actor);
 
         if (wallet) {
             for (const key of wallet.keys) {
@@ -51,9 +50,7 @@ export default class Chain {
     }
 
     static getPublicKeyByPermission(chainId: string, actor: string, permission: string) {
-        const wallet = store
-            .wallet()
-            .wallets.find((x) => x.chainId === chainId && x.name === actor);
+        const wallet = store.wallet().wallets.find((x) => x.chainId === chainId && x.name === actor);
 
         if (wallet) {
             for (const key of wallet.keys) {
@@ -72,11 +69,7 @@ export default class Chain {
     static get(chainId: string = '') {
         if (chainId == '') chainId = store.chain().currentChainId;
         if (typeof this.chains[chainId] == 'undefined') {
-            this.chains[chainId] = new EOS(
-                chainId,
-                store.chain().getSelectedRpc(chainId) as string,
-                this
-            );
+            this.chains[chainId] = new EOS(chainId, store.chain().getSelectedRpc(chainId) as string, this);
         }
         return this.chains[chainId];
     }
@@ -125,9 +118,7 @@ export default class Chain {
             }
             let msg = e.message;
             if (msg && msg.length < 100) {
-                if (msg.indexOf('reach free cpu') != -1) {
-                    return i18n.global.t('error.cpuTimeLimit');
-                }
+                if (msg.indexOf('reach free cpu') != -1) return i18n.global.t('error.cpuTimeLimit');
                 return msg;
             }
         }
@@ -136,13 +127,16 @@ export default class Chain {
 
     static authorityProvider(chainId: string) {
         return {
-            getRequiredKeys: async (params: any) => {
-                const { transaction } = params;
-
+            getRequiredKeys: async ({
+                transaction,
+                availableKeys,
+            }: {
+                transaction: Transaction;
+                availableKeys: string[];
+            }) => {
                 const permissions = new Set();
                 for (let action of transaction.actions) {
-                    for (let auth of action.authorization)
-                        permissions.add(auth.actor + '-' + auth.permission);
+                    for (let auth of action.authorization) permissions.add(auth.actor + '-' + auth.permission);
                 }
 
                 let keys: string[] = [];
@@ -152,7 +146,9 @@ export default class Chain {
                     if (key) keys.push(key);
                 });
 
-                return keys;
+                const requiredKeys = keys.filter((x) => availableKeys.includes(x));
+                // console.log('requiredKeys', requiredKeys);
+                return requiredKeys;
             },
         };
     }
@@ -161,33 +157,40 @@ export default class Chain {
         return {
             async getAvailableKeys() {
                 const keys = Chain.currentAccount().keys.map((x: any) => x.publicKey);
+                // console.log('availableKeys', keys);
                 return keys;
             },
 
+            // { chainId, requiredKeys, serializedTransaction, serializedContextFreeData, abis }
             async sign(transaction: any) {
-                const buffer = Buffer.from(
-                    Uint8Array.from(transaction.serializedTransaction) as any,
-                    'hex'
-                );
-
+                // console.log(transaction.serializedContextFreeData);
+                const buffer =
+                    typeof transaction.serializedTransaction == 'string'
+                        ? Buffer.from(transaction.serializedTransaction, 'hex')
+                        : Buffer.from(transaction.serializedTransaction);
                 const payload = {
                     buf: Buffer.concat([
-                        Buffer.from(chainId, 'hex'),
+                        Buffer.from(transaction.chainId, 'hex'),
                         buffer,
-                        Buffer.from(new Uint8Array(32)),
+                        Buffer.from(new Uint8Array(32)), // todo: serializedContextFreeData
                     ]),
                 };
 
+                // console.log(payload.buf.toString('hex'));
+
                 const signatures = transaction.requiredKeys.map((pub: string) => {
                     const privateKey = Chain.getPrivateKeyByPublicKey(pub);
-                    const signature = Chain.get(chainId).signature(
-                        payload,
-                        privateKey,
-                        false,
-                        false
-                    );
+                    const signature = Chain.get(transaction.chainId).signature(payload, privateKey, false, false);
                     return signature;
                 });
+
+                // console.log('');
+                //
+                // 30dacc64e4a9da5ead8400000000010000000000ea305500003f2a1ba6a24a010000000098669a690000000080ab26a7310000000098669a690000000098669a69000000000000000004454f5300000000e80300000000000004454f53000000000000
+                // SIG_K1_KjbR2tYkYEgxJoxWsjBaNwTy5K4zCWRK5EbCWZn3iU6Z2R8mZ5K74C1NmoG98m7wtwT3vUH58ym192QFwU7Joqpgek5KvU
+
+                // const api = new Api({chainId, rpc: new JsonRpc('http://office.gogo8899.com:8888')});
+                // const trx = api.deserializeTransaction(transaction.serializedTransaction);
 
                 return {
                     signatures,

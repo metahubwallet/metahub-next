@@ -1,13 +1,13 @@
 {
     "name": "vite-web-extension",
     "version": "1.0.0",
-    "displayName": "Vite Web Extension",
-    "author": "@samrum/vite-plugin-web-extension",
-    "description": "A @samrum/vite-plugin-web-extension web extension",
+    "displayName": "Metahub Wallet",
+    "author": "metahub",
+    "description": "A Simple to Use EOS Web Wallet",
     "scripts": {
         "build": "vue-tsc --noEmit && vite build",
         "watch": "vite build --watch --mode development --minify false",
-        "dev": "vite",
+        "dev": "vite  --mode development",
         "serve": "web-ext run -t chromium --start-url \"https://google.com\" --source-dir ./dist/",
         "serve:firefox": "web-ext run --start-url \"about:debugging#/runtime/this-firefox\"  --source-dir ./dist/",
         "prepare": "husky install",

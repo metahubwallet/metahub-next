@@ -280,10 +280,12 @@ class Background {
     }
 
     static async getEndPoint(chainId: string) {
+        
         const selectedRpc = (await localCache.get('selectedRpc', {})) as RPC;
         let endpoint = selectedRpc[chainId];
+        
         if (!endpoint) {
-            const networks = (await localCache.get('networks')) as Network[];
+            const networks = (await localCache.get('networks', [])) as Network[];
             const network = networks.find((x) => x.chainId == chainId);
             endpoint = network ? network.endpoint : '';
         }

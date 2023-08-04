@@ -32,10 +32,16 @@ const props = withDefaults(defineProps<Props>(), {});
                 :placeholder="props.cpuPlaceholder"
                 :value="props.cpuValue"
                 :min="0"
+                :precision="4"
+                :step="0.1"
                 @keyup.native="$emit('number')"
                 @update:value="$emit('update:cpuValue', $event)"
                 clearable
-            ></n-input-number>
+            > 
+                <template #suffix>
+                    <span class="text-gray-400 text-sm">EOS</span>
+                </template>
+            </n-input-number>
         </div>
 
         <div class="dialog-item">
@@ -44,10 +50,16 @@ const props = withDefaults(defineProps<Props>(), {});
                 :placeholder="props.netPlaceholder"
                 :value="props.netValue"
                 :min="0"
+                :precision="4"
+                :step="0.1"
                 @keyup.native="$emit('number')"
                 @update:value="$emit('update:netValue', $event)"
                 clearable
-            ></n-input-number>
+            >
+                <template #suffix>
+                    <span class="text-gray-400 text-sm">EOS</span>
+                </template>
+            </n-input-number>
         </div>
 
         <div class="dialog-item" v-show="props.action == 'rent' ? true : false">
