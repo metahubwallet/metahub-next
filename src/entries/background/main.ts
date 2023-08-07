@@ -89,50 +89,31 @@ class Background {
                     return;
                 }
             }
-            Windows.createWindow(
-                'login',
-                450,
-                600,
-                payload,
-                async (result: { code: number; data: any }) => {
-                    if (result.code < 0) {
-                        resolve(
-                            SdkError.signatureError(
-                                'identity_rejected',
-                                'User rejected the provision of an Identity'
-                            )
-                        );
-                        return;
-                    }
-                    //save...
-                    const authorizations = (await localCache.get(
-                        'authorizations',
-                        []
-                    )) as Authorization[];
-                    const account = Object.assign({}, result.data);
-                    account.expire = Date.now() + 86400 * 7 * 1000;
-                    let auth = authorizations.find(
-                        (x) => x.domain == payload.domain
-                    ) as Authorization;
-                    if (!auth) {
-                        auth = { domain: payload.domain, accounts: [], actor: '', permission: '' };
-                        authorizations.push(auth);
-                    }
-                    const index = auth.accounts.findIndex(
-                        (x) =>
-                            x.chainId == account.chainId &&
-                            x.name == account.name &&
-                            x.authority == account.authority
-                    );
-                    if (index >= 0) {
-                        auth.accounts.splice(index, 1);
-                    }
-                    auth.accounts.unshift(account);
-                    chrome.storage.local.set({ authorizations });
-                    const accounts = await this.getAuthorizations(payload.domain, payload.chainId);
-                    resolve(this.generateIdengity(accounts));
+            Windows.createWindow('login', 450, 600, payload, async (result: { code: number; data: any }) => {
+                if (result.code < 0) {
+                    resolve(SdkError.signatureError('identity_rejected', 'User rejected the provision of an Identity'));
+                    return;
                 }
-            );
+                //save...
+                const authorizations = (await localCache.get('authorizations', [])) as Authorization[];
+                const account = Object.assign({}, result.data);
+                account.expire = Date.now() + 86400 * 7 * 1000;
+                let auth = authorizations.find((x) => x.domain == payload.domain) as Authorization;
+                if (!auth) {
+                    auth = { domain: payload.domain, accounts: [], actor: '', permission: '' };
+                    authorizations.push(auth);
+                }
+                const index = auth.accounts.findIndex(
+                    (x) => x.chainId == account.chainId && x.name == account.name && x.authority == account.authority
+                );
+                if (index >= 0) {
+                    auth.accounts.splice(index, 1);
+                }
+                auth.accounts.unshift(account);
+                chrome.storage.local.set({ authorizations });
+                const accounts = await this.getAuthorizations(payload.domain, payload.chainId);
+                resolve(this.generateIdengity(accounts));
+            });
         });
     }
 
@@ -163,7 +144,7 @@ class Background {
                                 x.name == y.name &&
                                 y.keys.findIndex((z) => {
                                     return z.permissions.findIndex((item) => {
-                                        return item.perm_name === x.authority;
+                                        return item === x.authority;
                                     });
                                 }) >= 0
                         ) >= 0
@@ -175,15 +156,10 @@ class Background {
                 }
 
                 const chainAccounts =
-                    chainId == '*'
-                        ? filterAccounts
-                        : filterAccounts.filter((x) => x.chainId == chainId);
+                    chainId == '*' ? filterAccounts : filterAccounts.filter((x) => x.chainId == chainId);
                 const returnAccounts = [];
                 for (const chainAccount of chainAccounts) {
-                    const { expire, ...account } = Object.assign(
-                        { blockchain: 'eos' },
-                        chainAccount
-                    );
+                    const { expire, ...account } = Object.assign({ blockchain: 'eos' }, chainAccount);
                     returnAccounts.push(account);
                 }
                 return returnAccounts;
@@ -222,9 +198,7 @@ class Background {
 
     static async getAccountSmoothMode(payload: Payload) {
         const wallets = (await localCache.get('wallets', [])) as Wallet[];
-        const wallet = wallets.find(
-            (x) => x.name === payload.account && x.chainId === payload.chainId
-        );
+        const wallet = wallets.find((x) => x.name === payload.account && x.chainId === payload.chainId);
         if (wallet) return wallet.smoothMode;
 
         return false;
@@ -280,10 +254,9 @@ class Background {
     }
 
     static async getEndPoint(chainId: string) {
-        
         const selectedRpc = (await localCache.get('selectedRpc', {})) as RPC;
         let endpoint = selectedRpc[chainId];
-        
+
         if (!endpoint) {
             const networks = (await localCache.get('networks', [])) as Network[];
             const network = networks.find((x) => x.chainId == chainId);
@@ -322,9 +295,7 @@ class Background {
             const authIdx = newPayload.actions[0].authorization.length - 1;
             newPayload.authorization = newPayload.actions[0].authorization[authIdx]; //todo: 是否正确 ???
             account = authorizations.find(
-                (x) =>
-                    x.name == newPayload.authorization.actor &&
-                    x.authority == newPayload.authorization.permission
+                (x) => x.name == newPayload.authorization.actor && x.authority == newPayload.authorization.permission
             );
             // -- new start ---
             const allAuths = newPayload.actions
@@ -350,10 +321,7 @@ class Background {
                 );
             }
             if (payload.data.length >= 1024) {
-                return SdkError.signatureError(
-                    'signature_rejected',
-                    'String length cannot greater than 1024.'
-                );
+                return SdkError.signatureError('signature_rejected', 'String length cannot greater than 1024.');
             }
             account = authorizations.find((x) => x.publicKey == payload.publicKey);
             if (account) {
@@ -372,10 +340,7 @@ class Background {
         }
 
         if (!account) {
-            return SdkError.signatureError(
-                'signature_rejected',
-                'you have no permission for this operation'
-            );
+            return SdkError.signatureError('signature_rejected', 'you have no permission for this operation');
         }
 
         //check whitelist
@@ -385,14 +350,9 @@ class Background {
             let allMatch = true;
             for (const action of newPayload.actions) {
                 const hash = md5(
-                    [
-                        payload.domain,
-                        payload.chainId,
-                        account.name,
-                        account.authority,
-                        action.code,
-                        action.type,
-                    ].join('-')
+                    [payload.domain, payload.chainId, account.name, account.authority, action.code, action.type].join(
+                        '-'
+                    )
                 );
                 const wli = whitelist.find((x) => x.hash == hash);
                 if (wli) {
@@ -410,25 +370,16 @@ class Background {
                 if (vars.isLock) {
                     //to unlock
                     const result = (await new Promise((resolve) => {
-                        Windows.createWindow(
-                            'unlock',
-                            500,
-                            450,
-                            newPayload,
-                            async (result: any) => {
-                                if (result.code < 0) {
-                                    resolve({ unlock: false });
-                                    return;
-                                }
-                                resolve({ unlock: true });
+                        Windows.createWindow('unlock', 500, 450, newPayload, async (result: any) => {
+                            if (result.code < 0) {
+                                resolve({ unlock: false });
+                                return;
                             }
-                        );
+                            resolve({ unlock: true });
+                        });
                     })) as any;
                     if (!result.unlock) {
-                        return SdkError.signatureError(
-                            'signature_rejected',
-                            'User rejected the signature request'
-                        );
+                        return SdkError.signatureError('signature_rejected', 'User rejected the signature request');
                     }
                 }
                 // todo, through permission
@@ -451,12 +402,7 @@ class Background {
                 newPayload,
                 async (result: { code: number; data: any }) => {
                     if (result.code < 0) {
-                        resolve(
-                            SdkError.signatureError(
-                                'signature_rejected',
-                                'User rejected the signature request'
-                            )
-                        );
+                        resolve(SdkError.signatureError('signature_rejected', 'User rejected the signature request'));
                         return;
                     }
                     //save whitelist...

@@ -34,7 +34,7 @@ const toLink = (url: string) => {
 // 获取数据
 const stakeList = ref([]);
 const ramprice = ref(0);
-let resourceData = reactive({
+let resourceData = ref({
     total_resources: {
         cpu_weight: 0,
         net_weight: 0,
@@ -52,16 +52,12 @@ const loadData = async () => {
         const data: ResourceData = await chain.get().getAccount(wallet.currentWallet.name);
 
         data.cpu_limit.percentage =
-            data.cpu_limit.max > 0
-                ? parseInt((data.cpu_limit.used / data.cpu_limit.max) * 100 + '')
-                : 100;
+            data.cpu_limit.max > 0 ? parseInt((data.cpu_limit.used / data.cpu_limit.max) * 100 + '') : 100;
         if (data.cpu_limit.percentage > 100) {
             data.cpu_limit.percentage = 100;
         }
         data.net_limit.percentage =
-            data.net_limit.max > 0
-                ? parseInt((data.net_limit.used / data.net_limit.max) * 100 + '')
-                : 100;
+            data.net_limit.max > 0 ? parseInt((data.net_limit.used / data.net_limit.max) * 100 + '') : 100;
         if (data.net_limit.percentage > 100) {
             data.net_limit.percentage = 100;
         }
@@ -98,31 +94,23 @@ const loadData = async () => {
             };
         }
         data.stakeForUserCPU =
-            parseFloat(data.total_resources.cpu_weight) -
-            parseFloat(data.self_delegated_bandwidth.cpu_weight);
+            parseFloat(data.total_resources.cpu_weight) - parseFloat(data.self_delegated_bandwidth.cpu_weight);
         data.stakeForUserNET =
-            parseFloat(data.total_resources.net_weight) -
-            parseFloat(data.self_delegated_bandwidth.net_weight);
+            parseFloat(data.total_resources.net_weight) - parseFloat(data.self_delegated_bandwidth.net_weight);
         data.stakeForUserCPU = Number(data.stakeForUserCPU.toFixed(4));
         data.stakeForUserNET = Number(data.stakeForUserNET.toFixed(4));
         data.stakeForOthersCPU = Number(stakeForOthersCPU.toFixed(4));
         data.stakeForOthersNET = Number(stakeForOthersNET.toFixed(4));
 
         if (data.refund_request) {
-            let leftTime =
-                new Date().getTime() - new Date(data.refund_request.request_time).getTime();
+            let leftTime = new Date().getTime() - new Date(data.refund_request.request_time).getTime();
             let minutes = 4320 - (leftTime / 60000 - 479); //赎回剩余分钟数
             data.refund_request.left_time =
                 minutes > 0
-                    ? toInteger(minutes / 1440) +
-                      'd ' +
-                      (toInteger(minutes / 60) % 24) +
-                      'h ' +
-                      (minutes % 60) +
-                      'm'
+                    ? toInteger(minutes / 1440) + 'd ' + (toInteger(minutes / 60) % 24) + 'h ' + (minutes % 60) + 'm'
                     : '-';
         }
-        resourceData = data;
+        resourceData.value = data;
     } catch (e) {
         console.log(e);
         window.msg.error(e);
@@ -246,10 +234,7 @@ const loadData = async () => {
                 border: 1px solid #dbdbdb;
                 &.on {
                     border: #bf01fa 1px solid;
-                    background-image: linear-gradient(
-                        rgba(247, 197, 244, 0.6),
-                        rgba(234, 225, 250, 0.06)
-                    );
+                    background-image: linear-gradient(rgba(247, 197, 244, 0.6), rgba(234, 225, 250, 0.06));
                 }
             }
             .links {

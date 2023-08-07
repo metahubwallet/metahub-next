@@ -85,17 +85,20 @@ const beforeSubmit = async (value: string) => {
         netValue.value = 500;
         modalTitle.value = t('resource.rent') + t('resource.resources');
 
-        let parms = powerup(
-            '',
-            '',
-            formatValue(cpuValue.value),
-            formatValue(netValue.value),
-            await getPowupState()
-        );
-        estimatedCost.value = parms.max_payment;
+        await getEstimatedCost();
     }
 
     centerDialogVisible.value = true;
+};
+
+// 计算预计花费
+const getEstimatedCost = async () => {
+    if (action.value == 'rent') {
+        let cpu = formatValue(cpuValue.value);
+        let net = formatValue(netValue.value);
+        let parms = powerup('', '', cpu, net, await getPowupState());
+        estimatedCost.value = parms.max_payment;
+    }
 };
 
 // 格式化值
@@ -144,22 +147,17 @@ const handleSubmit = async () => {
         } else if (action.value == 'refund') {
             await chain
                 .get()
-                .undelegatebw(
-                    wallet.currentWallet.name,
-                    receiver.value,
-                    netQuantity,
-                    cpuQuantity,
-                    chain.getAuth()
-                );
+                .undelegatebw(wallet.currentWallet.name, receiver.value, netQuantity, cpuQuantity, chain.getAuth());
         } else if (action.value == 'rent') {
-            const powupState = await getPowupState();
             let parms = powerup(
                 wallet.currentWallet.name,
                 receiver.value,
                 cpuQuantity,
                 netQuantity,
-                powupState
+                await getPowupState()
             );
+            console.log(parms);
+
             await chain.get().powerup(parms, chain.getAuth());
         }
         window.msg.success(t('resource.stakeSuccess'));
@@ -253,19 +251,11 @@ const handleSubmit = async () => {
                     <span>{{ $t('resource.refunding') }}</span>
                     <span
                         class="small"
-                        v-if="
-                            props.type === 'cpu'
-                                ? refundData.cpu_amount != 0
-                                : refundData.net_amount != 0
-                        "
+                        v-if="props.type === 'cpu' ? refundData.cpu_amount != 0 : refundData.net_amount != 0"
                         :class="{ refund: refundData.left_time == '-' }"
                         @click="refundNow()"
                     >
-                        {{
-                            refundData.left_time == '-'
-                                ? $t('resource.refundNow')
-                                : refundData.left_time
-                        }}
+                        {{ refundData.left_time == '-' ? $t('resource.refundNow') : refundData.left_time }}
                     </span>
                 </div>
             </div>
@@ -312,6 +302,7 @@ const handleSubmit = async () => {
             :action="action"
             :estimated-cost="estimatedCost"
             :transfer-visible="transferVisible"
+            @getEstimatedCost="getEstimatedCost"
             @close="centerDialogVisible = false"
             @submit="handleSubmit"
         ></resource-option>

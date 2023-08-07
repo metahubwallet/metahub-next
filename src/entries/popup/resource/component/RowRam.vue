@@ -21,9 +21,7 @@ const beforeSubmit = async (value: string) => {
         placeholder.value = props.resourceData.core_liquid_balance;
         modalTitle.value = t('resource.buy') + ' ' + t('resource.ram');
     } else if (value == 'sellRam') {
-        placeholder.value =
-            ((props.resourceData.ram_quota - props.resourceData.ram_usage) / 1024).toFixed(4) +
-            ' KB';
+        placeholder.value = ((props.resourceData.ram_quota - props.resourceData.ram_usage) / 1024).toFixed(4) + ' KB';
         modalTitle.value = t('resource.sell') + ' ' + t('resource.ram');
     }
     modalVisible.value = true;
@@ -41,8 +39,7 @@ const onSubmit = async () => {
     if (!receiver.value) return window.msg.warning(t('wallet.emptyReceiver'));
     else if (receiver.value.length != 42 && receiver.value.length > 12)
         return window.msg.warning(t('wallet.errorReceiver'));
-    if (!inputValue.value || inputValue.value == 0)
-        return window.msg.warning(t('resource.valueError'));
+    if (!inputValue.value || inputValue.value == 0) return window.msg.warning(t('resource.valueError'));
 
     try {
         // 发起操作
@@ -52,9 +49,7 @@ const onSubmit = async () => {
         if (action.value == 'buyRam') {
             const precision = store.chain().currentNetwork.token.precision;
             let value = inputValue.value.toFixed(precision) + ' ' + currentSymbol;
-            result = await chain
-                .get()
-                .buyRam(wallet.currentWallet.name, receiver.value, value, chain.getAuth());
+            result = await chain.get().buyRam(wallet.currentWallet.name, receiver.value, value, chain.getAuth());
         }
         // 出售
         else if (action.value == 'sellRam') {
@@ -113,9 +108,7 @@ const onSubmit = async () => {
             <div class="content-line line1">
                 <div class="item">
                     <span>{{ $t('resource.price') }}</span>
-                    <span class="small">
-                        {{ props.ramprice.toFixed(4) }} {{ currentSymbol }}/KB
-                    </span>
+                    <span class="small">{{ props.ramprice.toFixed(4) }} {{ currentSymbol }}/KB</span>
                 </div>
             </div>
 
@@ -129,12 +122,7 @@ const onSubmit = async () => {
         </div>
 
         <!-- submit form -->
-        <modal
-            :is-show="modalVisible"
-            :title="modalTitle"
-            @close="modalVisible = false"
-            @submit="onSubmit()"
-        >
+        <modal :is-show="modalVisible" :title="modalTitle" @close="modalVisible = false" @submit="onSubmit()">
             <div class="dialog-item p-4">
                 <span class="label">{{ $t('resource.stakeReceiver') }}</span>
                 <n-input v-model:value="receiver"></n-input>
@@ -144,8 +132,15 @@ const onSubmit = async () => {
                 <n-input-number
                     :placeholder="placeholder"
                     v-model:value="inputValue"
+                    :min="0"
+                    :precision="4"
+                    :step="0.1"
                     clearable
-                ></n-input-number>
+                >
+                    <template #suffix>
+                        <span class="text-gray-400 text-sm">EOS</span>
+                    </template>
+                </n-input-number>
             </div>
         </modal>
     </div>

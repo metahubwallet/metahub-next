@@ -6,11 +6,12 @@ const iv = CryptoJS.enc.Utf8.parse('A3CE6FKE34SG3LD2'); //十六位十六进制�
 
 export const metahubKey = 'YM4BqViCkPs2qt3tTdTuP3ABUimU7sBU';
 
-//解密方法
+// 解密方法
 export const decrypt = (word: string, seed = key) => {
     const encryptedHexStr = CryptoJS.enc.Hex.parse(word);
     const srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
     const parseSeed = CryptoJS.enc.Utf8.parse(seed);
+
     const decrypt = CryptoJS.AES.decrypt(srcs, parseSeed, {
         iv: iv,
         mode: CryptoJS.mode.CBC,
@@ -20,7 +21,7 @@ export const decrypt = (word: string, seed = key) => {
     return decrypt.toString(CryptoJS.enc.Utf8);
 };
 
-//加密方法
+// 加密方法
 export const encrypt = (word: string, seed = key) => {
     const parseSeed = CryptoJS.enc.Utf8.parse(seed);
     let srcs = CryptoJS.enc.Utf8.parse(word);
@@ -45,7 +46,6 @@ export const password2 = (word: string) => {
 };
 
 export const sha256 = (word: Buffer | string, secret: string = '') => {
-    const hash =
-        secret === null ? crypto.createHash('sha256') : crypto.createHmac('sha256', secret);
+    const hash = secret === null ? crypto.createHash('sha256') : crypto.createHmac('sha256', secret);
     return hash.update(word).digest('hex');
 };

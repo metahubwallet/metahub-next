@@ -74,12 +74,7 @@ const handleSelectWallet = (wallet: any) => {
 
             <!-- list -->
             <div class="list-container">
-                <div
-                    :key="item.index"
-                    @click="handleSelectWallet(item)"
-                    class="account-cell"
-                    v-for="item in wallets"
-                >
+                <div :key="item.index" @click="handleSelectWallet(item)" class="account-cell" v-for="item in wallets">
                     <div class="account-left">
                         <div class="account-left-name">
                             {{ item.chainName }}：
@@ -90,11 +85,7 @@ const handleSelectWallet = (wallet: any) => {
                             <div class="span-right">{{ item.publicKey }}</div>
                         </div>
                     </div>
-                    <img
-                        v-if="item.isSelected === true"
-                        class="close"
-                        src="@/asset/img/account_select@2x.png"
-                    />
+                    <img v-if="item.isSelected === true" class="close" src="@/asset/img/account_select@2x.png" />
                 </div>
             </div>
         </div>

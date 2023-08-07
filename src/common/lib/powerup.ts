@@ -5,17 +5,10 @@ export function powerup(
     receiver: string,
     cpuQuantity: string = '',
     netQuantity: string = '',
-    powup_state: any | null = null
+    powupState: any | null = null
 ) {
-    // const powup_state = await eos_rpc.get_table_rows({
-    //   code: 'eosio',
-    //   scope: '',
-    //   table: 'powup.state',
-    //   json: true,
-    //   limit: 1
-    // });
-    if (!powup_state) {
-        powup_state = {
+    if (!powupState) {
+        powupState = {
             version: 0,
             net: {
                 version: 0,
@@ -61,19 +54,15 @@ export function powerup(
         cpuFee = 0,
         netFrac = 0,
         netFee = 0;
-    if (cpuAmount) {
-        ({ cpuFrac, cpuFee } = calc_cpu_params(cpuAmount, powup_state));
-    }
-    if (netAmount) {
-        ({ netFrac, netFee } = calc_net_params(netAmount, powup_state));
-    }
+    if (cpuAmount) ({ cpuFrac, cpuFee } = calcCpuParams(cpuAmount, powupState));
+    if (netAmount) ({ netFrac, netFee } = calcNetParams(netAmount, powupState));
 
     const parms = {
         payer,
         receiver,
-        days: parseInt(powup_state.powerup_days),
-        netFrac: netFrac,
-        cpuFrac: cpuFrac,
+        days: parseInt(powupState.powerup_days),
+        net_frac: netFrac,
+        cpu_frac: cpuFrac,
         max_payment:
             toBN(cpuFee + netFee)
                 .div(10000)
@@ -82,30 +71,25 @@ export function powerup(
     return parms;
 }
 
-function calc_cpu_params(cpuAmount: number, powup_state: any) {
-    // const cpuAmount = 10000;  // 表示租用1EOS
-    const rentbw_frac = Math.pow(10, 15);
-    const cpu_weight = parseInt(powup_state.cpu.weight);
-    const cpuFrac = Math.floor(toBN(cpuAmount).times(rentbw_frac).div(cpu_weight).toNumber());
-    const utilizationIncrease = parseInt(
-        toBN(cpuFrac).times(cpu_weight).div(rentbw_frac).toFixed(0)
-    );
-    const cpuFee = calc_powerup_fee(powup_state.cpu, utilizationIncrease);
-    return { cpuFrac, cpuFee };
+function calcCpuParams(cpuAmount: number, powupState: any) {
+    const rentbwFrac = Math.pow(10, 15);
+    const cpuWeight = parseInt(powupState.cpu.weight);
+    const cpuFrac = parseInt(toBN(cpuAmount).times(rentbwFrac).div(cpuWeight).toFixed(0));
+    const utilizationIncrease = parseInt(toBN(cpuFrac).times(cpuWeight).div(rentbwFrac).toFixed(0));
+    const cpuFee = calcPowerupFee(powupState.cpu, utilizationIncrease);
+    return { cpuFrac: cpuFrac, cpuFee };
 }
 
-function calc_net_params(netAmount: number, powup_state: any) {
-    const rentbw_frac = Math.pow(10, 15);
-    const net_weight = parseInt(powup_state.net.weight);
-    const netFrac = Math.floor(toBN(netAmount).times(rentbw_frac).div(net_weight).toNumber());
-    const utilizationIncrease = parseInt(
-        toBN(netFrac).times(net_weight).div(rentbw_frac).toFixed(0)
-    );
-    const netFee = calc_powerup_fee(powup_state.net, utilizationIncrease);
-    return { netFrac, netFee };
+function calcNetParams(netAmount: number, powupState: any) {
+    const rentbwFrac = Math.pow(10, 15);
+    const netWeight = parseInt(powupState.net.weight);
+    const netFrac = parseInt(toBN(netAmount).times(rentbwFrac).div(netWeight).toFixed(0));
+    const utilizationIncrease = parseInt(toBN(netFrac).times(netWeight).div(rentbwFrac).toFixed(0));
+    const netFee = calcPowerupFee(powupState.net, utilizationIncrease);
+    return { netFrac: netFrac, netFee };
 }
 
-function calc_powerup_fee(state: any, utilization_increase: number): number {
+function calcPowerupFee(state: any, utilization_increase: number): number {
     if (utilization_increase <= 0) {
         return 0;
     }
@@ -114,7 +98,7 @@ function calc_powerup_fee(state: any, utilization_increase: number): number {
     const exponent = parseInt(state.exponent);
     const weight = parseInt(state.weight);
 
-    const price_integral_delta = (start_utilization: number, end_utilization: number): number => {
+    const priceIntegralDelta = (start_utilization: number, end_utilization: number): number => {
         const exponent = parseInt(state.exponent);
         const weight = parseInt(state.weight);
         let coefficient = (start_utilization - end_utilization) / exponent;
@@ -128,7 +112,7 @@ function calc_powerup_fee(state: any, utilization_increase: number): number {
         return result;
     };
 
-    const price_function = (utilization: number): number => {
+    const priceFunction = (utilization: number): number => {
         let price = min_price;
         let new_exponent = exponent - 1.0;
         if (new_exponent <= 0) {
@@ -146,13 +130,13 @@ function calc_powerup_fee(state: any, utilization_increase: number): number {
     let adjusted_utilization = parseInt(state.adjusted_utilization);
     if (start_utilization < adjusted_utilization) {
         fee +=
-            (price_function(adjusted_utilization) *
+            (priceFunction(adjusted_utilization) *
                 Math.min(utilization_increase, adjusted_utilization - start_utilization)) /
             weight;
         start_utilization = adjusted_utilization;
     }
     if (start_utilization < end_utilization) {
-        fee += price_integral_delta(start_utilization, end_utilization);
+        fee += priceIntegralDelta(start_utilization, end_utilization);
     }
     return Math.ceil(fee);
 }

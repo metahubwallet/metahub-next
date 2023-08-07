@@ -1,6 +1,5 @@
 import { Network } from '@/store/chain/type';
 import MessageCenter from './messageCenter';
-import { Account } from '@/store/wallet/type';
 
 const strippedHost = () => {
     let host = location.hostname;
@@ -21,7 +20,7 @@ export class Payload {
     buf: Buffer;
     transaction: {
         delay_sec: string;
-        actions: Account[];
+        actions: any[];
         serializedTransaction: number[];
         chainId: string;
     };

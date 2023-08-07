@@ -83,10 +83,9 @@ export default class EOS {
                 accounts.push(account.account_name);
             }
             let filterAccounts = [...new Set(accounts)];
-            // todo: 原来的bug会导致刚注册的账号获取不到
             return filterAccounts;
         } catch (e: any) {
-            console.log(e.json);
+            console.log(e);
             return [];
         }
     }
@@ -263,7 +262,7 @@ export default class EOS {
                     {
                         account: 'eosio',
                         name: 'delegatebw',
-                        authorization: [ auth ],
+                        authorization: [auth],
                         data: {
                             from,
                             receiver,
@@ -401,15 +400,12 @@ export default class EOS {
         );
     }
 
-    async transact(transaction: Transaction, options: any = {}, ignoreCPUProxy:boolean = false) {
+    async transact(transaction: Transaction, options: any = {}, ignoreCPUProxy: boolean = false) {
         let currentAccount = this.chain.currentAccount();
         let isProxy = currentAccount.smoothMode;
 
         // 是否为充值CPU
-        if (
-            transaction.actions[0].name == 'transfer' &&
-            transaction.actions[0].account == 'eosio.token'
-        ) {
+        if (transaction.actions[0].name == 'transfer' && transaction.actions[0].account == 'eosio.token') {
             if (transaction.actions[0].data.to == '1stbillpayer') {
                 isProxy = true;
             }
@@ -422,8 +418,7 @@ export default class EOS {
             // transaction.expiration = '2023-08-04T11:00:00.000';
             // transaction.ref_block_num = 43492;
             // transaction.ref_block_prefix = 2225954522;
-            const trx = await this.api.transact(transaction, {});
-            console.log(trx);
+            const trx = await this.api.transact(transaction, options);
             return trx;
         }
 
@@ -540,10 +535,7 @@ export default class EOS {
 
     async parseEosjs2Request(payload: Payload, endpoint: string) {
         const { transaction } = payload;
-        const buffer = Buffer.from(
-            Uint8Array.from(transaction.serializedTransaction).toString(),
-            'hex'
-        );
+        const buffer = Buffer.from(Uint8Array.from(transaction.serializedTransaction).toString(), 'hex');
         const parsed = await this.api.deserializeTransactionWithActions(buffer);
         const actions = parsed.actions.map((account, name, ...x) => ({
             ...x,
@@ -572,9 +564,7 @@ export default class EOS {
                 let abi = abis[contractAccountName];
                 const typeName = abi.abi.actions.find((x: any) => x.name === action.name).type;
                 const data = abi.fromBuffer(typeName, action.data);
-                const actionAbi = abi.abi.actions.find(
-                    (fcAction: any) => fcAction.name === action.name
-                );
+                const actionAbi = abi.abi.actions.find((fcAction: any) => fcAction.name === action.name);
                 let ricardian = actionAbi ? actionAbi.ricardian_contract : null;
 
                 if (ricardian) {
@@ -582,15 +572,8 @@ export default class EOS {
                         h1: 'div class="ricardian-action"',
                         h2: 'div class="ricardian-description"',
                     };
-                    const signer =
-                        action.authorizations.length === 1 ? action.authorizations[0].actor : null;
-                    ricardian = ricardianParser.parse(
-                        action.name,
-                        data,
-                        ricardian,
-                        signer,
-                        htmlFormatting
-                    );
+                    const signer = action.authorizations.length === 1 ? action.authorizations[0].actor : null;
+                    ricardian = ricardianParser.parse(action.name, data, ricardian, signer, htmlFormatting);
                 }
 
                 if (transaction.hasOwnProperty('delay_sec') && parseInt(transaction.delay_sec) > 0)
@@ -625,10 +608,7 @@ export default class EOS {
         if (arbitrary && isHash) {
             sig = ecc.Signature.signHash(payload.data, privateKey).toString();
         } else {
-            sig = ecc.sign(
-                arbitrary ? Buffer.from(payload.data, 'hex') : payload.buf,
-                privateKey,
-                'utf8');
+            sig = ecc.sign(arbitrary ? Buffer.from(payload.data, 'hex') : payload.buf, privateKey, 'utf8');
         }
         return sig;
     }

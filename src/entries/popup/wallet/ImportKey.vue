@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Wallet } from '@/store/wallet/type';
 import { eosChainId, getNetworkLocalIcon } from '@/common/util/network';
-import { sha256, md5, encrypt } from '@/common/util/crypto';
+import { sha256, md5, decrypt, encrypt } from '@/common/util/crypto';
 import bs58 from 'bs58';
 import { Address } from 'ethereumjs-util';
 import chain from '@/common/lib/chain';
@@ -48,6 +48,7 @@ const handleImportKey = async () => {
     let isKey = chain.get().isValidPrivate(privateKey.value);
 
     let ethAddress = '';
+
     if (!isKey && privateKey.value.length == 64) {
         const privateKeyHex = Buffer.from(privateKey.value, 'hex');
         ethAddress = Address.fromPrivateKey(privateKeyHex).toString();
@@ -70,12 +71,9 @@ const handleImportKey = async () => {
             .toUpperCase();
         chainAccount.blockchain = 'eos'; // eth, tron ...
         chainAccount.smoothMode = false; // 默认关闭顺畅模式
-        const publicKey = chain.get(network?.chainId).privateToPublic(privateKey.value);
 
-        const privateValue = encrypt(
-            privateKey.value,
-            md5(chainAccount.seed + store.user().password)
-        );
+        const publicKey = chain.get(network?.chainId).privateToPublic(privateKey.value);
+        const privateValue = encrypt(privateKey.value, md5(chainAccount.seed + store.user().password));
         const key = { publicKey, privateKey: privateValue, permissions: [] };
         chainAccount.keys = [key];
         try {
@@ -85,8 +83,7 @@ const handleImportKey = async () => {
             });
 
             if (accounts.length == 0)
-                if (accounts.length == 0)
-                    accounts = await chain.get(network?.chainId).getKeyAccounts(publicKey);
+                if (accounts.length == 0) accounts = await chain.get(network?.chainId).getKeyAccounts(publicKey);
             tipMessage = t('public.noAccountForPrivateKey');
 
             for (let account of accounts) {
@@ -97,10 +94,7 @@ const handleImportKey = async () => {
                 let existed = false;
                 for (let i = 0; i < store.wallet().wallets.length; i++) {
                     const element = store.wallet().wallets[i];
-                    if (
-                        element.name === newAccount.name &&
-                        element.chainId === newAccount.chainId
-                    ) {
+                    if (element.name === newAccount.name && element.chainId === newAccount.chainId) {
                         existed = true;
                         break;
                     }
@@ -109,6 +103,8 @@ const handleImportKey = async () => {
                 else importAccounts.push(newAccount);
             }
         } catch (e) {
+            console.log(1123);
+
             console.log(e);
             window.msg.error(e);
             isLoad.value = false;
@@ -116,7 +112,6 @@ const handleImportKey = async () => {
     } else tipMessage = t('public.invaildPrivateKey');
 
     importAccounts.sort(sortAccounts);
-
     if (importAccounts.length > 1) {
         accountList.value = importAccounts;
         isShowChoose.value = true;
@@ -183,12 +178,7 @@ const sortAccounts = (first: any, second: any) => {
             <div class="cover-content _effect pr-[15px]">
                 <div class="import-key-container">
                     <div class="import-key-tip mb-[10px]">{{ $t('public.importNetTip') }}:</div>
-                    <n-popover
-                        style="max-height: 250px"
-                        trigger="click"
-                        scrollable
-                        placement="bottom"
-                    >
+                    <n-popover style="max-height: 250px" trigger="click" scrollable placement="bottom">
                         <template #trigger>
                             <div
                                 class="border border-[#DBDBDB] shadow-sm h-[71px] w-full rounded-[12px] flex items-center justify-between px-[20px]"
@@ -226,15 +216,9 @@ const sortAccounts = (first: any, second: any) => {
                         v-model:value="privateKey"
                     ></n-input>
                     <n-checkbox class="import-key-protocol" v-model:checked="checked"></n-checkbox>
-                    <span
-                        class="check-tip text-center cursor-pointer ml-[4px]"
-                        @click="checked = !checked"
-                    >
+                    <span class="check-tip text-center cursor-pointer ml-[4px]" @click="checked = !checked">
                         {{ $t('public.readAndAgree') }}
-                        <span
-                            @click="$router.push({ name: 'import-protocol' })"
-                            class="protocol-tip"
-                        >
+                        <span @click="$router.push({ name: 'import-protocol' })" class="protocol-tip">
                             {{ $t('public.readAndAgreeProtocols') }}
                         </span>
                     </span>

@@ -20,10 +20,7 @@ const props = withDefaults(defineProps<Props>(), {});
     <modal :is-show="props.isShow" :title="props.modalTitle" cus-footer @close="$emit('close')">
         <div class="dialog-item" v-show="props.receiverVisible">
             <span class="label">{{ $t('resource.stakeReceiver') }}</span>
-            <n-input
-                :value="props.receiver"
-                @update:value="$emit('update:receiver', $event)"
-            ></n-input>
+            <n-input :value="props.receiver" @update:value="$emit('update:receiver', $event)"></n-input>
         </div>
 
         <div class="dialog-item">
@@ -34,10 +31,12 @@ const props = withDefaults(defineProps<Props>(), {});
                 :min="0"
                 :precision="4"
                 :step="0.1"
-                @keyup.native="$emit('number')"
-                @update:value="$emit('update:cpuValue', $event)"
+                @update:value="
+                    $emit('update:cpuValue', $event);
+                    $emit('getEstimatedCost');
+                "
                 clearable
-            > 
+            >
                 <template #suffix>
                     <span class="text-gray-400 text-sm">EOS</span>
                 </template>
@@ -52,8 +51,10 @@ const props = withDefaults(defineProps<Props>(), {});
                 :min="0"
                 :precision="4"
                 :step="0.1"
-                @keyup.native="$emit('number')"
-                @update:value="$emit('update:netValue', $event)"
+                @update:value="
+                    $emit('update:netValue', $event);
+                    $emit('getEstimatedCost');
+                "
                 clearable
             >
                 <template #suffix>
