@@ -17,8 +17,8 @@ export default class Windows {
             if (forceClose) {
                 chrome.windows.remove(windowId);
             }
-            chrome.browserAction.setIcon({
-                path: '../icons/metahub-128.png',
+            chrome.action.setIcon({
+                path: '../../static/metahub-128.png',
             });
             if (typeof windowData.callback == 'function') {
                 setTimeout(() => windowData.callback(data), 1);
@@ -31,13 +31,7 @@ export default class Windows {
         return this.windowCount;
     }
 
-    static createWindow(
-        type: string,
-        width: number,
-        height: number,
-        params: any,
-        callback: Function
-    ) {
+    static createWindow(type: string, width: number, height: number, params: any, callback: Function) {
         chrome.windows.create(
             {
                 url: 'pages/window.html#/' + type,
@@ -49,8 +43,8 @@ export default class Windows {
             },
             (window: any) => {
                 this.windowCount++;
-                chrome.browserAction.setIcon({
-                    path: '../icons/metahub-open.png',
+                chrome.action.setIcon({
+                    path: '../../static/metahub-open.png',
                 });
                 this.windowIds[window.id] = { callback, params };
             }

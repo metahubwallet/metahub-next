@@ -28,10 +28,7 @@ onBeforeMount(() => {
 });
 
 onMounted(async () => {
-    let result = await chain.fetchPermissions(
-        wallet.currentWallet.name,
-        wallet.currentWallet.chainId
-    );
+    let result = await chain.fetchPermissions(wallet.currentWallet.name, wallet.currentWallet.chainId);
 
     if (result.code != 200) return window.msg.error(result.msg);
 
@@ -77,11 +74,7 @@ const handleRemove = async (
     try {
         await chain
             .get(chainId.value)
-            .updatePerms(
-                account.value,
-                newPerms,
-                chain.getAuthByAccount(account.value.name, walletAuthType)
-            );
+            .updatePerms(account.value, newPerms, chain.getAuthByAccount(account.value.name, walletAuthType));
         perms = newPerms;
         window.msg.success(t('public.executeSuccess'));
     } catch (e) {
@@ -153,28 +146,30 @@ const handleActiveRemove = (oldOperateKey: string) => {
 
 // 移除账号
 const showPasswordConfirm = ref(false);
-const emit = defineEmits(['refreshTokens']);
 const removeAccountClicked = () => {
-    let index =
-        chain.findLocalAccount(wallet.currentWallet.name, wallet.currentWallet.chainId)?.index ||
-        -1;
+    const index = store.wallet().wallets.findIndex((item) => {
+        return item.name === account.value.name && item.chainId === chainId.value;
+    });
     wallet.wallets.splice(index, 1);
     wallet.setWallets(wallet.wallets);
-    if (wallet.wallets.length > 0) {
-        const firstWallet = wallet.wallets[0];
-        let index = wallet.wallets.indexOf(firstWallet);
-        wallet.setSelectedIndex(index >= 0 ? index : 0);
-    } else wallet.setSelectedIndex(0);
 
+    // 无账号
+    if (wallet.wallets.length === 0) {
+        wallet.setSelectedIndex(0);
+        window.msg.success(t('password.deleteSuccess'));
+        router.push({ name: 'index' });
+        return;
+    }
+
+    // 存在其它账号
+    let firstIndex = wallet.wallets.indexOf(wallet.wallets[0]);
+    wallet.setSelectedIndex(firstIndex >= 0 ? firstIndex : 0);
     const network = store.chain().networks.find((item) => {
         return item.chainId === wallet.currentWallet.chainId;
     });
     if (network) store.chain().setCurrentNetwork(network);
-
-    emit('refreshTokens', true);
-    router.go(-1);
-
     window.msg.success(t('password.deleteSuccess'));
+    router.go(-1);
 };
 </script>
 
@@ -206,17 +201,10 @@ const removeAccountClicked = () => {
                             </div>
 
                             <!-- owner list -->
-                            <div
-                                class="account-cell"
-                                v-for="(item, index) of ownersArray"
-                                :key="index"
-                            >
+                            <div class="account-cell" v-for="(item, index) of ownersArray" :key="index">
                                 <!-- key -->
                                 <div class="account-cell-key">
-                                    <clip-button
-                                        class="account-left-name"
-                                        :value="item.key"
-                                    ></clip-button>
+                                    <clip-button class="account-left-name" :value="item.key"></clip-button>
                                 </div>
 
                                 <!-- options -->
@@ -240,10 +228,7 @@ const removeAccountClicked = () => {
                                         <div
                                             @click="handleOrderRemove(item.key)"
                                             class="account-change-btn"
-                                            v-if="
-                                                hiddenRemoveOwnerBtn &&
-                                                permissions.indexOf('owner') > -1
-                                            "
+                                            v-if="hiddenRemoveOwnerBtn && permissions.indexOf('owner') > -1"
                                         >
                                             {{ $t('setting.remove') }}
                                         </div>
@@ -267,10 +252,7 @@ const removeAccountClicked = () => {
                             <div class="account-cell" :key="item.id" v-for="item in activesArray">
                                 <!-- key -->
                                 <div class="account-cell-key">
-                                    <clip-button
-                                        class="account-left-name"
-                                        :value="item.key"
-                                    ></clip-button>
+                                    <clip-button class="account-left-name" :value="item.key"></clip-button>
                                 </div>
 
                                 <!-- optinos -->
@@ -302,10 +284,7 @@ const removeAccountClicked = () => {
 
                         <!-- remove account -->
                         <div class="account-buttons">
-                            <n-button
-                                @click="showPasswordConfirm = true"
-                                class="account-delete-button"
-                            >
+                            <n-button @click="showPasswordConfirm = true" class="account-delete-button">
                                 {{ $t('setting.removeWallet') }}
                             </n-button>
                             <password-confirm

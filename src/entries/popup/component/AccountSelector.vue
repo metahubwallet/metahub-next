@@ -45,9 +45,7 @@ const searchName = ref('');
 const wallet = store.wallet();
 const accounts = computed(() => {
     return wallet.wallets.filter(
-        (x) =>
-            x.chainId == activeChainId.value &&
-            (searchName.value == '' || x.account.includes(searchName.value))
+        (x) => x.chainId == activeChainId.value && (searchName.value == '' || x.account.includes(searchName.value))
     );
 });
 
@@ -99,15 +97,9 @@ const handleSelectAccount = (account: Wallet) => {
                                 <span>{{ item.name }}</span>
 
                                 <div class="actions">
-                                    <div
-                                        v-if="searchName != '' || accounts.length >= 8"
-                                        class="search-acts"
-                                    >
+                                    <div v-if="searchName != '' || accounts.length >= 8" class="search-acts">
                                         <i class="el-icon-search"></i>
-                                        <input
-                                            v-model="searchName"
-                                            :placeholder="$t('wallet.searchTip')"
-                                        />
+                                        <input v-model="searchName" :placeholder="$t('wallet.searchTip')" />
                                     </div>
                                     <img
                                         v-show="searchName != '' || accounts.length"
@@ -119,10 +111,7 @@ const handleSelectAccount = (account: Wallet) => {
                             </div>
 
                             <div v-show="accounts.length == 0">
-                                <n-button
-                                    @click="handleImportKey(item.chainId)"
-                                    class="import-key-btn"
-                                >
+                                <n-button @click="handleImportKey(item.chainId)" class="import-key-btn">
                                     +{{ $t('public.importKey') }}
                                 </n-button>
                             </div>
@@ -146,10 +135,7 @@ const handleSelectAccount = (account: Wallet) => {
                                 <img
                                     class="close"
                                     src="@/asset/img/account_select.png"
-                                    v-show="
-                                        wallet.selectedIndex == item.index &&
-                                        chain.currentChainId === item.chainId
-                                    "
+                                    v-show="wallet.selectedIndex == item.index && chain.currentChainId === item.chainId"
                                 />
                             </div>
                         </div>

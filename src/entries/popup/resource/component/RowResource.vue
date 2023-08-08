@@ -33,14 +33,13 @@ const refundData = computed(() => {
         : ({} as RefundRequest);
 });
 const wallet = store.wallet();
-const emit = defineEmits(['loadData', 'refreshTokens']);
+const emit = defineEmits(['loadData']);
 const refundNow = async () => {
     try {
         await chain.get().refund(wallet.currentWallet.name, chain.getAuth());
 
         window.msg.success(t('resource.stakeSuccess'));
         emit('loadData');
-        emit('refreshTokens', true);
     } catch (e) {
         window.msg.success(chain.getErrorMsg(e));
     }
@@ -164,7 +163,6 @@ const handleSubmit = async () => {
 
         //刷新数据
         emit('loadData');
-        emit('refreshTokens', true);
     } catch (e) {
         console.log(e);
         window.msg.error(chain.getErrorMsg(e));

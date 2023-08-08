@@ -19,7 +19,9 @@ onMounted(async () => {
 });
 
 // 加载默认节点
+const isLoad = ref(false);
 const loadRecommendEndpoints = async () => {
+    isLoad.value = true;
     const endpoints = await getEndpoints(chainId.value);
     if (endpoints && endpoints.length) {
         for (const endpoint of endpoints) {
@@ -28,6 +30,7 @@ const loadRecommendEndpoints = async () => {
         recommendEndpoints.value = endpoints;
         pingEndpoints(recommendEndpoints.value);
     }
+    isLoad.value = false;
 };
 
 // ping节点
@@ -103,8 +106,7 @@ const addCustomEndpoint = async () => {
     }
     let isHttp = completeUrl.startsWith('http://');
     let isHttps = completeUrl.startsWith('https://');
-    if (!isHttp && !isHttps)
-        return window.msg.error('Endpoint must start with http:// or https://');
+    if (!isHttp && !isHttps) return window.msg.error('Endpoint must start with http:// or https://');
 
     const startTimestamp = new Date().getTime();
     try {
@@ -153,7 +155,10 @@ const addCustomEndpoint = async () => {
                             </div>
                         </div>
 
-                        <n-empty v-show="recommendEndpoints.length == 0" class="m-auto mt-[10%]" />
+                        <div v-show="recommendEndpoints.length == 0">
+                            <n-spin v-if="isLoad" :size="24" stroke="#bf01fa" class="flex mt-[10%]" />
+                            <n-empty v-else class="m-auto mt-[10%]" />
+                        </div>
                     </div>
 
                     <!-- select custom node -->
@@ -202,10 +207,7 @@ const addCustomEndpoint = async () => {
                 @close="showAddNode = false"
                 @submit="addCustomEndpoint"
             >
-                <n-input
-                    :placeholder="$t('setting.inputNodeAddress')"
-                    v-model:value="userEnterUrl"
-                ></n-input>
+                <n-input :placeholder="$t('setting.inputNodeAddress')" v-model:value="userEnterUrl"></n-input>
             </modal>
         </div>
     </div>

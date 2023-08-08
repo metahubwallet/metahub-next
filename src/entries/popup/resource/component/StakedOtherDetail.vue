@@ -30,16 +30,13 @@ onMounted(async () => {
 
 // 提交
 const { t } = useI18n();
-const emit = defineEmits(['close', 'loadData', 'refreshTokens']);
+const emit = defineEmits(['close', 'loadData']);
 const submit = async (item: any) => {
     try {
-        await chain
-            .get()
-            .undelegatebw(item.from, item.to, item.net_weight, item.cpu_weight, chain.getAuth());
+        await chain.get().undelegatebw(item.from, item.to, item.net_weight, item.cpu_weight, chain.getAuth());
         window.msg.success(t('resource.stakeSuccess'));
         emit('close');
         emit('loadData');
-        emit('refreshTokens', true);
     } catch (e) {
         window.msg.error(chain.getErrorMsg(e));
     }

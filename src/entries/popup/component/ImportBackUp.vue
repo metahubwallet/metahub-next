@@ -57,7 +57,6 @@ const onSubmit = handleSubmit(() => {
 
 // 导入数据
 const router = useRouter();
-const emits = defineEmits(['refreshTokens', 'close']);
 const importWalletsFromData = async (content: string) => {
     if (!/^[0-9A-F]+$/.test(content)) return window.msg.error(t('public.importErrorTip'));
 
@@ -74,10 +73,7 @@ const importWalletsFromData = async (content: string) => {
             importData = JSON.parse(decryptData);
             for (const wallet of importData.wallets) {
                 for (const key of wallet.keys) {
-                    key.privateKey = decrypt(
-                        key.privateKey,
-                        md5(wallet.seed + password1(values.encryptPassword))
-                    );
+                    key.privateKey = decrypt(key.privateKey, md5(wallet.seed + password1(values.encryptPassword)));
                 }
             }
         } catch (err) {
@@ -108,23 +104,24 @@ const importWalletsFromData = async (content: string) => {
     store.wallet().setUserTokens(importData.userTokens);
     store.user().password = importData.password;
     store.user().setPasswordHash(importData.passwordHash);
-    store.setting().setLang(importData.language);
+    changeLang(importData.language);
     store.setting().setIsLock(true);
 
-    emits('refreshTokens', true);
     router.push({ name: 'index' });
 
     return window.msg.success(t('public.importBackupSuccess'));
 };
+
+// 切换语言
+const { locale } = useI18n();
+const changeLang = async (value: any) => {
+    locale.value = value;
+    store.setting().setLang(value);
+};
 </script>
 
 <template>
-    <modal
-        :is-show="props.isShow"
-        :title="$t('public.importBackup')"
-        @close="$emit('close')"
-        @submit="onSubmit"
-    >
+    <modal :is-show="props.isShow" :title="$t('public.importBackup')" @close="$emit('close')" @submit="onSubmit">
         <!-- 加密密码 -->
         <div class="mb-2">
             <div class="dialog-title flex justify-between items-center">
@@ -173,11 +170,7 @@ const importWalletsFromData = async (content: string) => {
 
         <!-- 选择备份文件 -->
         <div class="dialog-title">
-            <n-upload
-                v-if="values.uploadName == ''"
-                @before-upload="beforeUpload"
-                :show-file-list="false"
-            >
+            <n-upload v-if="values.uploadName == ''" @before-upload="beforeUpload" :show-file-list="false">
                 <n-button text class="upload-button text-primary">
                     {{ $t('public.selectFileToImport') }}
                 </n-button>

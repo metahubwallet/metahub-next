@@ -73,32 +73,16 @@ const beforeSubmit = () => {
                     <!-- recharge amount -->
                     <div class="res-container">
                         <div class="cards">
-                            <n-card
-                                class="card"
-                                :class="{ on: amount == 0.1 }"
-                                @click.native="changeAmount(0.1)"
-                            >
+                            <n-card class="card" :class="{ on: amount == 0.1 }" @click.native="changeAmount(0.1)">
                                 {{ $t('resource.rechargeTab1') }}
                             </n-card>
-                            <n-card
-                                class="card"
-                                :class="{ on: amount == 0.5 }"
-                                @click.native="changeAmount(0.5)"
-                            >
+                            <n-card class="card" :class="{ on: amount == 0.5 }" @click.native="changeAmount(0.5)">
                                 {{ $t('resource.rechargeTab2') }}
                             </n-card>
-                            <n-card
-                                class="card"
-                                :class="{ on: amount == 1 }"
-                                @click.native="changeAmount(1)"
-                            >
+                            <n-card class="card" :class="{ on: amount == 1 }" @click.native="changeAmount(1)">
                                 {{ $t('resource.rechargeTab3') }}
                             </n-card>
-                            <n-card
-                                class="card"
-                                :class="{ on: amount == 3 }"
-                                @click.native="changeAmount(3)"
-                            >
+                            <n-card class="card" :class="{ on: amount == 3 }" @click.native="changeAmount(3)">
                                 {{ $t('resource.rechargeTab4') }}
                             </n-card>
                         </div>
@@ -135,13 +119,13 @@ const beforeSubmit = () => {
                 </n-scrollbar>
             </div>
 
-            <popup-bottom
-                :is-show="showConfirm"
+            <transfer-confirm
+                :isShow="showConfirm"
                 :title="$t('resource.recharge')"
+                :transfer="form"
+                :precision="4"
                 @close="showConfirm = false"
-            >
-                <transfer-confirm :transfer="form" :precision="4"></transfer-confirm>
-            </popup-bottom>
+            ></transfer-confirm>
         </div>
     </div>
 </template>
@@ -181,10 +165,7 @@ const beforeSubmit = () => {
                 font-size: 12px;
                 &.on {
                     border: #bf01fa 1px solid;
-                    background-image: linear-gradient(
-                        rgba(247, 197, 244, 0.6),
-                        rgba(234, 225, 250, 0.06)
-                    );
+                    background-image: linear-gradient(rgba(247, 197, 244, 0.6), rgba(234, 225, 250, 0.06));
                 }
             }
         }

@@ -66,9 +66,7 @@ const getUserBalance = async () => {
     }) as Coin[];
 
     await getBalanceList(store.wallet().currentWallet.account, userCoins, (coin: Coin) => {
-        const selectedToken = tokens.value.find(
-            (x) => x.contract === coin.contract && x.symbol == coin.symbol
-        );
+        const selectedToken = tokens.value.find((x) => x.contract === coin.contract && x.symbol == coin.symbol);
 
         if (selectedToken) {
             selectedToken.amount = coin.amount;
@@ -112,8 +110,7 @@ const getWalletCache = async () => {
         rexCount = response['rows'][0]['rex_balance'];
     }
     const walletCaches = wallet.walletCaches;
-    let currentWalletCaches =
-        walletCaches[wallet.currentWallet?.name + '@' + wallet.currentWallet?.chainId];
+    let currentWalletCaches = walletCaches[wallet.currentWallet?.name + '@' + wallet.currentWallet?.chainId];
     if (!currentWalletCaches) return;
     currentWalletCaches['rexEOS'] = rexEOS;
     currentWalletCaches['rexCount'] = rexCount;
@@ -146,21 +143,12 @@ const handleViewCoin = (item: Coin) => {
             <img @click="loadTokens" class="list-refresh-img" src="@/asset/img/home_refresh.png" />
 
             <!-- add btn -->
-            <img
-                @click="showAddToken = true"
-                class="list-refresh-img ml15"
-                src="@/asset/img/home_add.png"
-            />
+            <img @click="showAddToken = true" class="list-refresh-img ml15" src="@/asset/img/home_add.png" />
         </div>
 
         <!-- body -->
         <n-scrollbar style="max-height: 277px">
-            <div
-                @click="handleViewCoin(item)"
-                class="resource-item"
-                v-for="(item, index) of tokens"
-                :key="index"
-            >
+            <div @click="handleViewCoin(item)" class="resource-item" v-for="(item, index) of tokens" :key="index">
                 <div class="resource-item-left">
                     <img
                         :src="
@@ -180,6 +168,8 @@ const handleViewCoin = (item: Coin) => {
                 </div>
             </div>
         </n-scrollbar>
+
+        <token-selector :is-show="showAddToken" @close="showAddToken = false"></token-selector>
     </div>
 </template>
 

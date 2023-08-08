@@ -53,8 +53,7 @@ const isShowMemo = ref(true);
 const receiverError = ref('');
 const checkReceiver = async () => {
     if (!form.receiver) return (receiverError.value = t('wallet.emptyReceiver'));
-    if (form.receiver == wallet.currentWallet.name)
-        return (receiverError.value = t('wallet.transferSelf'));
+    if (form.receiver == wallet.currentWallet.name) return (receiverError.value = t('wallet.transferSelf'));
 
     // 账号不存在
     if (form.receiver.length == 42) isShowMemo.value = false;
@@ -175,17 +174,14 @@ const checkSubmit = () => {
                                     class="symbol-button rounded-tl-[22px] rounded-bl-[22px]"
                                 >
                                     {{ targetCoin.symbol }}
-                                    <icon-down-one
-                                        theme="filled"
-                                        size="14"
-                                        fill="#4a4a4a"
-                                        class="ml-1"
-                                    />
+                                    <icon-down-one theme="filled" size="14" fill="#4a4a4a" class="ml-1" />
                                 </n-button>
                                 <n-input-number
                                     @blur="checkQuantity"
                                     v-model:value="form.quantity"
                                     :min="0"
+                                    :precision="4"
+                                    :step="0.1"
                                     :max="targetCoin.amount"
                                     :placeholder="targetCoin.amount + ' ' + targetCoin.symbol"
                                 />
@@ -206,12 +202,10 @@ const checkSubmit = () => {
                     </div>
 
                     <!-- memo -->
-                    <div class="transfer-title" v-show="isShowMemo">
-                        {{ $t('wallet.remark') }}（Memo）
-                    </div>
+                    <div class="transfer-title" v-show="isShowMemo">{{ $t('wallet.remark') }}（Memo）</div>
                     <div class="transfer-input" v-show="isShowMemo">
                         <n-input
-                            v-model="form.memo"
+                            v-model:value="form.memo"
                             placeholder=""
                             class="rounded-[22px] h-[46px] leading-[46px] pl-[5px] mb-[20px]"
                         ></n-input>
@@ -219,12 +213,7 @@ const checkSubmit = () => {
 
                     <!-- submit -->
                     <div class="transfer-buttons">
-                        <n-button
-                            type="primary"
-                            @click="checkSubmit"
-                            round
-                            class="primary-button mt-[70px]"
-                        >
+                        <n-button type="primary" @click="checkSubmit" round class="primary-button mt-[70px]">
                             {{ $t('wallet.transfer') }}
                         </n-button>
                     </div>
@@ -247,13 +236,13 @@ const checkSubmit = () => {
         ></select-coin>
 
         <!-- input password -->
-        <popup-bottom
+        <transfer-confirm
             :isShow="confirmVisible"
             :title="$t('wallet.transferInfo')"
+            :transfer="form"
+            :precision="targetCoin.precision"
             @close="confirmVisible = false"
-        >
-            <transfer-confirm :transfer="form" :precision="targetCoin.precision"></transfer-confirm>
-        </popup-bottom>
+        ></transfer-confirm>
     </div>
 </template>
 

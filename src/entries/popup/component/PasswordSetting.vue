@@ -99,11 +99,7 @@ const isShow = ref(false);
                     </span>
                 </div>
 
-                <n-button
-                    class="mt-10 bg-primary w-full rounded-[50px] h-[50px]"
-                    type="primary"
-                    @click="onSubmit()"
-                >
+                <n-button class="mt-10 bg-primary w-full rounded-[50px] h-[50px]" type="primary" @click="onSubmit()">
                     {{ $t('public.start') }}
                 </n-button>
             </div>
@@ -132,7 +128,7 @@ const isShow = ref(false);
     position: relative;
     height: 100%;
     width: 100%;
-    background-image: url('~@/asset/img/bg-2.png');
+    background-image: url(@/asset/img/bg-2.png);
     background-repeat: no-repeat;
     background-position: right bottom;
     background-size: 210px 250px;

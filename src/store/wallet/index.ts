@@ -1,4 +1,4 @@
-import { Coin, Wallet, WalletState, WhiteItem } from './type';
+import { Coin, Transation, Wallet, WalletState, WhiteItem } from './type';
 
 export default defineStore('wallet', {
     state: (): WalletState => ({
@@ -54,6 +54,10 @@ export default defineStore('wallet', {
         async setWhitelist(list: WhiteItem[]) {
             this.whitelist = list;
             await localCache.set('whitelist', list);
+        },
+        async setRecentTransation(recent: Transation) {
+            this.recentTransations.push(recent);
+            await localCache.set('recentTransations', this.recentTransations);
         },
     },
 });

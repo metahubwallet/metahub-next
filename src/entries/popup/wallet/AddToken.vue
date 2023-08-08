@@ -7,14 +7,12 @@ const contract = ref('');
 
 const { t } = useI18n();
 const router = useRouter();
-const emit = defineEmits(['refreshTokens']);
 const handleAddToken = async () => {
     try {
         const newContract = contract.value.toLowerCase();
         const symbol = code.value.toUpperCase();
 
         const result = await chain.get().getCurrencyStats(newContract, symbol);
-
         if (result && result.max_supply) {
             const [amount] = result.max_supply.split(' ');
             const precision = amount.split('.').length > 1 ? amount.split('.')[1].length : 0;
@@ -29,17 +27,13 @@ const handleAddToken = async () => {
                 store
                     .wallet()
                     .currentUserTokens.findIndex(
-                        (x: Coin) =>
-                            x.chain == token.chain &&
-                            x.contract == token.contract &&
-                            x.symbol == token.symbol
+                        (x: Coin) => x.chain == token.chain && x.contract == token.contract && x.symbol == token.symbol
                     ) >= 0;
             if (tokenExists) {
                 window.msg.error(t('wallet.addTokenExist'));
                 return;
             }
             store.wallet().setCurrentUserTokens([...store.wallet().currentUserTokens, token]);
-            emit('refreshTokens', true);
             window.msg.success(t('wallet.addTokenSuccessfully'));
             router.go(-1);
         } else {
@@ -60,12 +54,12 @@ const handleAddToken = async () => {
                 <div class="setting-group">
                     <div class="row">
                         <div class="title">{{ $t('wallet.contractName') }}:</div>
-                        <n-input :placeholder="$t('wallet.required')" v-model="contract"></n-input>
+                        <n-input :placeholder="$t('wallet.required')" v-model:value="contract"></n-input>
                     </div>
 
                     <div class="row">
                         <div class="title">{{ $t('wallet.symbolName') }}:</div>
-                        <n-input :placeholder="$t('wallet.required')" v-model="code"></n-input>
+                        <n-input :placeholder="$t('wallet.required')" v-model:value="code"></n-input>
                     </div>
                 </div>
                 <div class="bottom-container">

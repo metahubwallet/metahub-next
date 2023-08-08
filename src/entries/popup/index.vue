@@ -2,7 +2,7 @@
 import Windows from '@/common/lib/windows';
 import { supportNetworks } from '@/common/util/network';
 import { Network } from '@/store/chain/type';
-import { Wallet } from '@/store/wallet/type';
+import { Transation, Wallet } from '@/store/wallet/type';
 import localTokens from '@/asset/json/tokens.json';
 
 // 初始化钱包情况
@@ -12,11 +12,12 @@ const wallet = store.wallet();
 const setting = store.setting();
 onMounted(async () => {
     chain.networks = (await localCache.get('networks', supportNetworks.slice(0, 3))) as Network[];
-    chain.currentNetwork = (await localCache.get('currentNetwork', null)) as Network;
+    chain.currentNetwork = (await localCache.get('currentNetwork', chain.networks[0])) as Network;
     chain.selectedRpc = (await localCache.get('selectedRpc', null)) as any;
     chain.customRpcs = (await localCache.get('customRpcs', null)) as any;
     wallet.wallets = (await localCache.get('wallets', [])) as Wallet[];
     wallet.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
+    wallet.recentTransations = (await localCache.get('recentTransations', [])) as Transation[];
     user.passwordHash = (await localCache.get('passwordHash', '')) as string;
     setting.isLock = (await localCache.get('isLock', true)) as boolean;
 
@@ -71,9 +72,9 @@ const handleImportKey = (chainId: string) => {
 // 检查窗口情况，还原图标
 onBeforeMount(() => {
     if (Windows.getCount() == 0) {
-        chrome.browserAction.setIcon({
-            path: '@/assets/images/icons/metahub-128.png',
-        });
+        // chrome.action.setIcon({
+        //     path: '../static/metahub-128.png',
+        // });
     }
 });
 
@@ -98,10 +99,7 @@ watch(
 
             <div class="app-content">
                 <keep-alive include="wallet">
-                    <router-view
-                        class="animate__animated"
-                        :class="`animate__${transitionName}`"
-                    ></router-view>
+                    <router-view class="animate__animated" :class="`animate__${transitionName}`"></router-view>
                 </keep-alive>
             </div>
 

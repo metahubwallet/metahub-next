@@ -114,6 +114,16 @@ export default class EOS {
         return ecc.isValidPublic(publicKey);
     }
 
+    // 查询账户的币种信息
+    async getCurrencyStats(contract: string, symbol: string) {
+        try {
+            let res = await this.rpc.get_currency_stats(contract, symbol);
+            return res[symbol];
+        } catch (e) {
+            return null;
+        }
+    }
+
     /**
      * 根据实际需求更新 sourcePerms
      * @param {string} sourcePerms 账户权限说明
@@ -400,6 +410,32 @@ export default class EOS {
         );
     }
 
+    // 转账
+    async transfer(contract: string, from: string, to: string, quantity: string, memo: string, auth: Authorization) {
+        return await this.transact(
+            {
+                actions: [
+                    {
+                        account: contract,
+                        name: 'transfer',
+                        authorization: [auth],
+                        data: {
+                            from,
+                            to,
+                            quantity,
+                            memo,
+                        },
+                    },
+                ],
+            },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            }
+        );
+    }
+
+    // 办理
     async transact(transaction: Transaction, options: any = {}, ignoreCPUProxy: boolean = false) {
         let currentAccount = this.chain.currentAccount();
         let isProxy = currentAccount.smoothMode;

@@ -43,8 +43,7 @@ const initTokens = () => {
     }
     for (const ut of wallet.currentUserTokens) {
         if (ut.contract == 'eosio.token') continue;
-        if (tokens.findIndex((x) => x.contract == ut.contract && x.symbol == ut.symbol) >= 0)
-            continue;
+        if (tokens.findIndex((x) => x.contract == ut.contract && x.symbol == ut.symbol) >= 0) continue;
 
         let token = {} as Coin;
         Object.assign(token, ut);
@@ -79,7 +78,6 @@ const searchTokens = () => {
 };
 
 // 新增token
-const emit = defineEmits(['close', 'refreshTokens']);
 const handleAddToken = async (token: Coin) => {
     if (token.isShow) {
         const index = wallet.currentUserTokens.findIndex(
@@ -99,16 +97,11 @@ const handleAddToken = async (token: Coin) => {
         token.isShow = true;
     }
     wallet.setUserTokens(wallet.userTokens);
-    emit('refreshTokens', true);
 };
 </script>
 
 <template>
-    <popup-bottom
-        :is-show="props.isShow"
-        :title="$t('wallet.addNewTokens')"
-        @close="$emit('close')"
-    >
+    <popup-bottom :is-show="props.isShow" :title="$t('wallet.addNewTokens')" @close="$emit('close')">
         <div class="selector-searchWords">
             <n-input
                 class="searchWords-input"
@@ -133,9 +126,7 @@ const handleAddToken = async (token: Coin) => {
 
                     <div class="col-span-8">
                         <div class="coin-symbol ml-[20px]">{{ token.symbol }}</div>
-                        <div class="coin-contract">
-                            {{ $t('wallet.contract') }}: {{ token.contract }}
-                        </div>
+                        <div class="coin-contract">{{ $t('wallet.contract') }}: {{ token.contract }}</div>
                     </div>
 
                     <div class="col-span-2">
@@ -146,6 +137,8 @@ const handleAddToken = async (token: Coin) => {
                         />
                     </div>
                 </div>
+
+                <n-empty v-show="tokenList.length == 0" class="m-auto mt-[10%]" />
             </n-scrollbar>
         </div>
 

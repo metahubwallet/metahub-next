@@ -126,7 +126,6 @@ const handleImportKey = async () => {
 // import wallet
 const router = useRouter();
 const privateKey = ref('');
-const emit = defineEmits(['refreshTokens']);
 const importWallet = async (wallets: Wallet[]) => {
     isLoad.value = true;
 
@@ -139,10 +138,6 @@ const importWallet = async (wallets: Wallet[]) => {
     let index = store.wallet().wallets.indexOf(firstWallet);
     store.wallet().setSelectedIndex(index >= 0 ? index : 0);
     store.chain().setCurrentNetwork(networks[activeIndex.value]);
-
-    setTimeout(() => {
-        emit('refreshTokens', true);
-    }, 100);
 
     window.msg.success(t('wallet.importSuccess'));
     isLoad.value = false;

@@ -14,4 +14,5 @@ export type CacheKey =
     | 'selectedIndex'
     | 'allTokens'
     | 'userTokens'
-    | 'updateAt';
+    | 'updateAt'
+    | 'recentTransations';

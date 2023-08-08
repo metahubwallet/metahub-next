@@ -3,6 +3,8 @@ import { Transfer } from '@/store/wallet/type';
 import chain from '@/common/lib/chain';
 
 interface Props {
+    isShow: boolean;
+    title: string;
     transfer: Transfer;
     precision: number;
 }
@@ -14,10 +16,7 @@ const receiver = computed(() => {
     const rsl = props.transfer.receiver.length;
     let account = props.transfer.receiver;
     if (rsl == 42) {
-        account =
-            props.transfer.receiver.substring(0, 14) +
-            '...' +
-            props.transfer.receiver.substring(rsl - 8);
+        account = props.transfer.receiver.substring(0, 14) + '...' + props.transfer.receiver.substring(rsl - 8);
     }
     return account.toLowerCase();
 });
@@ -44,27 +43,32 @@ const handleSubmit = async () => {
             time: Date.now(),
             memo: isEthAddress ? '' : props.transfer.memo,
         };
-        wallet.recentTransations.push(recent);
+        wallet.setRecentTransation(recent);
+        console.log(recent);
+        console.log(wallet.recentTransations);
+
+        console.log(await localCache.get('recentTransations'));
 
         const params = [
             props.transfer.contract,
             wallet.currentWallet.name,
             receiver,
-            props.transfer.quantity + ' ' + props.transfer.symbol,
+            props.transfer.quantity.toFixed(4) + ' ' + props.transfer.symbol,
             memo,
         ];
+
         await chain.get().transfer(...params, chain.getAuth());
         window.msg.success(t('wallet.transferSuccess'));
-
         router.go(-1);
     } catch (e) {
+        console.log(e);
         window.msg.error(chain.getErrorMsg(e));
     }
 };
 </script>
 
 <template>
-    <div class="">
+    <popup-bottom :isShow="props.isShow" :title="props.title" @close="$emit('close')">
         <div class="list-container">
             <div class="info-cell">
                 <span class="info-cell-key">{{ $t('wallet.paymentAccount') }}：</span>
@@ -94,7 +98,7 @@ const handleSubmit = async () => {
         <n-button type="primary" @click="handleSubmit" class="submit-button">
             {{ $t('wallet.transfer') }}
         </n-button>
-    </div>
+    </popup-bottom>
 </template>
 
 <style lang="scss" scoped>

@@ -34,7 +34,7 @@ const receiver = ref(wallet.currentWallet.name);
 const inputValue = ref(0);
 const submitLoading = ref(false);
 const { currentSymbol } = store.chain();
-const emit = defineEmits(['loadData', 'refreshTokens']);
+const emit = defineEmits(['loadData']);
 const onSubmit = async () => {
     if (!receiver.value) return window.msg.warning(t('wallet.emptyReceiver'));
     else if (receiver.value.length != 42 && receiver.value.length > 12)
@@ -67,7 +67,6 @@ const onSubmit = async () => {
         inputValue.value = 0;
         //刷新数据
         emit('loadData');
-        emit('refreshTokens', true);
     } catch (e) {
         console.log(e);
         window.msg.error(chain.getErrorMsg(e));
