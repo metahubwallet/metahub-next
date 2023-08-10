@@ -171,7 +171,7 @@ const checkSubmit = () => {
                             <div class="flex justify-between">
                                 <n-button
                                     @click="selectTokenVisible = true"
-                                    class="symbol-button rounded-tl-[22px] rounded-bl-[22px]"
+                                    class="symbol-button rounded-none  rounded-tl-[22px] rounded-bl-[22px]"
                                 >
                                     {{ targetCoin.symbol }}
                                     <icon-down-one theme="filled" size="14" fill="#4a4a4a" class="ml-1" />
@@ -180,7 +180,7 @@ const checkSubmit = () => {
                                     @blur="checkQuantity"
                                     v-model:value="form.quantity"
                                     :min="0"
-                                    :precision="4"
+                                    :precision="targetCoin.precision"
                                     :step="0.1"
                                     :max="targetCoin.amount"
                                     :placeholder="targetCoin.amount + ' ' + targetCoin.symbol"
@@ -190,7 +190,7 @@ const checkSubmit = () => {
                                         form.quantity = targetCoin.amount;
                                         checkQuantity();
                                     "
-                                    class="rounded-tr-[22px] rounded-br-[22px]"
+                                    class="all-button rounded-none rounded-tr-[22px] rounded-br-[22px]"
                                 >
                                     {{ $t('wallet.all') }}
                                 </n-button>
@@ -312,8 +312,20 @@ form {
     }
 }
 
+.n-button__border {
+    border-right: none !important;
+}
+
 .symbol-button {
     padding: 0 10px;
+    overflow: hidden;
+    margin-right: -1px;
+}
+
+.all-button {
+    border-left: none !important;
+    overflow: hidden;
+    margin-left: -1px;
 }
 
 .confirm-box {

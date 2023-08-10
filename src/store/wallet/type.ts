@@ -10,12 +10,9 @@ export interface WalletState {
     };
     whitelist: WhiteItem[];
     recentTransations: Transation[]; // 最近转账记录
-    allTokens: {
-        [key: string]: Coin[]; // 链: Coins
-    };
-    userTokens: {
-        [key: string]: Coin[]; // 链: Coins
-    };
+    allTokens: { [key: string]: ChainToken[] };
+    userTokens: { [key: string]: Coin[]; }; // 链: Coins
+    
 }
 
 export interface Wallet {
@@ -64,7 +61,11 @@ export interface Token {
     symbol: string;
     contract: string;
     precision: number;
-    logo?: string;
+    logo: string;
+}
+
+export interface ChainToken extends Token {
+    chain: string;
 }
 
 export interface Coin extends Token {
@@ -157,3 +158,4 @@ export interface Authorization {
         address: string;
     }[];
 }
+

@@ -8,7 +8,7 @@ const isSelectToken = ref(false);
 </script>
 
 <template>
-    <div>
+    <div class="full">
         <n-scrollbar class="full" v-if="wallet.wallets.length > 0">
             <wallet-header :type="assetUnit" :amount="assetAmount" :isLoad="isLoad"></wallet-header>
 
@@ -21,11 +21,7 @@ const isSelectToken = ref(false);
 
         <no-account v-else></no-account>
 
-        <token-selector
-            :isShow="isSelectToken"
-            v-model="isSelectToken"
-            @close="isSelectToken = false"
-        ></token-selector>
+        <token-selector :is-show="isSelectToken" @close="isSelectToken = false"></token-selector>
     </div>
 </template>
 

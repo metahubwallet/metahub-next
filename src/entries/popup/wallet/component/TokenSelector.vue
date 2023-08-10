@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Token, Coin } from '@/store/wallet/type';
+import { ChainToken, Coin } from '@/store/wallet/type';
 import CoinAddSelected from '@/asset/img/coin_add_selected.png';
 import CoinAdd from '@/asset/img/coin_add.png';
 
@@ -7,19 +7,26 @@ interface Props {
     isShow: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {});
+const emits = defineEmits(['update:isShow'])
 
-let chainTokens: Coin[] = [];
+let chainTokens: ChainToken[] = [];
 const tokenList = ref<Coin[]>([]);
 
 // 初始化组件
 watch(
     () => props.isShow,
-    (newValue) => {
-        if (newValue && chainTokens.length == 0) initTokens();
+    (newValue, oldValue) => {
+        console.log(newValue, chainTokens.length);
+        if (newValue && chainTokens.length == 0) {
+            initTokens();
+        }
         if (newValue === false) {
             keywords.value = '';
             tokenList.value = [];
             chainTokens = [];
+        }
+        if (newValue !== oldValue) {
+            emits('update:isShow', newValue)
         }
     }
 );
@@ -28,27 +35,29 @@ watch(
 const wallet = store.wallet();
 const initTokens = () => {
     let tokens: Coin[] = [];
-    chainTokens = (wallet.allTokens[store.chain().currentChain] as Coin[]) || [];
-    for (const k in chainTokens) {
-        const chainToken = chainTokens[k];
-        if (chainToken.contract == 'eosio.token') continue;
-
-        let token = {} as Coin;
-        Object.assign(token, chainToken);
-        token.isShow =
+    chainTokens = [];
+    for (const chainToken of wallet.chainTokens) {
+        console.log(chainToken);
+        if (chainToken.contract == 'eosio.token') {
+            continue;
+        }
+        let coin = {} as Coin;
+        Object.assign(coin, chainToken);
+        coin.isShow =
             wallet.currentUserTokens.findIndex(
-                (x: Token) => x.contract == token.contract && x.symbol == token.symbol
+                (x: ChainToken) => x.contract == coin.contract && x.symbol == coin.symbol
             ) >= 0;
-        tokens.push(token);
+        coin.amount = 0;
+        tokens.push(coin);
     }
     for (const ut of wallet.currentUserTokens) {
         if (ut.contract == 'eosio.token') continue;
         if (tokens.findIndex((x) => x.contract == ut.contract && x.symbol == ut.symbol) >= 0) continue;
 
-        let token = {} as Coin;
-        Object.assign(token, ut);
-        token.isShow = true;
-        tokens.push(token);
+        let coin = {} as Coin;
+        Object.assign(coin, ut);
+        coin.isShow = true;
+        coin.push(coin);
     }
     chainTokens = tokens.sort((x, y) => (x.symbol > y.symbol ? 1 : -1));
 
@@ -60,13 +69,14 @@ const keywords = ref('');
 const searchTokens = () => {
     keywords.value = keywords.value.toLowerCase();
     const tokens =
-        keywords.value == ''
+        (keywords.value == ''
             ? chainTokens.concat()
             : chainTokens.filter(
-                  (token: Coin) =>
+                  (token: ChainToken) =>
                       token.symbol.toLowerCase().includes(keywords.value) ||
                       token.contract.toLowerCase() == keywords.value
-              );
+            )
+        ).map((token: ChainToken) => ({ ...token, amount: 0} as Coin));
     // sort
     tokenList.value = tokens.sort((x: Coin, y: Coin) => {
         if (x.symbol.toLowerCase() == keywords.value) return -1;
@@ -81,7 +91,7 @@ const searchTokens = () => {
 const handleAddToken = async (token: Coin) => {
     if (token.isShow) {
         const index = wallet.currentUserTokens.findIndex(
-            (x: Token) => x.contract == token.contract && x.symbol == token.symbol
+            (x: Coin) => x.contract == token.contract && x.symbol == token.symbol
         );
         wallet.currentUserTokens.splice(index, 1);
         token.isShow = false;
@@ -92,6 +102,7 @@ const handleAddToken = async (token: Coin) => {
             contract: token.contract,
             symbol: token.symbol,
             precision: token.precision,
+            logo: '',
         };
         wallet.setCurrentUserTokens([...wallet.currentUserTokens, newToken]);
         token.isShow = true;

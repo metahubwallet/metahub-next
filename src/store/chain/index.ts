@@ -1,14 +1,18 @@
 import { eosChainId } from '@/common/util/network';
 import { ChainState, Network, RPC } from './type';
+import { supportNetworks } from '@/common/util/network';
+
 
 export default defineStore('chain', {
-    state: (): ChainState => ({
-        networks: [],
-        currentNetwork: {} as Network,
-        rpcs: {},
-        selectedRpc: {} as RPC,
-        customRpcs: {},
-    }),
+    state: (): ChainState => {
+        return {
+            networks: [],
+            currentNetwork: {} as Network,
+            rpcs: {},
+            selectedRpc: {} as RPC,
+            customRpcs: {},
+        }
+    },
 
     getters: {
         currentChain: (state) => {
@@ -34,6 +38,12 @@ export default defineStore('chain', {
         },
     },
     actions: {
+        async init() {
+            this.networks = (await localCache.get('networks', supportNetworks.slice(0, 3))) as Network[];
+            this.currentNetwork = (await localCache.get('currentNetwork', this.networks[0])) as Network;
+            this.selectedRpc = (await localCache.get('selectedRpc', null)) as RPC;
+            this.customRpcs = (await localCache.get('customRpcs', null)) as any;
+        },
         async setNetworks(networks: Network[]) {
             this.networks = networks;
             await localCache.set('networks', networks);
@@ -52,3 +62,5 @@ export default defineStore('chain', {
         },
     },
 });
+
+  

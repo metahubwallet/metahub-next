@@ -1,62 +1,34 @@
 <script setup lang="ts">
 import Windows from '@/common/lib/windows';
-import { supportNetworks } from '@/common/util/network';
-import { Network } from '@/store/chain/type';
+
 import { Transation, Wallet } from '@/store/wallet/type';
-import localTokens from '@/asset/json/tokens.json';
+
 
 // 初始化钱包情况
-const user = store.user();
+
 const chain = store.chain();
 const wallet = store.wallet();
+const user = store.user();
 const setting = store.setting();
-onMounted(async () => {
-    chain.networks = (await localCache.get('networks', supportNetworks.slice(0, 3))) as Network[];
-    chain.currentNetwork = (await localCache.get('currentNetwork', chain.networks[0])) as Network;
-    chain.selectedRpc = (await localCache.get('selectedRpc', null)) as any;
-    chain.customRpcs = (await localCache.get('customRpcs', null)) as any;
-    wallet.wallets = (await localCache.get('wallets', [])) as Wallet[];
-    wallet.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
-    wallet.recentTransations = (await localCache.get('recentTransations', [])) as Transation[];
-    user.passwordHash = (await localCache.get('passwordHash', '')) as string;
-    setting.isLock = (await localCache.get('isLock', true)) as boolean;
 
-    initTokens();
+onBeforeMount(async () => {
+
+    await chain.init();
+    await wallet.init();
+    await user.init();
+    await setting.init();
+
+    console.log('store inited');
+
+    if (Windows.getCount() == 0) {
+        // chrome.action.setIcon({
+        //     path: '../static/metahub-128.png',
+        // });
+    }
+
 });
 
-// 更新token
-const initTokens = async () => {
-    // get tokens form local
-    if (!wallet.allTokens || !wallet.allTokens.tokens) {
-        wallet.allTokens = getTokenMapFromArray(localTokens);
-    }
 
-    // update tokens
-    setInterval(async () => {
-        await http
-            .get('https://cdn.jsdelivr.net/gh/metahubwallet/eos-tokens@master/tokens.json')
-            .then((res) => {
-                const tokenArray = typeof res == 'string' ? JSON.parse(res) : res;
-                const tokenMap = getTokenMapFromArray(tokenArray);
-                wallet.setAllTokens(tokenMap);
-            })
-            .catch((e) => {
-                console.log(e);
-            });
-    }, 1000 * 60 * 60 * 24);
-};
-
-const getTokenMapFromArray = (tokenArray: any[]) => {
-    let tokenMap = {} as any;
-    for (const token of tokenArray) {
-        if (!tokenMap[token.chain]) tokenMap[token.chain] = {};
-        const k = `${token.contract}-${token.symbol}`;
-        const name = `${token.chain}/${k}.png`.toLowerCase();
-        token.logo = 'https://cdn.jsdelivr.net/gh/metahubwallet/eos-tokens@master/logos/' + name;
-        tokenMap[token.chain][k] = token;
-    }
-    return tokenMap;
-};
 
 // 钱包选择
 const showAccountSelector = ref(false);
@@ -68,15 +40,6 @@ const handleImportKey = (chainId: string) => {
     });
     showAccountSelector.value = false;
 };
-
-// 检查窗口情况，还原图标
-onBeforeMount(() => {
-    if (Windows.getCount() == 0) {
-        // chrome.action.setIcon({
-        //     path: '../static/metahub-128.png',
-        // });
-    }
-});
 
 // 路由动画
 const route = useRoute();

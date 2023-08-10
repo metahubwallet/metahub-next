@@ -25,3 +25,4 @@ export interface RPC {
     endpoint: string;
     [key: string]: any;
 }
+

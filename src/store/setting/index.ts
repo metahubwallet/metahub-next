@@ -6,6 +6,9 @@ export default defineStore('setting', {
         isLock: true,
     }),
     actions: {
+        async init() {
+            this.isLock = (await localCache.get('isLock', true)) as boolean;
+        },
         async setLang(lang: 'zh-CN' | 'en') {
             this.language = lang;
             await localCache.set('lang', lang);

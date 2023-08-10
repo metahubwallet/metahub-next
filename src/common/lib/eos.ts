@@ -84,7 +84,7 @@ export default class EOS {
             }
             let filterAccounts = [...new Set(accounts)];
             return filterAccounts;
-        } catch (e: any) {
+        } catch (e) {
             console.log(e);
             return [];
         }

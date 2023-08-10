@@ -54,8 +54,10 @@ const loadTokens = async () => {
 // 获取Coin图标
 const getCoinsLogo = (coins: Coin[]) => {
     for (const coin of coins) {
-        const t = wallet.getCoin(coin);
-        if (t.logo) coin.logo = t.logo;
+        const t = wallet.getToken(coin);
+        if (t.logo) {
+            coin.logo = t.logo;
+        }
     }
 };
 
