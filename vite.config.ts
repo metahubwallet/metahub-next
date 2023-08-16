@@ -9,6 +9,12 @@ export default defineConfig({
     resolve: { alias },
     css,
     build: {
-        chunkSizeWarningLimit: 1600,
+        // assetsInlineLimit: 100000,
+        chunkSizeWarningLimit: 10000,
+        // rollupOptions: {
+        //     output: {
+        //         inlineDynamicImports: true
+        //     }
+        // }
     },
 });

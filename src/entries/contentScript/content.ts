@@ -1,3 +1,4 @@
+import MessageCenter from '@/common/lib/messages/messageCenter';
 import { SignatureResult, Message, SignaturePayload, Identity, LoginPayload, Network, Payload, NetworkPayload, AccountPayload, ArbitrarySignaturePayload, RequiredKeysPayload, SignaturePayloadArgs, ChainInfoResult, Transaction } from '../../common/lib/messages/message';
 import * as MessageTypes from '../../common/lib/messages/types';
 import { API_URL } from '@/common/constants';
@@ -32,6 +33,9 @@ import { API_URL } from '@/common/constants';
 // addToken
 // identity
 
+// start watch message
+MessageCenter.watch();
+
 const signatureProvider = (chainId: string) => {
     return {
         async getAvailableKeys() {
@@ -50,11 +54,17 @@ const signatureProvider = (chainId: string) => {
             // serializedTransaction
 
             //signargs.network = network;
-            const params = Object.assign({}, signatureArgs);
+            const params: Partial<SignaturePayload> = {
+                chainId: signatureArgs.chainId,
+                requiredKeys: [],
+                serializedTransaction: [],
+                serializedContextFreeData: [],
+                abis: [],
+            };
             //Uint8Array to array
-            params.serializedTransaction = Array.from(params.serializedTransaction);
-            if (params.serializedContextFreeData) {
-                params.serializedContextFreeData = Array.from(params.serializedContextFreeData);
+            params.serializedTransaction = Array.from(signatureArgs.serializedTransaction);
+            if (signatureArgs.serializedContextFreeData) {
+                params.serializedContextFreeData = Array.from(signatureArgs.serializedContextFreeData);
             }
             const result = (await Message.signal<SignaturePayload>(MessageTypes.REQUEST_SIGNATURE, params).request()) as SignatureResult;
 
@@ -76,7 +86,7 @@ const signatureProvider = (chainId: string) => {
 }
 
 class Dapp {
-    identity?: Identity;
+    public identity?: Identity;
 
     constructor() {
         this.init();
@@ -109,7 +119,7 @@ class Dapp {
         return this.identity;
     }
 
-    useIdentity(id: string) {
+    async useIdentity(id: string) {
         console.log('useIdentity');
         // console.log(id);
     }
@@ -129,7 +139,7 @@ class Dapp {
     }
 
     async getIdentityFromPermissions() : Promise<Identity> {
-        // console.log('getIdentityFromPermissions');
+        console.log('getIdentityFromPermissions');
         const result = (await Message.signal<Payload>(MessageTypes.GET_IDENTITY_FROM_PERMISSIONS).request()) as Identity;
         return result;
     }
@@ -300,8 +310,6 @@ class Dapp {
         return api;
     }
 
-    
-
     async requestTransfer() {
         console.log('requestTransfer');
         console.log(arguments);
@@ -311,25 +319,21 @@ class Dapp {
         console.log('requestTransfer');
         console.log(arguments);
     }
-    }
+}
 
-    const dapp = new Dapp();
-    window.metahub = dapp;
-    window.scatter = dapp;
+const dapp = new Dapp();
+window.metahub = dapp;
+window.scatter = dapp;
 
-    let checkTime = 200;
-    function resetScatter() {
+let checkTime = 1000;
+function resetScatter() {
     if (typeof window.scatter == 'object' && window.scatter != dapp && typeof window.scatter.getIdentity == 'function') {
         window.scatter = dapp;
     }
-    if (checkTime < 10000) {
-        checkTime += 200;
-    } else {
-        checkTime += 1000;
-    }
+    checkTime += 1000;
     setTimeout(resetScatter, checkTime);
 }
-setTimeout(resetScatter, 200);
+setTimeout(resetScatter, checkTime);
 
 // const dapp = new Dapp();
 // window.scatter = new Proxy(dapp, {

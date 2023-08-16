@@ -64,7 +64,7 @@ export interface Token {
     symbol: string;
     contract: string;
     precision: number;
-    logo: string;
+    logo?: string;
 }
 
 export interface ChainToken extends Token {

@@ -23,6 +23,7 @@ const targetCoin = reactive<Coin>({
     precision: 4,
     amount: 0,
     chain: '',
+    logo: '',
 });
 
 // 初始化数据

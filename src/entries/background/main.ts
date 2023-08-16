@@ -7,7 +7,7 @@ import Windows from '@/common/lib/windows';
 import { Network as ChainNetwork, RPC } from '@/store/chain/type';
 // import { decrypt, md5 } from '@/common/util/crypto';
 
-
+console.log('run...');
 // fake methods start
 function decrypt(key: string, content: string) {
     return key + content;
@@ -19,9 +19,6 @@ function md5(str: string) {
 
 const eos = {
     endpoint: '',
-    requestParser: async (payload: any, endpoint: string) => {
-        return {} as any;
-    },
     signature: (data: any, privateKey: string, arbitrary = false, isHash = false) : string => {
         return {} as any;
     },
@@ -304,7 +301,7 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
     const authorizations = await getAuthorizations(payload.domain, payload.chainId);
     if ('serializedTransaction' in payload) {
         // payload.transaction
-        newPayload.actions = await eos.requestParser(payload, eos.endpoint);
+        newPayload.actions = await parseEosjsRequest(payload, eos.endpoint);
 
         // -- old start --
         const authIdx = newPayload.actions[0].authorization.length - 1;
@@ -518,6 +515,28 @@ async function cacheChainInfoInterval() {
         const currentChainId = currentWallet.chainId;
         cacheChainInfo(currentChainId);
     }
+}
+
+async function parseEosjsRequest(payload: SignaturePayload, endpoint: string) {
+
+    const buffer = Buffer.from(Uint8Array.from(payload.serializedTransaction).toString(), 'hex');
+    const parsed = await deserializeTransactionWithActions(buffer);
+    const actions = parsed.actions.map((account: string, name: string, ...x: any[]) => ({
+        ...x,
+        code: account,
+        type: name,
+    }));
+
+    // payload.buf = Buffer.concat([
+    //     Buffer.from(transaction.chainId, 'hex'), // Chain ID
+    //     buffer, // Transaction
+    //     Buffer.from(new Uint8Array(32)), // Context free actions
+    // ]);
+    return actions;
+}
+
+async function deserializeTransactionWithActions(buffer: Buffer): Promise<any> {
+    return {};
 }
 
 async function getEosInfo(chainId: string) {

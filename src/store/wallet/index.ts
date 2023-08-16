@@ -58,7 +58,7 @@ const store = defineStore('wallet', {
             this.allTokens = tokens;
             await localCache.set('allTokens', tokens);
         },
-        async setUserTokens(tokens: Record<string, Coin[]>) {
+        async setUserTokens(tokens: { [key: string]: Coin[] }) {
             this.userTokens = tokens;
             await localCache.set('userTokens', tokens);
         },

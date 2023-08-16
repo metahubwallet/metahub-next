@@ -41,7 +41,7 @@ export interface Transaction {
     max_cpu_usage_ms?: number;
     delay_sec?: number;
     context_free_actions?: any[];
-    context_free_data?: Uint8Array[];
+    context_free_data?: Uint8Array;
     actions: any[];
     transaction_extensions?: [number, string][];
     resource_payer?: any;
@@ -50,8 +50,8 @@ export interface Transaction {
 export interface SignaturePayloadArgs {
     chainId: string;
     requiredKeys: string[];
-    serializedTransaction: Uint8Array[];
-    serializedContextFreeData?: Uint8Array[];
+    serializedTransaction: Uint8Array;
+    serializedContextFreeData?: Uint8Array;
     abis: any[];
 }
 
@@ -78,13 +78,21 @@ export interface RequiredKeysPayload extends Payload {
     availableKeys: string[];
 }
 
-export interface SignaturePayload extends Payload, SignaturePayloadArgs {
-
+export interface SignaturePayload extends Payload {
+    chainId: string;
+    requiredKeys: string[];
+    serializedTransaction: number[];
+    serializedContextFreeData?: number[];
+    abis: any[];
 }
 
 export interface ArbitrarySignaturePayload extends Payload {
     publicKey: string;
     data: string;
+}
+
+export interface BufferSignaturePayload extends Payload {
+    buffer: Buffer;
 }
 
 export interface SignatureResult {
@@ -126,15 +134,15 @@ export class Message<T extends Payload> {
         return m;
     }
 
-    request() : Promise<Result> {
+    request(): Promise<Result> {
         // reset domain
         this.payload.domain = strippedHost();
         return new Promise<any>((resolve, reject) => {
             MessageCenter.send(this, (response: any) => {
-                if (response.isError) {
+                if (response && response.isError) {
                     reject(response);
                 } else {
-                    if (typeof response == 'undefined' || response === null) {
+                    if (typeof response == 'undefined') {
                         reject(SdkError.maliciousEvent());
                     } else {
                         resolve(response);

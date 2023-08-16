@@ -1,7 +1,5 @@
 import { Api, JsonRpc } from 'eosjs';
-import ecc from 'eosjs-ecc';
-import * as ricardianParser from 'eos-rc-parser';
-import { Payload } from './messages/message';
+import { ecc } from 'eosjs/dist/eosjs-ecc-migration';
 import { ErrorCode } from '../util/type';
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
 import { Auth, Perm, Wallet } from '@/store/wallet/type';
@@ -562,69 +560,6 @@ export default class EOS {
         }
     }
 
-    async requestParser(payload: Payload, endpoint: string) {
-        if (payload.transaction.hasOwnProperty('serializedTransaction'))
-            return this.parseEosjs2Request(payload, endpoint);
-        else return this.parseEosjsRequest(payload);
-    }
-
-    async parseEosjs2Request(payload: Payload, endpoint: string) {
-        const { transaction } = payload;
-        const buffer = Buffer.from(Uint8Array.from(transaction.serializedTransaction).toString(), 'hex');
-        const parsed = await this.api.deserializeTransactionWithActions(buffer);
-        const actions = parsed.actions.map((account, name, ...x) => ({
-            ...x,
-            code: account,
-            type: name,
-        }));
-
-        payload.buf = Buffer.concat([
-            Buffer.from(transaction.chainId, 'hex'), // Chain ID
-            buffer, // Transaction
-            Buffer.from(new Uint8Array(32)), // Context free actions
-        ]);
-        return actions;
-    }
-
-    async parseEosjsRequest(payload: Payload) {
-        const { transaction } = payload;
-
-        const contracts = transaction.actions.map<string>((action) => action.account).filter((value, index, array) => array.indexOf(value) === index);
-        const abis = await this.getAbis(contracts);
-
-        return await Promise.all(
-            transaction.actions.map(async (action) => {
-                const contractAccountName = action.account;
-
-                let abi = abis[contractAccountName];
-                const typeName = abi.abi.actions.find((x: any) => x.name === action.name).type;
-                const data = abi.fromBuffer(typeName, action.data);
-                const actionAbi = abi.abi.actions.find((fcAction: any) => fcAction.name === action.name);
-                let ricardian = actionAbi ? actionAbi.ricardian_contract : null;
-
-                if (ricardian) {
-                    const htmlFormatting = {
-                        h1: 'div class="ricardian-action"',
-                        h2: 'div class="ricardian-description"',
-                    };
-                    const signer = action.authorizations.length === 1 ? action.authorizations[0].actor : null;
-                    ricardian = ricardianParser.parse(action.name, data, ricardian, signer, htmlFormatting);
-                }
-
-                if (transaction.hasOwnProperty('delay_sec') && parseInt(transaction.delay_sec) > 0)
-                    data.delay_sec = transaction.delay_sec;
-
-                return {
-                    data,
-                    code: action.account,
-                    type: action.name,
-                    authorization: action.authorizations,
-                    ricardian,
-                };
-            })
-        );
-    }
-
     async getAbis(contracts: string[]) {
         const abis = {} as any;
         await Promise.all(
@@ -635,15 +570,19 @@ export default class EOS {
         return abis;
     }
 
-    signature(payload: Payload, privateKey: string, arbitrary = false, isHash = false) {
+    signature(data: Buffer | string, privateKey: string, arbitrary: boolean = false) {
         if (!privateKey) {
             return null;
         }
         let sig;
-        if (arbitrary && isHash) {
-            sig = ecc.Signature.signHash(payload.data, privateKey).toString();
+        if (typeof data == 'string') {
+            if (arbitrary) {
+                sig = ecc.sign(Buffer.from(data, 'hex'), privateKey, 'utf8');
+            } else {
+                sig = ecc.signHash(data, privateKey).toString();
+            }
         } else {
-            sig = ecc.sign(arbitrary ? Buffer.from(payload.data, 'hex') : payload.buf, privateKey, 'utf8');
+            sig = ecc.sign(data, privateKey, 'utf8');
         }
         return sig;
     }

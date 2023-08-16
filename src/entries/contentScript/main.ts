@@ -1,8 +1,7 @@
 const contentJsUrl = chrome.runtime.getURL('/src/entries/contentScript/content.js');
 const script = document.createElement('script');
-script.setAttribute('type', 'text/javascript');
+script.setAttribute('type', 'module');
 script.setAttribute('src', contentJsUrl);
-console.log(document.head || document.body || document.documentElement);
 (document.head || document.body || document.documentElement).appendChild(script);
 script.onload = () => script.remove();
 

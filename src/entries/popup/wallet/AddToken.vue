@@ -16,24 +16,25 @@ const handleAddToken = async () => {
         if (result && result.max_supply) {
             const [amount] = result.max_supply.split(' ');
             const precision = amount.split('.').length > 1 ? amount.split('.')[1].length : 0;
-            const token = {
+            const coin: Coin = {
                 amount: 0,
                 chain: store.chain().currentChain,
                 contract: newContract,
                 symbol: symbol,
                 precision: precision,
+                logo: '',
             };
             const tokenExists =
                 store
                     .wallet()
                     .currentUserTokens.findIndex(
-                        (x: Coin) => x.chain == token.chain && x.contract == token.contract && x.symbol == token.symbol
+                        (x: Coin) => x.chain == coin.chain && x.contract == coin.contract && x.symbol == coin.symbol
                     ) >= 0;
             if (tokenExists) {
                 window.msg.error(t('wallet.addTokenExist'));
                 return;
             }
-            store.wallet().setCurrentUserTokens([...store.wallet().currentUserTokens, token]);
+            store.wallet().setCurrentUserTokens([...store.wallet().currentUserTokens, coin]);
             window.msg.success(t('wallet.addTokenSuccessfully'));
             router.go(-1);
         } else {

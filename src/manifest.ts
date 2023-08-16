@@ -55,7 +55,10 @@ export function additionalInputs() {
         scripts: [
             {
                 fileName: 'src/entries/contentScript/content.ts',
-                webAccessible: true,
+                webAccessible: {
+                    matches: ["<all_urls>"],
+                    isInject: true,
+                },
             }
         ],
     };

@@ -1,4 +1,4 @@
-import webExtension from '@samrum/vite-plugin-web-extension';
+import webExtension from 'vite-plugin-web-extension';
 import { getManifest, additionalInputs } from '../../../src/manifest';
 
 export const setupManifest = (): any => {

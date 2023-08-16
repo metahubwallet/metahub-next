@@ -164,23 +164,21 @@ export default class Chain {
             // { chainId, requiredKeys, serializedTransaction, serializedContextFreeData, abis }
             async sign(transaction: any) {
                 // console.log(transaction.serializedContextFreeData);
-                const buffer =
+                const _buffer =
                     typeof transaction.serializedTransaction == 'string'
                         ? Buffer.from(transaction.serializedTransaction, 'hex')
                         : Buffer.from(transaction.serializedTransaction);
-                const payload = {
-                    buf: Buffer.concat([
+                const buffer = Buffer.concat([
                         Buffer.from(transaction.chainId, 'hex'),
-                        buffer,
+                        _buffer,
                         Buffer.from(new Uint8Array(32)), // todo: serializedContextFreeData
-                    ]),
-                };
+                    ]);
 
                 // console.log(payload.buf.toString('hex'));
 
                 const signatures = transaction.requiredKeys.map((pub: string) => {
                     const privateKey = Chain.getPrivateKeyByPublicKey(pub);
-                    const signature = Chain.get(transaction.chainId).signature(payload, privateKey, false, false);
+                    const signature = Chain.get(transaction.chainId).signature(buffer, privateKey);
                     return signature;
                 });
 
