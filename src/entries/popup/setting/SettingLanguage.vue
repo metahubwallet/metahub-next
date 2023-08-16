@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { i18n } from '@/common/plugin/lang';
-
+import { theme } from '@/common/util/theme';
 const lang = ref([
     {
         name: '简体中文',
@@ -11,7 +10,7 @@ const lang = ref([
         value: 'en',
     },
 ]);
-const currentLanguage = computed(() => i18n.global.locale);
+const setting = store.setting();
 
 // 切换语言
 const { locale } = useI18n();
@@ -34,8 +33,8 @@ const handleChangeLang = async (value: any) => {
                         class="setting-item cursor-pointer"
                         v-for="item in lang"
                     >
-                        <div class="title">{{ item.name }}</div>
-                        <i v-show="item.value as any == currentLanguage" class="row-icon"></i>
+                        <div class="title">{{ item.name }} {{ item.value  }}</div>
+                        <icon-check v-show="item.value == setting.language" :fill="theme.primaryColor" />
                     </div>
                 </div>
             </div>
@@ -66,3 +65,4 @@ const handleChangeLang = async (value: any) => {
     }
 }
 </style>
+@/common/util/theme

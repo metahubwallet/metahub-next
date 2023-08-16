@@ -3,7 +3,9 @@
 const wallet = store.wallet();
 onMounted(async () => {
     await api.resource.getTime(wallet.currentWallet.name).then((res) => {
-        if (res && res.data.code == 200) smoothModeCPU.value = res.data.result / 1000 + ' ms';
+        if (res && res.data && res.data.code == 200) {
+            smoothModeCPU.value = res.data.result / 1000 + ' ms';
+        }
     });
 });
 
@@ -73,17 +75,17 @@ const beforeSubmit = () => {
                     <!-- recharge amount -->
                     <div class="res-container">
                         <div class="cards">
-                            <n-card class="card" :class="{ on: amount == 0.1 }" @click.native="changeAmount(0.1)">
-                                {{ $t('resource.rechargeTab1') }}
+                            <n-card class="card" :class="{ on: amount == 0.1 }" :content-style="{padding: 0}"	 @click.native="changeAmount(0.1)">
+                                <pre>{{ $t('resource.rechargeTab1') }}</pre>
                             </n-card>
-                            <n-card class="card" :class="{ on: amount == 0.5 }" @click.native="changeAmount(0.5)">
-                                {{ $t('resource.rechargeTab2') }}
+                            <n-card class="card" :class="{ on: amount == 0.5 }" :content-style="{padding: 0}" @click.native="changeAmount(0.5)">
+                                <pre>{{ $t('resource.rechargeTab2') }}</pre>
                             </n-card>
-                            <n-card class="card" :class="{ on: amount == 1 }" @click.native="changeAmount(1)">
-                                {{ $t('resource.rechargeTab3') }}
+                            <n-card class="card" :class="{ on: amount == 1 }" :content-style="{padding: 0}" @click.native="changeAmount(1)">
+                                <pre>{{ $t('resource.rechargeTab3') }}</pre>
                             </n-card>
-                            <n-card class="card" :class="{ on: amount == 3 }" @click.native="changeAmount(3)">
-                                {{ $t('resource.rechargeTab4') }}
+                            <n-card class="card" :class="{ on: amount == 3 }" :content-style="{padding: 0}" @click.native="changeAmount(3)">
+                                <pre>{{ $t('resource.rechargeTab4') }}</pre>
                             </n-card>
                         </div>
                     </div>
@@ -106,7 +108,7 @@ const beforeSubmit = () => {
                         <n-input
                             v-show="radioFor == 'other'"
                             v-model="rechargeTo"
-                            placeholder="请输入要充值的账号"
+                            placeholder=""
                         ></n-input>
                     </div>
 
@@ -164,8 +166,15 @@ const beforeSubmit = () => {
                 width: 24%;
                 font-size: 12px;
                 &.on {
-                    border: #bf01fa 1px solid;
+                    border: $color-primary 1px solid;
                     background-image: linear-gradient(rgba(247, 197, 244, 0.6), rgba(234, 225, 250, 0.06));
+                }
+                pre {
+                    padding: 12px 5px;
+                    font-size: 12px;
+                    text-align: center;
+                    word-wrap: break-word;
+                    white-space:pre-wrap;
                 }
             }
         }

@@ -11,4 +11,5 @@ declare module '*.vue' {
 // 声明环境变量类型
 declare interface MetaEnv {
     VITE_ENV: string;
+    API_URL: string;
 }

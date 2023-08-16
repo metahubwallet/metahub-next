@@ -1,6 +1,6 @@
 import pkg from '../package.json';
 
-const manifest = {
+const manifest: Partial<chrome.runtime.ManifestV3> = {
     action: {
         default_icon: {
             16: 'icons/16.png',
@@ -14,8 +14,9 @@ const manifest = {
     },
     content_scripts: [
         {
-            js: ['src/entries/contentScript/primary/main.ts'],
+            js: ['src/entries/contentScript/main.ts'],
             matches: ['*://*/*'],
+            run_at: 'document_start',
         },
     ],
     host_permissions: ['*://*/*'],
@@ -29,6 +30,13 @@ const manifest = {
         page: 'src/entries/options/index.html',
         open_in_tab: true,
     },
+    // web_accessible_resources: [
+    //     {
+    //       resources: ['src/entries/contentScript/content.ts'],
+    //       matches: [ '*://*/*' ],
+    //     },
+    // ],
+    permissions: ['storage', 'unlimitedStorage', 'alarms'],
 };
 
 export function getManifest(): chrome.runtime.ManifestV3 {
@@ -38,7 +46,17 @@ export function getManifest(): chrome.runtime.ManifestV3 {
         name: pkg.displayName ?? pkg.name,
         version: pkg.version,
         manifest_version: 3,
-        permissions: ['storage', 'unlimitedStorage'],
         ...manifest,
+    };
+}
+
+export function additionalInputs() {
+    return {
+        scripts: [
+            {
+                fileName: 'src/entries/contentScript/content.ts',
+                webAccessible: true,
+            }
+        ],
     };
 }

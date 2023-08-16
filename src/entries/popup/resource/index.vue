@@ -10,10 +10,14 @@ const wallet = store.wallet();
 onBeforeMount(async () => {
     showResBox.value = store.chain().currentChainId == eosChainId;
     loadData();
-    if (wallet.currentWallet.smoothMode) smoothMode.value = true;
+    if (wallet.currentWallet.smoothMode) {
+        smoothMode.value = true;
+    }
 
     await api.resource.getTime(wallet.currentWallet.name).then((res: any) => {
-        if (res.code == 200) smoothModeCPU.value = Math.floor(res.result / 1000) + ' ms';
+        if (res.code == 200) {
+            smoothModeCPU.value = Math.floor(res.result / 1000) + ' ms';
+        }
     });
 });
 
@@ -233,7 +237,7 @@ const loadData = async () => {
                 border-radius: 8px;
                 border: 1px solid #dbdbdb;
                 &.on {
-                    border: #bf01fa 1px solid;
+                    border: $color-primary 1px solid;
                     background-image: linear-gradient(rgba(247, 197, 244, 0.6), rgba(234, 225, 250, 0.06));
                 }
             }

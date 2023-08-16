@@ -19,6 +19,7 @@ declare module '@vue/runtime-core' {
     Global: typeof import('./../../src/component/Global.vue')['default']
     IconAddOne: typeof import('@icon-park/vue-next')['AddOne']
     IconArrowLeft: typeof import('@icon-park/vue-next')['ArrowLeft']
+    IconCheck: typeof import('@icon-park/vue-next')['Check']
     IconClose: typeof import('@icon-park/vue-next')['Close']
     IconDelete: typeof import('@icon-park/vue-next')['Delete']
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']

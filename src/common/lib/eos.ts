@@ -4,9 +4,8 @@ import * as ricardianParser from 'eos-rc-parser';
 import { Payload } from './messages/message';
 import { ErrorCode } from '../util/type';
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
-import _ from 'lodash';
-import { Authorization, Perm, Wallet } from '@/store/wallet/type';
-import { TransactConfig, Transaction } from 'eosjs/dist/eosjs-api-interfaces';
+import { Auth, Perm, Wallet } from '@/store/wallet/type';
+import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 
 export default class EOS {
     public rpc;
@@ -140,7 +139,7 @@ export default class EOS {
         oldOperateKey: string,
         newOperateKey: string
     ) {
-        let perms = _.cloneDeep(sourcePerms);
+        let perms = JSON.parse(JSON.stringify(sourcePerms)); // clone-deep
         for (let i = 0; i < perms.length; i++) {
             if (perms[i].perm_name == authType) {
                 switch (operateType) {
@@ -182,7 +181,7 @@ export default class EOS {
     }
 
     // 权限更新操作
-    async updatePerms(operateUser: Wallet, perms: any[], auth: Authorization) {
+    async updatePerms(operateUser: Wallet, perms: Perm[], auth: Auth) {
         let accountName = operateUser.name;
         const actions = [];
         for (const perm of perms) {
@@ -264,7 +263,7 @@ export default class EOS {
         stake_net_quantity = '0.0000 EOS',
         stake_cpu_quantity = '0.0000 EOS',
         transfer = 0,
-        auth: Authorization
+        auth: Auth
     ) {
         return await this.transact(
             {
@@ -296,7 +295,7 @@ export default class EOS {
         receiver: string,
         unstake_net_quantity = '0.0000 EOS',
         unstake_cpu_quantity = '0.0000 EOS',
-        auth: Authorization
+        auth: Auth
     ) {
         return await this.transact(
             {
@@ -322,7 +321,7 @@ export default class EOS {
     }
 
     // 立即取回赎回中的资源
-    async refund(owner: string, auth: Authorization) {
+    async refund(owner: string, auth: Auth) {
         return await this.transact(
             {
                 actions: [
@@ -344,7 +343,7 @@ export default class EOS {
     }
 
     // 租用
-    async powerup(parms: any, auth: Authorization) {
+    async powerup(parms: any, auth: Auth) {
         return await this.transact(
             {
                 actions: [
@@ -364,7 +363,7 @@ export default class EOS {
     }
 
     // 购买RAM
-    async buyRam(payer: string, receiver: string, quant: string, auth: Authorization) {
+    async buyRam(payer: string, receiver: string, quant: string, auth: Auth) {
         return await this.transact(
             {
                 actions: [
@@ -388,7 +387,7 @@ export default class EOS {
     }
 
     // 出售RAM
-    async sellRam(account: string, bytes: number, auth: Authorization) {
+    async sellRam(account: string, bytes: number, auth: Auth) {
         return await this.transact(
             {
                 actions: [
@@ -411,7 +410,7 @@ export default class EOS {
     }
 
     // 转账
-    async transfer(contract: string, from: string, to: string, quantity: string, memo: string, auth: Authorization) {
+    async transfer(contract: string, from: string, to: string, quantity: string, memo: string, auth: Auth) {
         return await this.transact(
             {
                 actions: [
@@ -590,7 +589,7 @@ export default class EOS {
     async parseEosjsRequest(payload: Payload) {
         const { transaction } = payload;
 
-        const contracts = _.uniq(transaction.actions.map((action) => action.account));
+        const contracts = transaction.actions.map<string>((action) => action.account).filter((value, index, array) => array.indexOf(value) === index);
         const abis = await this.getAbis(contracts);
 
         return await Promise.all(

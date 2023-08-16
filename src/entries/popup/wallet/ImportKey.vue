@@ -262,7 +262,7 @@ const sortAccounts = (first: any, second: any) => {
         margin-right: 0px;
     }
     .import-key-btn {
-        background: linear-gradient(140deg, #da00f2 0%, #bf01fa 100%, #bf01fa 100%);
+        background: linear-gradient(140deg, #da00f2 0%, $color-primary 100%, $color-primary 100%);
         box-shadow: 0px 2px 6px 0px rgba(210, 0, 244, 0.09);
         border-radius: 50px;
         width: 178px;

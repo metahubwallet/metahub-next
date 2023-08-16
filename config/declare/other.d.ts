@@ -2,6 +2,9 @@
 declare interface Window {
     msg: any;
     dialog: any;
+    // inject wallet
+    metahub: any;
+    scatter: any;
 }
 
 declare module 'eos-rc-parser';

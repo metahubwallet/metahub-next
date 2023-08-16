@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Global from '@/component/Global.vue';
-import { themeOverrides } from '@/asset/theme';
+import { themeOverrides } from '@/common/util/theme';
 import Index from './index.vue';
 </script>
 
@@ -12,3 +12,4 @@ import Index from './index.vue';
 </template>
 
 <style lang="scss" scoped></style>
+@/common/util/theme

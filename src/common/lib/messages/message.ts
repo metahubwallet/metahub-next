@@ -1,88 +1,145 @@
-import { Network } from '@/store/chain/type';
 import MessageCenter from './messageCenter';
+import SdkError from '../sdkError';
 
 const strippedHost = () => {
     let host = location.hostname;
-
     // Replacing www. only if the domain starts with it.
     if (host.indexOf('www.') === 0) host = host.replace('www.', '');
-
     return host;
 };
 
-export class Payload {
-    domain: string;
+export interface Network {
+    blockchain: string;
     chainId: string;
-    data: string;
-    newLogin: string;
-    accounts: Network[];
-    account: string;
-    buf: Buffer;
-    transaction: {
-        delay_sec: string;
-        actions: any[];
-        serializedTransaction: number[];
-        chainId: string;
-    };
-    publicKey: string;
-    availableKeys: string[];
-
-    constructor() {
-        this.domain = '';
-        this.chainId = '';
-        this.data = '';
-        this.newLogin = '';
-        this.accounts = [];
-        this.account = '';
-        this.buf = {} as Buffer;
-        this.transaction = {
-            delay_sec: '',
-            actions: [],
-            serializedTransaction: [],
-            chainId: '',
-        };
-        this.publicKey = '';
-        this.availableKeys = [];
-    }
+    host: string;
+    port: number;
+    protocol: string;
 }
 
-export class Message {
-    type: string;
-    payload: Payload;
+export interface IdentityAccount {
+    blockchain: string;
+    name: string;
+    publicKey: string;
+    authority: string;
+    chainId: string;
+    isHardware: boolean;
+};
+
+export interface Identity {
+    accounts: IdentityAccount[],
+    kyc: boolean;
+    name: string;
+    publicKey: string;
+    hash: string;
+};
+
+export interface Transaction {
+    expiration?: string;
+    ref_block_num?: number;
+    ref_block_prefix?: number;
+    max_net_usage_words?: number;
+    max_cpu_usage_ms?: number;
+    delay_sec?: number;
+    context_free_actions?: any[];
+    context_free_data?: Uint8Array[];
+    actions: any[];
+    transaction_extensions?: [number, string][];
+    resource_payer?: any;
+}
+
+export interface SignaturePayloadArgs {
+    chainId: string;
+    requiredKeys: string[];
+    serializedTransaction: Uint8Array[];
+    serializedContextFreeData?: Uint8Array[];
+    abis: any[];
+}
+
+export interface Payload {
+    domain: string;
+    chainId: string;
+}
+
+export interface NetworkPayload extends Payload {
+    network: Network;
+}
+
+export interface LoginPayload extends Payload {
+    newLogin?: boolean;
+    accounts?: Network[];
+}
+
+export interface AccountPayload extends Payload {
+    account: string;
+}
+
+export interface RequiredKeysPayload extends Payload {
+    transaction: any;
+    availableKeys: string[];
+}
+
+export interface SignaturePayload extends Payload, SignaturePayloadArgs {
+
+}
+
+export interface ArbitrarySignaturePayload extends Payload {
+    publicKey: string;
+    data: string;
+}
+
+export interface SignatureResult {
+    signatures: string[];
+}
+
+export interface ChainInfoResult {
+    info: any;
+}
+
+export type Result = SignatureResult | Identity | ChainInfoResult;
+export class Message<T extends Payload> {
+    public type: string;
+    public payload: T;
 
     constructor() {
         this.type = '';
-        this.payload = new Payload();
+        this.payload = {
+            domain: '',
+            chainId: '',
+        } as T;
     }
 
-    static placeholder() {
-        return new Message();
+    static placeholder<T extends Payload>() {
+        return new Message<T>();
     }
+
     static fromJson(json: Object) {
-        return Object.assign(this.placeholder(), json);
+        const m = new Message<Payload>();
+        return Object.assign(m, json);
     }
 
-    static payload(type: string, payload: Payload) {
-        let p = this.placeholder();
-        p.type = type;
-        p.payload = payload;
-        return p;
-    }
-
-    static signal(type: string) {
-        let p = this.placeholder();
-        p.type = type;
-        return p;
-    }
-
-    request() {
-        const msg = this;
-        if (!msg.payload.domain) {
-            msg.payload.domain = strippedHost();
+    static signal<T extends Payload>(type: string, data?: Partial<T>) {
+        const m = new Message<T>();
+        m.type = type;
+        if (typeof data != 'undefined') {
+            Object.assign(m.payload, data);
         }
-        return new Promise((resolve, reject) => {
-            MessageCenter.send(msg, (response: any) => {
-                resolve(response);
+        return m;
+    }
+
+    request() : Promise<Result> {
+        // reset domain
+        this.payload.domain = strippedHost();
+        return new Promise<any>((resolve, reject) => {
+            MessageCenter.send(this, (response: any) => {
+                if (response.isError) {
+                    reject(response);
+                } else {
+                    if (typeof response == 'undefined' || response === null) {
+                        reject(SdkError.maliciousEvent());
+                    } else {
+                        resolve(response);
+                    }
+                }
             });
         });
     }

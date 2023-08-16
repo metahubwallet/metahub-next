@@ -1,4 +1,3 @@
-import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 
 export interface WalletState {
     wallets: Wallet[]; // 里面存储 eos 账号相关信息
@@ -36,7 +35,7 @@ export interface CacheABI {
     contract: string;
     expire: number;
     timestamp: number;
-    abi: Abi;
+    abi: any;
     hash: string;
 }
 
@@ -48,12 +47,16 @@ export interface Key {
 
 export interface Perm {
     perm_name: string;
+    parent: string;
     required_auth: {
+        threshold: number;
         keys: {
             id: string;
             key: string;
             isCurrent: boolean;
         }[];
+        accounts: Auth[],
+        waits: any[]
     };
 }
 
@@ -142,20 +145,25 @@ export interface RefundRequest {
     left_time: string;
 }
 
-export interface Authorization {
+export interface Auth {
+    permission: string;
+    actor: string;
+}
+
+
+export interface AuthStore {
     permission: string;
     actor: string;
     domain: string;
     accounts: {
-        authorizations: Authorization[];
+        authorizations: Auth[];
         data: any;
-        account: any;
+        account: string;
         chainId: string;
         name: string;
         expire?: number;
         authority: string;
         publicKey: string;
-        address: string;
     }[];
 }
 

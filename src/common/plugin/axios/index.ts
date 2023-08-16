@@ -1,14 +1,8 @@
-import { env } from '@/common/util/env';
+import { API_URL } from '@/common/constants';
 import axios from 'axios';
 
-// 接口根路径
-const apiURL =
-    env.VITE_ENV === 'production'
-        ? 'https://res.metahub.cash' // 生产环境
-        : 'https://res.metahub.cash'; // 开发环境
-
 export const http = axios.create({
-    baseURL: apiURL,
+    baseURL: API_URL,
     timeout: 10000,
 });
 

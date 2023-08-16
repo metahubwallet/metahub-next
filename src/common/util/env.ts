@@ -1,7 +1,6 @@
-import _ from 'lodash';
 
 const parseEnv = (env: Record<string, any>): MetaEnv => {
-    const envs: any = _.cloneDeep(env);
+    const envs: any = Object.assign({}, env);
 
     Object.entries(env).forEach(([key, value]) => {
         if (value == 'true' || value == 'false') envs[key] = value == 'true' ? true : false;

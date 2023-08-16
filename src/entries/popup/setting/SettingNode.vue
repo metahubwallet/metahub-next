@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
 import { getEndpoints } from '@/common/lib/remote';
+import { theme } from '@/common/util/theme';
 import { RPC } from '@/store/chain/type';
 import _ from 'lodash';
 
@@ -156,7 +157,7 @@ const addCustomEndpoint = async () => {
                         </div>
 
                         <div v-show="recommendEndpoints.length == 0">
-                            <n-spin v-if="isLoad" :size="24" stroke="#bf01fa" class="flex mt-[10%]" />
+                            <n-spin v-if="isLoad" :size="24" :stroke="theme.primaryColor" class="flex mt-[10%]" />
                             <n-empty v-else class="m-auto mt-[10%]" />
                         </div>
                     </div>
