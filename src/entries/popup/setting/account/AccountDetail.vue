@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
-import { Perm, Wallet } from '@/store/wallet/type';
+import { Wallet } from '@/store/wallet/type';
+import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 
 interface Params {
     account: Wallet;
-    perms: Perm[];
+    perms: Permission[];
     authType: string;
     operateType: string;
     oldOperateKey: string;
 }
-let perms = ref([] as Perm[]);
+let perms = ref([] as Permission[]);
 
 const route = useRoute();
 const account = ref(JSON.parse(route.query.account + '') as Wallet);
@@ -17,6 +18,8 @@ const account = ref(JSON.parse(route.query.account + '') as Wallet);
 // 初始化
 const wallet = store.wallet();
 const permissions = ref([] as string[]);
+
+const currentKey = computed(() => wallet.currentWallet.keys[0].publicKey );
 onBeforeMount(() => {
     let perms = new Set();
     for (const key of wallet.currentWallet.keys) {
@@ -31,12 +34,6 @@ onMounted(async () => {
     let result = await chain.fetchPermissions(wallet.currentWallet.name, wallet.currentWallet.chainId);
 
     if (result.code != 200) return window.msg.error(result.msg);
-
-    for (const p of result.permissions) {
-        for (const k of p.required_auth.keys) {
-            k.isCurrent = k.key == wallet.currentWallet.keys[0].publicKey;
-        }
-    }
 
     perms.value = result.permissions;
 });
@@ -210,7 +207,7 @@ const removeAccountClicked = () => {
                                 <!-- options -->
                                 <div class="account-cell-buttons items-center">
                                     <div class="mt-[3px]">
-                                        <span class="account-current" v-if="item.isCurrent">
+                                        <span class="account-current" v-if="item.key == currentKey">
                                             {{ $t('setting.currentAccount') }}
                                         </span>
                                     </div>
@@ -249,7 +246,7 @@ const removeAccountClicked = () => {
                             </div>
 
                             <!-- active list -->
-                            <div class="account-cell" :key="item.id" v-for="item in activesArray">
+                            <div class="account-cell" :key="item.key" v-for="item in activesArray">
                                 <!-- key -->
                                 <div class="account-cell-key">
                                     <clip-button class="account-left-name" :value="item.key"></clip-button>
@@ -257,7 +254,7 @@ const removeAccountClicked = () => {
 
                                 <!-- optinos -->
                                 <div class="account-cell-buttons">
-                                    <div class="account-current" v-if="item.isCurrent">
+                                    <div class="account-current" v-if="item.key == currentKey">
                                         {{ $t('setting.currentAccount') }}
                                     </div>
 

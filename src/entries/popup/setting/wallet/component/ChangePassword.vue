@@ -30,7 +30,7 @@ const handleChangePassword = async () => {
             key.privateKey = encrypt(pk, md5(wallet.seed + password1(passwordNew.value)));
         }
     }
-    store.user().password = '';
+    store.user().setPassword('');
     store.setting().setIsLock(true);
 };
 </script>

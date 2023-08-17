@@ -1,24 +1,23 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
 import { powerup } from '@/common/lib/powerup';
-import { RefundRequest, ResourceData } from '@/store/wallet/type';
+import { ResourceData } from '@/store/wallet/type';
 
 interface Props {
-    resourceData: ResourceData;
+    resources: { [key: string]: ResourceData };
     type: 'cpu' | 'net';
 }
 const props = withDefaults(defineProps<Props>(), {});
 
 // 使用数据
-const key = (props.type + '_limit') as 'cpu_limit' | 'net_limit';
 const resoureUsed = computed(() => {
-    return props.resourceData[key] ? (props.resourceData[key].used / 1000).toFixed(2) : '0';
+    return props.resources[props.type] ? (props.resources[props.type].use_limit.used / 1000).toFixed(2) : '0';
 });
 const resoureTotal = computed(() => {
-    return props.resourceData[key] ? (props.resourceData[key].max / 1000).toFixed(2) : '0';
+    return props.resources[props.type] ? (props.resources[props.type].use_limit.max / 1000).toFixed(2) : '0';
 });
 const resourePercentage = computed(() => {
-    return props.resourceData[key] ? props.resourceData[key].percentage : 0;
+    return props.resources[props.type] ? props.resources[props.type].use_percentage : 0;
 });
 
 // 查看质押详情
@@ -27,11 +26,7 @@ const showStakedOtherDetail = ref(false);
 const { t } = useI18n();
 
 // 赎回
-const refundData = computed(() => {
-    return props.resourceData && props.resourceData.refund_request
-        ? props.resourceData.refund_request
-        : ({} as RefundRequest);
-});
+
 const wallet = store.wallet();
 const emit = defineEmits(['loadData']);
 const refundNow = async () => {
@@ -65,14 +60,14 @@ const beforeSubmit = async (value: string) => {
     // 质押
     if (action.value == 'stake') {
         receiverVisible.value = true;
-        cpuPlaceholder.value = props.resourceData.stakeCpuMax + ' ' + currentSymbol;
-        netPlaceholder.value = props.resourceData.stakeNetMax + ' ' + currentSymbol;
+        cpuPlaceholder.value = props.resources.cpu.stake_max + ' ' + currentSymbol;
+        netPlaceholder.value = props.resources.net.stake_max + ' ' + currentSymbol;
         modalTitle.value = t('resource.stake') + t('resource.resources');
     }
     // 赎回
     else if (action.value == 'refund') {
-        cpuPlaceholder.value = props.resourceData.self_delegated_bandwidth?.cpu_weight;
-        netPlaceholder.value = props.resourceData.self_delegated_bandwidth?.net_weight;
+        cpuPlaceholder.value = props.resources.cpu.self_delegated_bandwidth_weight;
+        netPlaceholder.value = props.resources.net.self_delegated_bandwidth_weight;
         modalTitle.value = t('resource.unstake') + t('resource.resources');
     }
     // 租用
@@ -207,9 +202,7 @@ const handleSubmit = async () => {
                     <span>{{ $t('resource.staked') }}</span>
                     <span class="small">
                         {{
-                            props.type === 'cpu'
-                                ? props.resourceData.total_resources?.cpu_weight
-                                : props.resourceData.total_resources?.net_weight
+                            props.resources[props.type ].total_resources_weight
                         }}
                     </span>
                 </div>
@@ -223,12 +216,7 @@ const handleSubmit = async () => {
                     <span>{{ $t('resource.stakeForOthers') }}</span>
                     <span class="small">
                         {{
-                            (props.type === 'cpu'
-                                ? props.resourceData.stakeForOthersCPU
-                                : props.resourceData.stakeForOthersNET
-                            ).toFixed(4) +
-                            ' ' +
-                            currentSymbol
+                            props.resources[props.type].staked_for_others.toFixed(4) + ' ' + currentSymbol
                         }}
                     </span>
                 </div>
@@ -237,23 +225,23 @@ const handleSubmit = async () => {
             <!-- refund -->
             <div
                 class="content-line line1"
-                v-show="props.type === 'cpu' ? refundData.cpu_amount : refundData.net_amount"
+                v-show="resources[props.type].refund_request.amount"
             >
                 <div class="item">
                     <span>{{ $t('resource.refunding') }}</span>
                     <span class="small">
-                        {{ props.type === 'cpu' ? refundData.cpu_amount : refundData.net_amount }}
+                        {{ resources[props.type].refund_request.amount }}
                     </span>
                 </div>
                 <div class="item">
                     <span>{{ $t('resource.refunding') }}</span>
                     <span
                         class="small"
-                        v-if="props.type === 'cpu' ? refundData.cpu_amount != 0 : refundData.net_amount != 0"
-                        :class="{ refund: refundData.left_time == '-' }"
+                        v-if="resources[props.type].refund_request.amount != 0"
+                        :class="{ refund: resources[props.type].refund_request.left_time == '-' }"
                         @click="refundNow()"
                     >
-                        {{ refundData.left_time == '-' ? $t('resource.refundNow') : refundData.left_time }}
+                        {{ resources[props.type].refund_request.left_time == '-' ? $t('resource.refundNow') : resources[props.type].refund_request.left_time }}
                     </span>
                 </div>
             </div>
@@ -276,7 +264,7 @@ const handleSubmit = async () => {
         <staked-detail
             :is-show="showStakedDetail"
             @close="showStakedDetail = false"
-            :resourceData="resourceData"
+            :resources="resources"
             :type="props.type"
         ></staked-detail>
 

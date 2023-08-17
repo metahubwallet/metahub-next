@@ -15,22 +15,23 @@ export default defineStore('chain', {
     },
 
     getters: {
-        currentChain: (state) => {
+        currentChain: (state) : string => {
             return state.currentNetwork.chain || 'eos';
         },
-        currentChainId: (state) => {
+        currentChainId: (state) : string => {
             return state.currentNetwork.chainId || eosChainId;
         },
-        findNetwork: (state) => (chainId: string) => {
-            return state.networks.find((x) => x.chainId == chainId);
+        findNetwork: (state) => (chainId: string) : Network => {
+            const network = state.networks.find((x) => x.chainId == chainId);
+            return network ?? state.networks[0];
         },
-        getSelectedRpc: (state) => (chainId: string) => {
+        getSelectedRpc: (state) => (chainId: string) : string => {
             let selectedRpc = state.rpcs[chainId];
             if (!selectedRpc) {
                 const network = state.networks.find((x) => x.chainId == chainId);
                 return network ? network.endpoint : '';
             }
-            return selectedRpc;
+            return selectedRpc.endpoint;
         },
         currentSymbol: (state) => {
             const network = state.networks.find((x: Network) => x.chainId == state.currentNetwork.chainId);

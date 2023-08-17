@@ -15,4 +15,4 @@ export type CacheKey =
     | 'allTokens'
     | 'userTokens'
     | 'updateAt'
-    | 'recentTransations';
+    | 'recentTransfers';

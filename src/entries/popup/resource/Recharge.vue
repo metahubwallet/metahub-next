@@ -35,16 +35,19 @@ const radioChange = () => {
 const form = reactive({
     sender: wallet.currentWallet.name,
     receiver: 'metahubpower',
-    quantity: 0,
-    symbol: 'EOS',
-    contract: 'eosio.token',
+    amount: 0,
     memo: '',
+    token: {
+        symbol: 'EOS',
+        contract: 'eosio.token',
+        precision: 4,
+    }
 });
 const showConfirm = ref(false);
 const beforeSubmit = () => {
     if (!rechargeTo.value) rechargeTo.value = wallet.currentWallet.name;
     form.memo = rechargeTo.value;
-    form.quantity = amount.value;
+    form.amount = amount.value;
     showConfirm.value = true;
 };
 </script>

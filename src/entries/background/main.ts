@@ -580,7 +580,6 @@ chrome.windows.onRemoved.addListener((windowId) => {
     chrome.windows.getAll((windows) => {
         if (windows.length == 0) {
             vars.isLock = true;
-            vars.password = '';
         }
     });
 });

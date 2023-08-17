@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import Windows from '@/common/lib/windows';
 
-import { Transation, Wallet } from '@/store/wallet/type';
-
-
 // 初始化钱包情况
 
 const chain = store.chain();
@@ -17,8 +14,6 @@ onBeforeMount(async () => {
     await wallet.init();
     await user.init();
     await setting.init();
-
-    console.log('store inited');
 
     if (Windows.getCount() == 0) {
         // chrome.action.setIcon({

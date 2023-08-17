@@ -7,7 +7,8 @@ export default defineStore('setting', {
     }),
     actions: {
         async init() {
-            this.isLock = (await localCache.get('isLock', true)) as boolean;
+            const result: any = (await chrome.storage.session.get(['isLock'])) ?? {};
+            this.isLock = result.isLock as boolean ?? true;
         },
         async setLang(lang: 'zh-CN' | 'en') {
             this.language = lang;
@@ -15,7 +16,7 @@ export default defineStore('setting', {
         },
         async setIsLock(flag: boolean) {
             this.isLock = flag;
-            await localCache.set('isLock', flag, 60 * 60 * 24);
+            await chrome.storage.session.set({isLock: this.isLock});
         },
     },
 });

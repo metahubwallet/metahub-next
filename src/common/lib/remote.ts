@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import axios from 'axios';
 import chain from './chain.js';
-import { Action, Coin } from '@/store/wallet/type';
+import { Balance, Coin } from '@/store/wallet/type';
 
 let manifestData = chrome.runtime.getManifest();
 
@@ -97,13 +97,14 @@ export const getBalanceList = async (
 ) => {
     try {
         // to use: http://light-api/api/account/CHAIN/ACCOUNT
-        const balances = [];
+        const balances = [] as Balance[];
         for (const t of tokens) {
             const balance = await chain.get().getCurrencyBalance(t.contract, account, t.symbol);
-            t.amount = balance ? balance.split([' '])[0] : 0;
-            balances.push(t);
+            const amount = balance ? parseFloat(balance.split(' ')[0]) : 0;
+            const item: Balance = { ...t, amount };
+            balances.push(item);
             if (typeof onBlanceInquired == 'function') {
-                onBlanceInquired(t);
+                onBlanceInquired(item);
             }
         }
         return balances;
@@ -128,7 +129,7 @@ export const getTransactionList = async (chain: string, data: any) => {
         let res = await axios.get(url);
         const actions = res.data && res.data.actions ? res.data.actions : [];
         actions.map((i: any) => {
-            let action = {} as Action;
+            let action = {} as any;
             action.receiver = i.act.data.to;
             action.sender = i.act.data.from;
             action.quantity = i.act.data.quantity;

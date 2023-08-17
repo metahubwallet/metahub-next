@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { Transfer } from '@/store/wallet/type';
+import { TransferRecord, Transfer } from '@/store/wallet/type';
 import chain from '@/common/lib/chain';
 
 interface Props {
     isShow: boolean;
     title: string;
     transfer: Transfer;
-    precision: number;
 }
 const props = withDefaults(defineProps<Props>(), {});
 const { t } = useI18n();
@@ -37,23 +36,26 @@ const handleSubmit = async () => {
             memo = props.transfer.receiver;
         }
 
-        props.transfer.quantity = Number(props.transfer.quantity.toFixed(props.precision));
-        let recent = {
-            ...props.transfer,
+        props.transfer.amount = Number(props.transfer.amount.toFixed(props.transfer.token.precision));
+        let recent: TransferRecord = {
+            account: props.transfer.receiver,
             time: Date.now(),
             memo: isEthAddress ? '' : props.transfer.memo,
+            token: props.transfer.token,
         };
-        wallet.setRecentTransation(recent);
-        console.log(recent);
-        console.log(wallet.recentTransations);
 
-        console.log(await localCache.get('recentTransations'));
+        wallet.addRecentTransfer(recent);
 
-        const params = [
-            props.transfer.contract,
+        // console.log(recent);
+        // console.log(wallet.recentTransfers);
+
+        console.log(await localCache.get('recentTransfers'));
+
+        const params: [ string, string, string, string, string ] = [
+            props.transfer.token.contract,
             wallet.currentWallet.name,
             receiver,
-            props.transfer.quantity.toFixed(4) + ' ' + props.transfer.symbol,
+            props.transfer.amount.toFixed(props.transfer.token.precision) + ' ' + props.transfer.token.symbol,
             memo,
         ];
 
@@ -85,7 +87,7 @@ const handleSubmit = async () => {
             <div class="info-cell">
                 <span class="info-cell-key">{{ $t('wallet.amount') }}：</span>
                 <span class="info-cell-value">
-                    {{ transfer.quantity.toFixed(props.precision) + ' ' + transfer.symbol }}
+                    {{ transfer.amount.toFixed(transfer.token.precision) + ' ' + transfer.token.symbol }}
                 </span>
             </div>
             <div class="info-cell" v-show="isShowMemo">

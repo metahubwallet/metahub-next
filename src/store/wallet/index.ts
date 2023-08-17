@@ -1,9 +1,9 @@
-import { Coin, ChainToken, Transation, Wallet, WalletState, WhiteItem } from './type';
+import { Balance, Coin, TransferRecord, Wallet, WalletState, WhiteItem } from './type';
 import localTokens from '@/asset/json/tokens.json';
 import axios from 'axios';
 import chain from '../chain';
 
-type AllTokens = { [key: string]: ChainToken[] };
+type AllTokens = { [key: string]: Coin[] };
 
 const store = defineStore('wallet', {
     state: (): WalletState => ({
@@ -11,21 +11,22 @@ const store = defineStore('wallet', {
         selectedIndex: 0,
         walletCaches: {},
         whitelist: [],
-        recentTransations: [],
+        recentTransfers: [],
         allTokens: {},
         userTokens: {},
     }),
 
     getters: {
-        getToken: (state) => (token: ChainToken) : ChainToken => {
-            const chainTokens = state.allTokens[token.chain] || [];
+        getToken: (state) => (token: Coin) : Coin => {
+            const _chain = token.chain ?? chain().currentChain;
+            const chainTokens = state.allTokens[_chain] ?? [];
             const result = chainTokens.find(t => t.contract == token.contract && t.symbol == token.symbol);
-            return result ? result : {} as ChainToken;
+            return result ? result : {} as Coin;
         },
         currentWallet: (state) => {
             return state.wallets[state.selectedIndex];
         },
-        chainTokens(state): ChainToken[] {
+        chainTokens(state): Coin[] {
             const currentChain = chain().currentChain;
             return state.allTokens[currentChain] ? state.allTokens[currentChain] : [];
         },
@@ -33,7 +34,7 @@ const store = defineStore('wallet', {
             const account = this.currentWallet;
             return account.name + '@' + account.chainId.substring(0, 16);
         },
-        currentUserTokens(state): Coin[] {
+        currentUserTokens(state): Balance[] {
             const key = this.currentWalletKey;
             return state.userTokens[key] ? state.userTokens[key] : [];
         },
@@ -43,7 +44,7 @@ const store = defineStore('wallet', {
         async init() {
             this.wallets = (await localCache.get('wallets', [])) as Wallet[];
             this.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
-            this.recentTransations = (await localCache.get('recentTransations', [])) as Transation[];
+            this.recentTransfers = (await localCache.get('recentTransfers', [])) as TransferRecord[];
             this.allTokens = await initTokens();
         },
         async setWallets(wallets: Wallet[]) {
@@ -58,11 +59,11 @@ const store = defineStore('wallet', {
             this.allTokens = tokens;
             await localCache.set('allTokens', tokens);
         },
-        async setUserTokens(tokens: { [key: string]: Coin[] }) {
+        async setUserTokens(tokens: { [key: string]: Balance[] }) {
             this.userTokens = tokens;
             await localCache.set('userTokens', tokens);
         },
-        async setCurrentUserTokens(coins: Coin[]) {
+        async setCurrentUserTokens(coins: Balance[]) {
             this.userTokens[this.currentWalletKey] = coins;
             await localCache.set('userTokens', this.userTokens);
         },
@@ -70,9 +71,19 @@ const store = defineStore('wallet', {
             this.whitelist = list;
             await localCache.set('whitelist', list);
         },
-        async setRecentTransation(recent: Transation) {
-            this.recentTransations.push(recent);
-            await localCache.set('recentTransations', this.recentTransations);
+        async addRecentTransfer(recent: TransferRecord) {
+            const recentTransfers = this.recentTransfers.filter(oldItem => {
+                return oldItem.account !== recent.account &&  oldItem.memo !== recent.memo;
+            });
+            // max 100
+            if (recentTransfers.length > 99) {
+                recentTransfers.splice(99, recentTransfers.length - 99);
+            }
+            // add
+            recentTransfers.unshift(recent);
+            this.recentTransfers = recentTransfers;
+            // save
+            await localCache.set('recentTransfers', recentTransfers);
         },
     },
 });
@@ -81,7 +92,7 @@ export default store;
 
 
 const getLocalTokens = () => {
-    const tokens: ChainToken[] = [];
+    const tokens: Coin[] = [];
     localTokens.forEach(t => {
         tokens.push({...t, logo: ''});
     });
@@ -112,7 +123,7 @@ const initTokens = async (): Promise<AllTokens> => {
     return allTokens;
 };
 
-const getTokensFromJson = (tokenArray: ChainToken[]) : AllTokens => {
+const getTokensFromJson = (tokenArray: Coin[]) : AllTokens => {
     let tokenMap = {} as AllTokens;
     for (const token of tokenArray) {
         if (typeof tokenMap[token.chain] == 'undefined') {

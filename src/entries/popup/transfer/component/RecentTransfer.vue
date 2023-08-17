@@ -19,17 +19,17 @@ const { timeFormat } = tool;
 
         <n-scrollbar>
             <div
-                v-for="(item, index) of wallet.recentTransations"
+                v-for="(item, index) of wallet.recentTransfers"
                 :key="index"
                 class="grid grid-cols-12 items-center border-gray-200 py-[10px] cursor-pointer"
                 :class="index ? 'border-t' : ''"
                 @click="$emit('select', item)"
             >
                 <div class="col-span-7 ml-2">
-                    <span v-if="item.receiver.length == 42">
-                        {{ item.receiver.substring(0, 10) }}...{{ item.receiver.substring(36) }}
+                    <span v-if="item.account.length == 42">
+                        {{ item.account.substring(0, 10) }}...{{ item.account.substring(36) }}
                     </span>
-                    <span v-else>{{ item.receiver }}</span>
+                    <span v-else>{{ item.account }}</span>
                 </div>
 
                 <div class="col-span-5 text-center">
@@ -37,7 +37,7 @@ const { timeFormat } = tool;
                 </div>
             </div>
 
-            <div class="text-center py-[10px] text-gray-400" v-if="wallet.recentTransations.length === 0">
+            <div class="text-center py-[10px] text-gray-400" v-if="wallet.recentTransfers.length === 0">
                 {{ $t('public.noData') }}
             </div>
         </n-scrollbar>

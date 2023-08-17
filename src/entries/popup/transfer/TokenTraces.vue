@@ -2,22 +2,20 @@
 import EOSIcon from '@/asset/img/eos_icon.png';
 import CoinGet from '@/asset/img/coin_get@2x.png';
 import CoinOut from '@/asset/img/coin_out@2x.png';
-import { Coin, Transation } from '@/store/wallet/type';
+import { Balance, Coin } from '@/store/wallet/type';
 import chain from '@/common/lib/chain';
 import { getTransactionList } from '@/common/lib/remote';
 
 const { timeFormat } = tool;
 
-let token = reactive({} as Coin);
+const wallet = store.wallet();
+
+const [contract, symbol] = (useRoute().params.token as any).split('-');
+const token = ref(wallet.currentUserTokens.find(
+    (x: Coin) => x.contract == contract && x.symbol == symbol
+)!);
 
 // 初始化
-const wallet = store.wallet();
-onBeforeMount(() => {
-    const [contract, symbol] = (useRoute().params.token as any).split('-');
-    token = wallet.currentUserTokens.find(
-        (x: Coin) => x.contract == contract && x.symbol == symbol
-    ) as Coin;
-});
 onMounted(() => {
     getBalance();
     setTimeout(() => {
@@ -29,19 +27,19 @@ onMounted(() => {
 const getBalance = async () => {
     const balance = await chain
         .get()
-        .getCurrencyBalance(token.contract, wallet.currentWallet.name, token.symbol);
+        .getCurrencyBalance(token.value.contract, wallet.currentWallet.name, token.value.symbol);
     if (balance) {
-        token.amount = Number(balance.split(' ')[0]);
+        token.value.amount = Number(balance.split(' ')[0]);
     }
 };
 
 // 获取远程数据
-const traceList = ref<Transation[]>([]);
+const traceList = ref([] as any);
 const getTraceList = async () => {
     const chain = store.chain().currentChain;
     const params = {
         account: wallet.currentWallet.name,
-        filter: `${token.contract}:*`,
+        filter: `${token.value.contract}:*`,
         sort: 'desc',
     };
     traceList.value = await getTransactionList(chain, params);
@@ -53,14 +51,14 @@ const viewTransfer = () => {
     router.push({
         name: 'transfer',
         query: {
-            symbol: token.symbol,
-            contract: token.contract,
+            symbol: token.value.symbol,
+            contract: token.value.contract,
         },
     });
 };
 
 // 跳转至事务详情页
-const viewTransation = (item: Transation) => {
+const viewTransation = (item: any) => {
     router.push({
         name: 'transation',
         query: {

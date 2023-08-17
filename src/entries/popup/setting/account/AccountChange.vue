@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import chain from '@/common/lib/chain';
-import { Perm } from '@/store/wallet/type';
+import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 
-const permissions = ref<Perm[]>([]);
+const permissions = ref<Permission[]>([]);
 onBeforeMount(() => {
     let perms = new Set();
     for (const key of store.wallet().currentWallet.keys) {
@@ -10,7 +10,7 @@ onBeforeMount(() => {
             perms.add(perm);
         }
     }
-    permissions.value = Array.from(perms) as Perm[];
+    permissions.value = Array.from(perms) as Permission[];
 });
 
 const route = useRoute();

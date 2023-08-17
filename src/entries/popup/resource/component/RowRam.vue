@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import chain from '@/common/lib/chain';
-import { ResourceData } from '@/store/wallet/type';
+import { ResourceBase } from '@/store/wallet/type';
 const { t } = useI18n();
 
 interface Props {
-    resourceData: ResourceData;
+    memory: ResourceBase;
     ramprice: number;
 }
 const props = withDefaults(defineProps<Props>(), {});
@@ -18,10 +18,10 @@ const beforeSubmit = async (value: string) => {
     action.value = value;
 
     if (value == 'buyRam') {
-        placeholder.value = props.resourceData.core_liquid_balance;
+        placeholder.value = props.memory.core_liquid_balance;
         modalTitle.value = t('resource.buy') + ' ' + t('resource.ram');
     } else if (value == 'sellRam') {
-        placeholder.value = ((props.resourceData.ram_quota - props.resourceData.ram_usage) / 1024).toFixed(4) + ' KB';
+        placeholder.value = ((props.memory.use_limit.max - props.memory.use_limit.used) / 1024).toFixed(4) + ' KB';
         modalTitle.value = t('resource.sell') + ' ' + t('resource.ram');
     }
     modalVisible.value = true;
@@ -89,13 +89,13 @@ const onSubmit = async () => {
                 <div class="progress-text">
                     <span>{{ $t('resource.used') }}</span>
                     <span>
-                        {{ (resourceData.ram_usage / 1024).toFixed(2) }} KB /
-                        {{ (resourceData.ram_quota / 1024).toFixed(2) }}
+                        {{ (memory.use_limit.used / 1024).toFixed(2) }} KB /
+                        {{ (memory.use_limit.max / 1024).toFixed(2) }}
                         KB
                     </span>
                 </div>
                 <n-progress
-                    :percentage="resourceData.ram_percentage"
+                    :percentage="memory.use_percentage"
                     :show-text="false"
                     :stroke-width="9"
                     :show-indicator="false"

@@ -1,12 +1,12 @@
 import EOS from '@/common/lib/eos';
 import { decrypt, md5 } from '@/common/util/crypto';
 import { ErrorCode } from '@/common/util/type';
-import { Perm, Wallet } from '@/store/wallet/type';
 import { i18n } from '../plugin/lang';
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
+import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 
 export default class Chain {
-    static chains: any = {};
+    static chains: { [key: string]: EOS } = {};
 
     static getCurrentPrivateKey() {
         if (store.wallet().wallets.length == 0) return '';
@@ -16,15 +16,14 @@ export default class Chain {
     }
 
     static getPrivateKeyByPublicKey(publicKey: string) {
-        for (let index = 0; index < store.wallet().wallets.length; index++) {
-            const wallet = store.wallet().wallets[index];
+        for (const wallet of store.wallet().wallets) {
             for (const key of wallet.keys) {
                 if (key.publicKey === publicKey) {
                     return decrypt(key.privateKey, md5(wallet.seed + store.user().password));
                 }
             }
         }
-        return false;
+        return '';
     }
 
     static getPrivateKeyByAuthorization(chainId: string, auth: string) {
@@ -164,21 +163,26 @@ export default class Chain {
             // { chainId, requiredKeys, serializedTransaction, serializedContextFreeData, abis }
             async sign(transaction: any) {
                 // console.log(transaction.serializedContextFreeData);
-                const _buffer =
+                const trxBuf =
                     typeof transaction.serializedTransaction == 'string'
                         ? Buffer.from(transaction.serializedTransaction, 'hex')
                         : Buffer.from(transaction.serializedTransaction);
                 const buffer = Buffer.concat([
                         Buffer.from(transaction.chainId, 'hex'),
-                        _buffer,
+                        trxBuf,
                         Buffer.from(new Uint8Array(32)), // todo: serializedContextFreeData
                     ]);
 
                 // console.log(payload.buf.toString('hex'));
+                // console.log('requiredKeys');
+
 
                 const signatures = transaction.requiredKeys.map((pub: string) => {
+                    console.log(pub);
                     const privateKey = Chain.getPrivateKeyByPublicKey(pub);
+                    console.log(privateKey);
                     const signature = Chain.get(transaction.chainId).signature(buffer, privateKey);
+                    console.log(signature);
                     return signature;
                 });
 
@@ -189,7 +193,7 @@ export default class Chain {
 
                 // const api = new Api({chainId, rpc: new JsonRpc('http://office.gogo8899.com:8888')});
                 // const trx = api.deserializeTransaction(transaction.serializedTransaction);
-
+                console.log(signatures);
                 return {
                     signatures,
                     serializedTransaction: transaction.serializedTransaction,
@@ -219,7 +223,7 @@ export default class Chain {
      *
      */
     static async fetchPermissions(account: string, chainId: string) {
-        let result = { code: ErrorCode.OK, permissions: [] as Perm[], msg: '' };
+        let result = { code: ErrorCode.OK, permissions: [] as Permission[], msg: '' };
 
         const index = store.wallet().wallets.findIndex((item) => {
             return item.account === account && item.chainId === chainId;

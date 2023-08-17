@@ -15,7 +15,7 @@ const submit = () => {
 
     // 持久化存储锁屏状态，有效1d
     store.setting().setIsLock(false);
-    store.user().password = password1(password.value);
+    store.user().setPassword(password1(password.value));
     router.push({ name: 'index' });
 };
 </script>

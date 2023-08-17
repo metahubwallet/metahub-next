@@ -31,7 +31,7 @@ const { values, errors, handleSubmit } = useForms(schema);
 
 // 设置密码
 const onSubmit = handleSubmit(() => {
-    store.user().password = password1(values.password);
+    store.user().setPassword(password1(values.password));
     store.user().setPasswordHash(password2(values.password));
     store.setting().setIsLock(false);
     router.push({ name: 'index' });

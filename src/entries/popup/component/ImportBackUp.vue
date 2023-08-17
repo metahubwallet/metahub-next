@@ -102,7 +102,7 @@ const importWalletsFromData = async (content: string) => {
     store.wallet().setWallets(importData.wallets);
     store.wallet().setSelectedIndex(importData.selectedIndex);
     store.wallet().setUserTokens(importData.userTokens);
-    store.user().password = importData.password;
+    store.user().setPassword(importData.password);
     store.user().setPasswordHash(importData.passwordHash);
     changeLang(importData.language);
     store.setting().setIsLock(true);

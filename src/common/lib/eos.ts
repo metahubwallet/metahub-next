@@ -2,8 +2,9 @@ import { Api, JsonRpc } from 'eosjs';
 import { ecc } from 'eosjs/dist/eosjs-ecc-migration';
 import { ErrorCode } from '../util/type';
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
-import { Auth, Perm, Wallet } from '@/store/wallet/type';
+import { Auth, Wallet } from '@/store/wallet/type';
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
+import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 
 export default class EOS {
     public rpc;
@@ -135,7 +136,7 @@ export default class EOS {
         authType: string,
         operateType: string,
         oldOperateKey: string,
-        newOperateKey: string
+        newOperateKey?: string
     ) {
         let perms = JSON.parse(JSON.stringify(sourcePerms)); // clone-deep
         for (let i = 0; i < perms.length; i++) {
@@ -143,7 +144,7 @@ export default class EOS {
                 switch (operateType) {
                     case 'add':
                         let item = {
-                            key: newOperateKey,
+                            key: newOperateKey!,
                             weight: 1,
                         };
                         perms[i].required_auth.keys.push(item);
@@ -151,7 +152,7 @@ export default class EOS {
                     case 'modify':
                         for (let j = 0; j < perms[i].required_auth.keys.length; j++) {
                             if (perms[i].required_auth.keys[j].key == oldOperateKey) {
-                                perms[i].required_auth.keys[j].key = newOperateKey;
+                                perms[i].required_auth.keys[j].key = newOperateKey!;
                             }
                         }
                         break;
@@ -170,16 +171,11 @@ export default class EOS {
                 }
             }
         }
-        for (const p of perms) {
-            for (const k of p.required_auth.keys) {
-                delete k.isCurrent;
-            }
-        }
         return perms;
     }
 
     // 权限更新操作
-    async updatePerms(operateUser: Wallet, perms: Perm[], auth: Auth) {
+    async updatePerms(operateUser: Wallet, perms: Permission[], auth: Auth) {
         let accountName = operateUser.name;
         const actions = [];
         for (const perm of perms) {
@@ -260,7 +256,7 @@ export default class EOS {
         receiver: string,
         stake_net_quantity = '0.0000 EOS',
         stake_cpu_quantity = '0.0000 EOS',
-        transfer = 0,
+        transfer = false,
         auth: Auth
     ) {
         return await this.transact(
@@ -275,7 +271,7 @@ export default class EOS {
                             receiver,
                             stake_net_quantity,
                             stake_cpu_quantity,
-                            transfer,
+                            transfer: transfer ? 1 : 0,
                         },
                     },
                 ],
@@ -550,7 +546,7 @@ export default class EOS {
     }
 
     async getAccount(account = '') {
-        if (account == '') return { code: ErrorCode.NAME_EMPTY };
+        if (account == '') throw { code: ErrorCode.NAME_EMPTY };
 
         try {
             let res = await this.rpc.get_account(account);

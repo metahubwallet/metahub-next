@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
-import { Coin, Transation } from '@/store/wallet/type';
+import { Balance, Transfer, TransferRecord } from '@/store/wallet/type';
 
 const { t } = useI18n();
 
@@ -8,44 +8,41 @@ const wallet = store.wallet();
 const recentVisible = ref(false);
 const selectTokenVisible = ref(false);
 
-const form = reactive({
+const transfer = reactive({
     sender: '',
     receiver: '',
-    quantity: 0,
-    memo: '',
-    symbol: '',
-    contract: '',
-});
-
-const targetCoin = reactive<Coin>({
-    contract: '',
-    symbol: 'eos',
-    precision: 4,
     amount: 0,
-    chain: '',
-    logo: '',
-});
+    memo: '',
+    token: {
+        symbol: '',
+        contract: '',
+        precision: 4,
+    }
+} as Transfer);
+
+const targeMaxAmount = ref(0);
+
 
 // 初始化数据
 const route = useRoute();
 onBeforeMount(() => {
     const currentSystemToken = store.chain().currentNetwork.token;
-
-    targetCoin.symbol = (route.query.symbol as string) || currentSystemToken.symbol;
-    targetCoin.contract = (route.query.contract as string) || currentSystemToken.contract;
-    targetCoin.precision = Number(route.query.precision) || currentSystemToken.precision;
-    if (!targetCoin.contract) targetCoin.contract = 'eosio.token';
-    if (!targetCoin.amount) targetCoin.amount = 0;
-    if (!targetCoin.precision) targetCoin.precision = 4;
+    transfer.token = {
+        symbol: (route.query.symbol as string) || currentSystemToken.symbol,
+        contract: (route.query.contract as string) || currentSystemToken.contract,
+        precision: Number(route.query.precision) || currentSystemToken.precision,
+    }
+    transfer.amount = Number(route.query.amount) || 0;
 
     wallet.currentUserTokens.forEach((row) => {
-        if (row.contract == targetCoin.contract && row.symbol == targetCoin.symbol) {
-            targetCoin.amount = row.amount;
-            targetCoin.precision = row.precision;
+        if (row.contract == transfer.token.contract && row.symbol == transfer.token.symbol) {
+            targeMaxAmount.value = row.amount;
+            transfer.token.precision = row.precision;
         }
     });
-    form.sender = tool.briefAccount(wallet.currentWallet.account, 14, 8);
-    form.symbol = targetCoin.symbol;
+
+    transfer.sender = tool.briefAccount(wallet.currentWallet.account, 14, 8);
+
     getBalance();
 });
 
@@ -53,26 +50,26 @@ onBeforeMount(() => {
 const isShowMemo = ref(true);
 const receiverError = ref('');
 const checkReceiver = async () => {
-    if (!form.receiver) return (receiverError.value = t('wallet.emptyReceiver'));
-    if (form.receiver == wallet.currentWallet.name) return (receiverError.value = t('wallet.transferSelf'));
+    if (!transfer.receiver) return (receiverError.value = t('wallet.emptyReceiver'));
+    if (transfer.receiver == wallet.currentWallet.name) return (receiverError.value = t('wallet.transferSelf'));
 
     // 账号不存在
-    if (form.receiver.length == 42) isShowMemo.value = false;
-    else if (form.receiver.length != 42 && form.receiver.length > 12)
+    if (transfer.receiver.length == 42) isShowMemo.value = false;
+    else if (transfer.receiver.length != 42 && transfer.receiver.length > 12)
         return (receiverError.value = t('wallet.errorReceiver'));
     else {
         isShowMemo.value = true;
-        let accountData = await chain.get().getAccount(form.receiver);
+        let accountData = await chain.get().getAccount(transfer.receiver);
         if (accountData == null) return (receiverError.value = t('wallet.accountNotExist'));
     }
     receiverError.value = '';
 };
 
 // 选择最近记录
-const handleSelectTransfer = (transfer: Transation) => {
+const handleSelectTransfer = (tr: TransferRecord) => {
     recentVisible.value = false;
-    form.receiver = transfer.receiver;
-    form.memo = transfer.memo;
+    transfer.receiver = tr.account;
+    transfer.memo = tr.memo;
     receiverError.value = '';
     checkReceiver();
 };
@@ -80,22 +77,24 @@ const handleSelectTransfer = (transfer: Transation) => {
 // 验证quantity值
 const quantityError = ref('');
 const checkQuantity = () => {
-    const quantity = isNaN(form.quantity) ? 0 : form.quantity;
+    const quantity = isNaN(transfer.amount) ? 0 : transfer.amount;
     if (quantity == 0) return (quantityError.value = t('wallet.emptyAmount'));
     if (quantity < 0) return (quantityError.value = t('wallet.emptyAmount'));
     quantityError.value = '';
 };
 
 // 切换token
-const handleChangeToken = (coin: Coin) => {
-    targetCoin.amount = coin.amount;
-    targetCoin.chain = coin.chain;
-    targetCoin.contract = coin.contract;
-    targetCoin.precision = coin.precision;
-    targetCoin.symbol = coin.symbol;
+const handleChangeToken = (coin: Balance) => {
+    transfer.token = {
+        symbol: coin.symbol,
+        contract: coin.contract,
+        precision: coin.precision,
+    }
+    
+    targeMaxAmount.value = coin.amount;
 
     selectTokenVisible.value = false;
-    form.quantity = 0;
+    transfer.amount = 0;
     getBalance();
 };
 
@@ -103,16 +102,15 @@ const handleChangeToken = (coin: Coin) => {
 const getBalance = async () => {
     const balance = await chain
         .get()
-        .getCurrencyBalance(targetCoin.contract, wallet.currentWallet.name, targetCoin.symbol);
-    if (balance) targetCoin.amount = Number(balance.split(' ')[0]);
+        .getCurrencyBalance(transfer.token.contract, wallet.currentWallet.name, transfer.token.symbol);
+    if (balance) {
+        targeMaxAmount.value = Number(balance.split(' ')[0]);
+    }
 };
 
 // 验证转账信息
 const confirmVisible = ref(false);
 const checkSubmit = () => {
-    form.symbol = targetCoin.symbol;
-    form.contract = targetCoin.contract;
-
     checkReceiver();
     checkQuantity();
     if (receiverError.value || quantityError.value) return;
@@ -133,7 +131,7 @@ const checkSubmit = () => {
                     <div class="transfer-input">
                         <n-input
                             :disabled="true"
-                            v-model:value="form.sender"
+                            v-model:value="transfer.sender"
                             class="rounded-[22px] h-[46px] leading-[46px] pl-[5px]"
                         ></n-input>
                     </div>
@@ -153,7 +151,7 @@ const checkSubmit = () => {
                         <div class="flex flex-col">
                             <n-input
                                 @blur="checkReceiver"
-                                v-model:value="form.receiver"
+                                v-model:value="transfer.receiver"
                                 placeholder=""
                                 class="rounded-[22px] h-[46px] leading-[46px] pl-[5px]"
                             ></n-input>
@@ -174,21 +172,21 @@ const checkSubmit = () => {
                                     @click="selectTokenVisible = true"
                                     class="symbol-button rounded-none  rounded-tl-[22px] rounded-bl-[22px]"
                                 >
-                                    {{ targetCoin.symbol }}
+                                    {{ transfer.token.symbol }}
                                     <icon-down-one theme="filled" size="14" fill="#4a4a4a" class="ml-1" />
                                 </n-button>
                                 <n-input-number
                                     @blur="checkQuantity"
-                                    v-model:value="form.quantity"
+                                    v-model:value="transfer.amount"
                                     :min="0"
-                                    :precision="targetCoin.precision"
+                                    :precision="transfer.token.precision"
                                     :step="0.1"
-                                    :max="targetCoin.amount"
-                                    :placeholder="targetCoin.amount + ' ' + targetCoin.symbol"
+                                    :max="targeMaxAmount"
+                                    :placeholder="transfer.amount + ' ' + transfer.token.symbol"
                                 />
                                 <n-button
                                     @click="
-                                        form.quantity = targetCoin.amount;
+                                        transfer.amount = transfer.amount;
                                         checkQuantity();
                                     "
                                     class="all-button rounded-none rounded-tr-[22px] rounded-br-[22px]"
@@ -206,7 +204,7 @@ const checkSubmit = () => {
                     <div class="transfer-title" v-show="isShowMemo">{{ $t('wallet.remark') }}（Memo）</div>
                     <div class="transfer-input" v-show="isShowMemo">
                         <n-input
-                            v-model:value="form.memo"
+                            v-model:value="transfer.memo"
                             placeholder=""
                             class="rounded-[22px] h-[46px] leading-[46px] pl-[5px] mb-[20px]"
                         ></n-input>
@@ -240,8 +238,7 @@ const checkSubmit = () => {
         <transfer-confirm
             :isShow="confirmVisible"
             :title="$t('wallet.transferInfo')"
-            :transfer="form"
-            :precision="targetCoin.precision"
+            :transfer="transfer"
             @close="confirmVisible = false"
         ></transfer-confirm>
     </div>

@@ -8,10 +8,9 @@ export interface WalletState {
         };
     };
     whitelist: WhiteItem[];
-    recentTransations: Transation[]; // 最近转账记录
-    allTokens: { [key: string]: ChainToken[] };
-    userTokens: { [key: string]: Coin[]; }; // 链: Coins
-    
+    recentTransfers: TransferRecord[]; // 最近转账记录
+    allTokens: { [key: string]: Coin[] };
+    userTokens: { [key: string]: Balance[]; }; // 链: Coins   
 }
 
 export interface Wallet {
@@ -45,36 +44,25 @@ export interface Key {
     permissions: string[];
 }
 
-export interface Perm {
-    perm_name: string;
-    parent: string;
-    required_auth: {
-        threshold: number;
-        keys: {
-            id: string;
-            key: string;
-            isCurrent: boolean;
-        }[];
-        accounts: Auth[],
-        waits: any[]
-    };
-}
-
 export interface Token {
     symbol: string;
     contract: string;
     precision: number;
-    logo?: string;
 }
 
-export interface ChainToken extends Token {
+export interface Coin extends Token {
     chain: string;
 }
 
 export interface Coin extends Token {
     chain: string;
-    amount: number;
+    logo?: string;
+}
 
+export interface Balance extends Coin {
+    chain: string;
+    logo?: string;
+    amount: number;
     [key: string]: any; // 自定义属性
 }
 
@@ -90,59 +78,41 @@ export interface WhiteItem {
     hash: string;
 }
 
-export interface Action {
+export interface Transfer {
     receiver: string;
     sender: string;
-    quantity: number;
+    amount: number;
     memo: string;
+    token: Token;
 }
 
-export interface Transfer extends Action {
-    symbol: string;
-    contract: string;
-}
-
-export interface Transation extends Transfer {
+export interface TransferRecord {
+    account: string;
+    memo: string;
+    token: Token;
     time: number;
 }
 
-export interface ResourceData {
+export interface ResourceBase {
+    use_percentage: number;
+    use_limit: {
+        max: number;
+        used: number;
+    };
     core_liquid_balance: string;
-    ram_quota: number;
-    ram_usage: number;
-    ram_percentage: number;
-    cpu_limit: {
-        percentage: number;
-        max: number;
-        used: number;
-    };
-    net_limit: {
-        percentage: number;
-        max: number;
-        used: number;
-    };
-    stakeCpuMax: number;
-    stakeNetMax: number;
-    refund_request: RefundRequest;
-    total_resources: {
-        cpu_weight: string;
-        net_weight: string;
-    };
-    self_delegated_bandwidth: {
-        cpu_weight: string;
-        net_weight: string;
-    };
-    stakeForUserCPU: number;
-    stakeForUserNET: number;
-    stakeForOthersCPU: number;
-    stakeForOthersNET: number;
 }
 
-export interface RefundRequest {
-    cpu_amount: number;
-    net_amount: number;
-    request_time: number;
-    left_time: string;
+export interface ResourceData extends ResourceBase {
+    stake_max: number;
+    refund_request: {
+        amount: number;
+        request_time: number;
+        left_time: string;
+    };
+    total_resources_weight: string;
+    self_delegated_bandwidth_weight: string;
+    staked_for_user: number;
+    staked_for_others: number;
 }
 
 export interface Auth {
@@ -166,4 +136,3 @@ export interface AuthStore {
         publicKey: string;
     }[];
 }
-

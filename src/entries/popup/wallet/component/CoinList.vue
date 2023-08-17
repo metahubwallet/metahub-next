@@ -2,7 +2,7 @@
 import EOSIcon from '@/asset/img/eos_icon.png';
 import ErrorIcon from '@/asset/img/placeholder.png';
 import ErrorCoinImg from '@/asset/img/placeholder.png';
-import { Coin } from '@/store/wallet/type';
+import { Balance, Coin } from '@/store/wallet/type';
 import { eosChainId } from '@/common/util/network';
 import { getBalanceList, isSupportChain } from '@/common/lib/remote';
 import chain from '@/common/lib/chain';
@@ -12,7 +12,7 @@ const showAddToken = ref(false);
 
 // 初始化Tokens
 let isLoad = ref(false);
-const tokens = ref<Coin[]>([]);
+const tokens = ref<Balance[]>([]);
 const wallet = store.wallet();
 const emit = defineEmits(['isLoad', 'setUnit', 'setAmount']);
 onMounted(async () => {
@@ -67,7 +67,8 @@ const getUserBalance = async () => {
         return { contract: x.contract, symbol: x.symbol };
     }) as Coin[];
 
-    await getBalanceList(store.wallet().currentWallet.account, userCoins, (coin: Coin) => {
+    await getBalanceList(store.wallet().currentWallet.account, userCoins, (coin: Balance) => {
+        // console.log(coin);
         const selectedToken = tokens.value.find((x) => x.contract === coin.contract && x.symbol == coin.symbol);
 
         if (selectedToken) {
@@ -107,7 +108,7 @@ const getWalletCache = async () => {
     let rexEOS = 0.0;
     let rexCount = 0.0;
     if (chainStore.currentChainId === eosChainId) {
-        let response = await chain.get().getREXInfo(wallet.currentWallet.name);
+        let response: any = await chain.get().getREXInfo(wallet.currentWallet.name);
         rexEOS = response['rows'][0]['vote_stake'];
         rexCount = response['rows'][0]['rex_balance'];
     }

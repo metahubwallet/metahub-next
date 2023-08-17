@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChainToken, Coin } from '@/store/wallet/type';
+import { Balance, Coin } from '@/store/wallet/type';
 import CoinAddSelected from '@/asset/img/coin_add_selected.png';
 import CoinAdd from '@/asset/img/coin_add.png';
 
@@ -9,8 +9,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {});
 const emits = defineEmits(['update:isShow'])
 
-let chainTokens: ChainToken[] = [];
-const tokenList = ref<Coin[]>([]);
+let chainTokens: Coin[] = [];
+const tokenList = ref<Balance[]>([]);
 
 // 初始化组件
 watch(
@@ -34,18 +34,18 @@ watch(
 // 初始化token列表
 const wallet = store.wallet();
 const initTokens = () => {
-    let tokens: Coin[] = [];
+    let tokens: Balance[] = [];
     chainTokens = [];
     for (const chainToken of wallet.chainTokens) {
         console.log(chainToken);
         if (chainToken.contract == 'eosio.token') {
             continue;
         }
-        let coin = {} as Coin;
+        let coin = {} as Balance;
         Object.assign(coin, chainToken);
         coin.isShow =
             wallet.currentUserTokens.findIndex(
-                (x: ChainToken) => x.contract == coin.contract && x.symbol == coin.symbol
+                (x: Coin) => x.contract == coin.contract && x.symbol == coin.symbol
             ) >= 0;
         coin.amount = 0;
         tokens.push(coin);
@@ -54,7 +54,7 @@ const initTokens = () => {
         if (ut.contract == 'eosio.token') continue;
         if (tokens.findIndex((x) => x.contract == ut.contract && x.symbol == ut.symbol) >= 0) continue;
 
-        let coin = {} as Coin;
+        let coin = {} as Balance;
         Object.assign(coin, ut);
         coin.isShow = true;
         coin.push(coin);
@@ -72,13 +72,13 @@ const searchTokens = () => {
         (keywords.value == ''
             ? chainTokens.concat()
             : chainTokens.filter(
-                  (token: ChainToken) =>
+                  (token: Coin) =>
                       token.symbol.toLowerCase().includes(keywords.value) ||
                       token.contract.toLowerCase() == keywords.value
             )
-        ).map((token: ChainToken) => ({ ...token, amount: 0} as Coin));
+        ).map((token: Coin) => ({ ...token, amount: 0} as Balance));
     // sort
-    tokenList.value = tokens.sort((x: Coin, y: Coin) => {
+    tokenList.value = tokens.sort((x: Balance, y: Balance) => {
         if (x.symbol.toLowerCase() == keywords.value) return -1;
         if (y.symbol.toLowerCase() == keywords.value) return 1;
         if (x.isShow != y.isShow) return x.isShow ? -1 : 1;
@@ -88,7 +88,7 @@ const searchTokens = () => {
 };
 
 // 新增token
-const handleAddToken = async (token: Coin) => {
+const handleAddToken = async (token: Balance) => {
     if (token.isShow) {
         const index = wallet.currentUserTokens.findIndex(
             (x: Coin) => x.contract == token.contract && x.symbol == token.symbol

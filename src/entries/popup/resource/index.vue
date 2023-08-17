@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
 import { eosChainId } from '@/common/util/network';
-import { ResourceData } from '@/store/wallet/type';
+import { ResourceBase, ResourceData } from '@/store/wallet/type';
 import { toInteger } from 'lodash';
 
 // 初始化
@@ -36,93 +36,111 @@ const toLink = (url: string) => {
 };
 
 // 获取数据
-const stakeList = ref([]);
+const stakeList = ref([] as any);
 const ramprice = ref(0);
-let resourceData = ref({
-    total_resources: {
-        cpu_weight: 0,
-        net_weight: 0,
-    } as any,
-    ram_quota: 0,
-    ram_usage: 0,
-    stakeForOthersCPU: 0,
-    stakeForOthersNET: 0,
-    stakeCpuMax: 0,
-    stakeNetMax: 0,
-} as ResourceData);
+
+const memory: ResourceBase= reactive({
+    core_liquid_balance: '0.0000 EOS',
+    use_percentage: 0,
+    use_limit: {
+        max: 0,
+        used: 0,
+    },
+});
+
+const emptyCoin = '0.0000 ' + store.chain().currentSymbol;
+const empayRefund = { amount: 0, request_time: 0, left_time: '' };
+const emptyResourceData: ResourceData = {
+    core_liquid_balance: emptyCoin,
+    use_percentage: 0,
+    use_limit: {
+        max: 1,
+        used: 0,
+    },
+    stake_max: 0,
+    refund_request: empayRefund,
+    total_resources_weight: emptyCoin,
+    self_delegated_bandwidth_weight: emptyCoin,
+    staked_for_others: 0,
+    staked_for_user: 0,
+}
+const resources: { [key: string]: ResourceData } = reactive({
+    cpu: emptyResourceData,
+    net: emptyResourceData,
+});
 const loadData = async () => {
     try {
-        stakeList.value = await chain.get().getDelegatebwList(wallet.currentWallet.name);
-        const data: ResourceData = await chain.get().getAccount(wallet.currentWallet.name);
-
-        data.cpu_limit.percentage =
-            data.cpu_limit.max > 0 ? parseInt((data.cpu_limit.used / data.cpu_limit.max) * 100 + '') : 100;
-        if (data.cpu_limit.percentage > 100) {
-            data.cpu_limit.percentage = 100;
-        }
-        data.net_limit.percentage =
-            data.net_limit.max > 0 ? parseInt((data.net_limit.used / data.net_limit.max) * 100 + '') : 100;
-        if (data.net_limit.percentage > 100) {
-            data.net_limit.percentage = 100;
-        }
-        data.ram_percentage = parseInt((data.ram_usage / data.ram_quota) * 100 + '');
-        data.stakeCpuMax = parseFloat(data.core_liquid_balance);
-        if (data.refund_request) {
-            data.stakeCpuMax += data.refund_request.cpu_amount;
-        }
-        data.stakeCpuMax = Number(data.stakeCpuMax.toFixed(4));
-        data.stakeNetMax = parseFloat(data.core_liquid_balance);
-        if (data.refund_request) {
-            data.stakeNetMax += data.refund_request.net_amount;
-        }
-        data.stakeNetMax = Number(data.stakeNetMax.toFixed(4));
-        let stakeForOthersNET = 0;
         let stakeForOthersCPU = 0;
+        let stakeForOthersNET = 0;
+
+        stakeList.value = await chain.get().getDelegatebwList(wallet.currentWallet.name);
         stakeList.value.forEach((item: any) => {
             if (item.to != wallet.currentWallet.name) {
                 stakeForOthersNET += parseFloat(item.net_weight);
                 stakeForOthersCPU += parseFloat(item.cpu_weight);
             }
         });
-        const emptyCoin = '0.0000 ' + store.chain().currentSymbol;
-        if (!data.total_resources) {
-            data.total_resources = {
-                cpu_weight: emptyCoin,
-                net_weight: emptyCoin,
-            };
-        }
-        if (!data.self_delegated_bandwidth) {
-            data.self_delegated_bandwidth = {
-                cpu_weight: emptyCoin,
-                net_weight: emptyCoin,
-            };
-        }
-        data.stakeForUserCPU =
-            parseFloat(data.total_resources.cpu_weight) - parseFloat(data.self_delegated_bandwidth.cpu_weight);
-        data.stakeForUserNET =
-            parseFloat(data.total_resources.net_weight) - parseFloat(data.self_delegated_bandwidth.net_weight);
-        data.stakeForUserCPU = Number(data.stakeForUserCPU.toFixed(4));
-        data.stakeForUserNET = Number(data.stakeForUserNET.toFixed(4));
-        data.stakeForOthersCPU = Number(stakeForOthersCPU.toFixed(4));
-        data.stakeForOthersNET = Number(stakeForOthersNET.toFixed(4));
 
-        if (data.refund_request) {
-            let leftTime = new Date().getTime() - new Date(data.refund_request.request_time).getTime();
-            let minutes = 4320 - (leftTime / 60000 - 479); //赎回剩余分钟数
-            data.refund_request.left_time =
-                minutes > 0
-                    ? toInteger(minutes / 1440) + 'd ' + (toInteger(minutes / 60) % 24) + 'h ' + (minutes % 60) + 'm'
-                    : '-';
+        const account = (await chain.get().getAccount(wallet.currentWallet.name))!;
+        const core_liquid_balance = account.core_liquid_balance ?? emptyCoin;
+        resources.cpu = {
+            core_liquid_balance,
+            use_percentage: account.cpu_limit.max > 0 ? parseInt((account.cpu_limit.used / account.cpu_limit.max) * 100 + '') : 100,
+            use_limit: account.cpu_limit,
+            stake_max: parseFloat(core_liquid_balance),
+            refund_request: account.refund_request ? {
+                amount: parseFloat(account.refund_request.cpu_amount),
+                request_time: new Date(account.refund_request.request_time).getTime(),
+                left_time: '',
+            } : empayRefund,
+            total_resources_weight: account.total_resources ? account.total_resources.cpu_weight : emptyCoin,
+            self_delegated_bandwidth_weight: account.self_delegated_bandwidth ? account.self_delegated_bandwidth.cpu_weight : emptyCoin,
+            staked_for_others: Number(stakeForOthersCPU.toFixed(4)),
+            staked_for_user: 0,
+            
         }
-        resourceData.value = data;
+        resources.net = {
+            core_liquid_balance,
+            use_percentage: account.net_limit.max > 0 ? parseInt((account.net_limit.used / account.net_limit.max) * 100 + '') : 100,
+            use_limit: account.net_limit,
+            stake_max: parseFloat(core_liquid_balance),
+            refund_request: account.refund_request ? {
+                amount: parseFloat(account.refund_request.net_amount),
+                request_time: new Date(account.refund_request.request_time).getTime(),
+                left_time: '',
+            } : empayRefund,
+            total_resources_weight: account.total_resources ? account.total_resources.net_weight : emptyCoin,
+            self_delegated_bandwidth_weight: account.self_delegated_bandwidth ? account.self_delegated_bandwidth.cpu_weight : emptyCoin,
+            staked_for_others: Number(stakeForOthersNET.toFixed(4)),
+            staked_for_user: 0,
+        };
+        memory.use_limit.used = account.ram_usage;
+        memory.use_limit.max = account.ram_quota;
+        memory.use_percentage = parseInt((account.ram_usage / account.ram_quota) * 100 + '');
+
+        ['cpu', 'net'].forEach(x => {
+            if (resources[x].use_percentage > 100) {
+                resources[x].use_percentage = 100;
+            }
+            if (resources[x].refund_request.amount) {
+                const leftTime = new Date().getTime() - resources[x].refund_request.request_time;
+                const minutes = 4320 - (leftTime / 60000 - 479); //赎回剩余分钟数
+                resources[x].refund_request.left_time = minutes > 0 ? toInteger(minutes / 1440) + 'd ' + (toInteger(minutes / 60) % 24) + 'h ' + (minutes % 60) + 'm' : '-';
+            }
+            resources[x].stake_max += Number(resources[x].refund_request.amount.toFixed(4));
+            resources[x].staked_for_user = parseFloat(resources[x].total_resources_weight) - parseFloat(resources[x].self_delegated_bandwidth_weight);
+            resources[x].staked_for_user = Number(resources[x].staked_for_user.toFixed(4));
+        });
+
+
     } catch (e) {
         console.log(e);
         window.msg.error(e);
     }
     try {
         let rammarketData = await chain.get().getRamMarket();
-        let balance1 = parseFloat(rammarketData.rows[0].quote.balance);
-        let balance2 = parseFloat(rammarketData.rows[0].base.balance);
+        let balance1 = parseFloat(rammarketData!.rows[0].quote.balance);
+        let balance2 = parseFloat(rammarketData!.rows[0].base.balance);
         ramprice.value = (balance1 / balance2) * 1024;
     } catch (e) {
         window.msg.error('ramprice error');
@@ -189,7 +207,7 @@ const loadData = async () => {
                             @loadData="loadData"
                             class="res-item"
                             type="cpu"
-                            :resourceData="resourceData"
+                            :resources="resources"
                         ></row-resource>
 
                         <!-- net -->
@@ -197,7 +215,7 @@ const loadData = async () => {
                             @loadData="loadData"
                             class="res-item"
                             type="net"
-                            :resourceData="resourceData"
+                            :resources="resources"
                         ></row-resource>
 
                         <!-- ram -->
@@ -205,7 +223,7 @@ const loadData = async () => {
                             @loadData="loadData"
                             class="res-item"
                             :ramprice="ramprice"
-                            :resourceData="resourceData"
+                            :memory="memory"
                         ></row-ram>
                     </div>
                 </n-scrollbar>

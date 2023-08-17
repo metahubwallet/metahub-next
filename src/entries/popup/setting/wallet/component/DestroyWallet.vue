@@ -12,7 +12,7 @@ const showConfirmModal = ref(false);
 const handleConfirm = async () => {
     store.wallet().setWallets([]);
     store.wallet().setUserTokens({});
-    store.user().password = '';
+    store.user().setPassword('');
     store.user().setPasswordHash('');
     store.setting().setIsLock(true);
 

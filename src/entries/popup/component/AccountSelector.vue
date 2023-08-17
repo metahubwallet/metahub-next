@@ -26,7 +26,7 @@ watch(
 const emit = defineEmits(['close', 'importKey']);
 const handleLock = () => {
     emit('close');
-    store.user().password = '';
+    store.user().setPassword('')
     store.setting().setIsLock(true);
 };
 

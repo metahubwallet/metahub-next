@@ -3,7 +3,7 @@ import { ResourceData } from '@/store/wallet/type';
 
 interface Props {
     isShow: boolean;
-    resourceData: ResourceData;
+    resources: { [key: string]: ResourceData };
     type: string;
 }
 const props = withDefaults(defineProps<Props>(), {});
@@ -17,13 +17,13 @@ const props = withDefaults(defineProps<Props>(), {});
                 <div class="info-cell">
                     <span class="info-cell-key">{{ $t('resource.selfStake') }}：</span>
                     <span class="info-cell-value">
-                        {{ props.resourceData.self_delegated_bandwidth?.cpu_weight }}
+                        {{ props.resources.cpu.self_delegated_bandwidth_weight }}
                     </span>
                 </div>
                 <div class="info-cell">
                     <span class="info-cell-key">{{ $t('resource.otherStake') }}：</span>
                     <span class="info-cell-value">
-                        {{ props.resourceData.stakeForUserCPU }} EOS
+                        {{ props.resources.cpu.staked_for_user }} EOS
                     </span>
                 </div>
             </div>
@@ -33,13 +33,13 @@ const props = withDefaults(defineProps<Props>(), {});
                 <div class="info-cell">
                     <span class="info-cell-key">{{ $t('resource.selfStake') }}：</span>
                     <span class="info-cell-value">
-                        {{ props.resourceData.self_delegated_bandwidth?.net_weight }}
+                        {{ props.resources.net.self_delegated_bandwidth_weight }}
                     </span>
                 </div>
                 <div class="info-cell">
                     <span class="info-cell-key">{{ $t('resource.otherStake') }}：</span>
                     <span class="info-cell-value">
-                        {{ props.resourceData.stakeForUserNET }} EOS
+                        {{ props.resources.net.staked_for_user }} EOS
                     </span>
                 </div>
             </div>
