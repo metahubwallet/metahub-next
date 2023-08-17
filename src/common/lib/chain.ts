@@ -178,11 +178,8 @@ export default class Chain {
 
 
                 const signatures = transaction.requiredKeys.map((pub: string) => {
-                    console.log(pub);
                     const privateKey = Chain.getPrivateKeyByPublicKey(pub);
-                    console.log(privateKey);
                     const signature = Chain.get(transaction.chainId).signature(buffer, privateKey);
-                    console.log(signature);
                     return signature;
                 });
 
@@ -193,7 +190,6 @@ export default class Chain {
 
                 // const api = new Api({chainId, rpc: new JsonRpc('http://office.gogo8899.com:8888')});
                 // const trx = api.deserializeTransaction(transaction.serializedTransaction);
-                console.log(signatures);
                 return {
                     signatures,
                     serializedTransaction: transaction.serializedTransaction,

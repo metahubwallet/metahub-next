@@ -128,15 +128,16 @@ export const getTransactionList = async (chain: string, data: any) => {
             new URLSearchParams(data).toString();
         let res = await axios.get(url);
         const actions = res.data && res.data.actions ? res.data.actions : [];
-        actions.map((i: any) => {
+        return actions.map((i: any) => {
             let action = {} as any;
             action.receiver = i.act.data.to;
             action.sender = i.act.data.from;
             action.quantity = i.act.data.quantity;
             action.memo = i.act.data.memo;
+            console.log(action);
             return action;
         });
-        return actions;
+
     } catch (e) {
         console.error(e);
         return [];

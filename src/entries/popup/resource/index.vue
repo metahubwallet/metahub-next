@@ -68,6 +68,7 @@ const resources: { [key: string]: ResourceData } = reactive({
     cpu: emptyResourceData,
     net: emptyResourceData,
 });
+
 const loadData = async () => {
     try {
         let stakeForOthersCPU = 0;

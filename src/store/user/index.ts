@@ -8,7 +8,7 @@ export default defineStore('user', {
 
     actions: {
         async init() {
-            const result: any = (await chrome.storage.session.get(['isLock'])) ?? {};
+            const result: any = (await chrome.storage.session.get(['password'])) ?? {};
             this.password = result.password as string || '';
             this.passwordHash = (await localCache.get('passwordHash', '')) as string;
         },

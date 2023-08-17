@@ -186,7 +186,7 @@ const checkSubmit = () => {
                                 />
                                 <n-button
                                     @click="
-                                        transfer.amount = transfer.amount;
+                                        transfer.amount = targeMaxAmount;
                                         checkQuantity();
                                     "
                                     class="all-button rounded-none rounded-tr-[22px] rounded-br-[22px]"
