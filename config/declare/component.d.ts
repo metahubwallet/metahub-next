@@ -25,6 +25,7 @@ declare module '@vue/runtime-core' {
     IconDownOne: typeof import('@icon-park/vue-next')['DownOne']
     IconFileSuccess: typeof import('@icon-park/vue-next')['FileSuccess']
     IconHistory: typeof import('@icon-park/vue-next')['History']
+    IconLoadingFour: typeof import('@icon-park/vue-next')['LoadingFour']
     IconPlus: typeof import('@icon-park/vue-next')['Plus']
     IconRight: typeof import('@icon-park/vue-next')['Right']
     ImportBackUp: typeof import('./../../src/entries/popup/component/ImportBackUp.vue')['default']

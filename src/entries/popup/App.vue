@@ -12,4 +12,3 @@ import Index from './index.vue';
 </template>
 
 <style lang="scss" scoped></style>
-@/common/util/theme

@@ -134,7 +134,6 @@ export const getTransactionList = async (chain: string, data: any) => {
             action.sender = i.act.data.from;
             action.quantity = i.act.data.quantity;
             action.memo = i.act.data.memo;
-            console.log(action);
             return action;
         });
 

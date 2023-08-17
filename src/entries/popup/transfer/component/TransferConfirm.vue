@@ -10,6 +10,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {});
 const { t } = useI18n();
 const router = useRouter();
+const wallet = store.wallet();
+
+const submiting = ref(false);
 
 const receiver = computed(() => {
     const rsl = props.transfer.receiver.length;
@@ -25,9 +28,10 @@ const isShowMemo = computed(() => {
 });
 
 // 转账
-const wallet = store.wallet();
+
 const handleSubmit = async () => {
     try {
+        submiting.value = true;
         let receiver = props.transfer.receiver;
         let memo = props.transfer.memo;
         const isEthAddress = receiver.length == 42;
@@ -49,8 +53,6 @@ const handleSubmit = async () => {
         // console.log(recent);
         // console.log(wallet.recentTransfers);
 
-        console.log(await localCache.get('recentTransfers'));
-
         const params: [ string, string, string, string, string ] = [
             props.transfer.token.contract,
             wallet.currentWallet.name,
@@ -65,6 +67,8 @@ const handleSubmit = async () => {
     } catch (e) {
         console.log(e);
         window.msg.error(chain.getErrorMsg(e));
+    } finally {
+        submiting.value = false;
     }
 };
 </script>
@@ -97,8 +101,9 @@ const handleSubmit = async () => {
                 </span>
             </div>
         </div>
-        <n-button type="primary" @click="handleSubmit" class="submit-button">
-            {{ $t('wallet.transfer') }}
+        <n-button type="primary" @click="handleSubmit" class="submit-button" :disabled="submiting">
+            <span>{{ $t('wallet.transfer') }}</span>
+            <icon-loading-four class="ml-15" size="1rem" :spin="true" v-show="submiting"></icon-loading-four>
         </n-button>
     </popup-bottom>
 </template>

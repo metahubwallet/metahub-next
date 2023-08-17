@@ -352,7 +352,8 @@ export default class EOS {
             {
                 blocksBehind: 3,
                 expireSeconds: 30,
-            }
+            },
+            true
         );
     }
 
@@ -438,8 +439,7 @@ export default class EOS {
             if (transaction.actions[0].data.to == '1stbillpayer') {
                 isProxy = true;
             }
-        }
-        if (!options.broadcast || ignoreCPUProxy) {
+        } else if ((typeof options.broadcast != 'undefined' && options.broadcast == false) || ignoreCPUProxy) {
             isProxy = false;
         }
         if (!isProxy) {
@@ -451,6 +451,10 @@ export default class EOS {
             return trx;
         }
 
+        // 顺畅模式下执行免CPU操作
+        options.broadcast = false;
+        options.sign = true;
+
         for (const action of transaction.actions) {
             action.authorization.unshift({
                 actor: '1stbillpayer',
@@ -458,18 +462,16 @@ export default class EOS {
             });
         }
 
-        // 顺畅模式下执行免CPU操作
-        options.broadcast = false;
-        options.sign = true;
         let signedTrx = (await this.api.transact(transaction, options)) as any;
-        const trx = this.api.deserializeTransaction(signedTrx.serializedTransaction) as any;
-        trx.signatures = [signedTrx.signatures[0]];
 
+        const trx = this.api.deserializeTransaction(signedTrx.serializedTransaction) as any;
+        trx.signatures = signedTrx.signatures;
+        
         let data = { signed: JSON.stringify(trx) };
-        let res = await api.resource.pushTx(data);
-        if (res && res.data && res.data.code == 200) {
-            const serverSignature = res.data.result.signature;
-            const signatures = [serverSignature, signedTrx.signatures[0]];
+        let res: any = await api.resource.pushTx(data);
+        if (res && res.result) {
+            const serverSignature = res.result.signature;
+            const signatures = [serverSignature, ...signedTrx.signatures];
             return this.rpc.push_transaction({
                 signatures,
                 serializedTransaction: signedTrx.serializedTransaction,
@@ -477,7 +479,9 @@ export default class EOS {
             });
         } else {
             let msg = 'unkonwn error';
-            if (res && res.data && res.data.message) msg = res.data.message;
+            if (res && res.message) {
+                msg = res.message;
+            }
             console.log('error', msg);
             throw new Error(msg);
         }

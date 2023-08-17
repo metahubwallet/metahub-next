@@ -7,6 +7,7 @@ export const setupComponent = () => {
         dirs: ['src/**/component'],
         resolvers: [
             NaiveUiResolver(),
+            // iconpark组件按需引入
             (componentName) => {
                 if (componentName.startsWith('Icon')) {
                     return { name: componentName.slice(4), from: '@icon-park/vue-next' };

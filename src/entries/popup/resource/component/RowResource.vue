@@ -202,7 +202,7 @@ const handleSubmit = async () => {
                     <span>{{ $t('resource.staked') }}</span>
                     <span class="small">
                         {{
-                            props.resources[props.type ].total_resources_weight
+                            props.resources[props.type].total_resources_weight
                         }}
                     </span>
                 </div>
