@@ -26,7 +26,7 @@ onMounted(() => {
 // 获取余额
 const getBalance = async () => {
     const balance = await chain
-        .get()
+        .getApi()
         .getCurrencyBalance(token.value.contract, wallet.currentWallet.name, token.value.symbol);
     if (balance) {
         token.value.amount = Number(balance.split(' ')[0]);

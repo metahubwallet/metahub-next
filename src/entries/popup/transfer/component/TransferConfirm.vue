@@ -61,7 +61,7 @@ const handleSubmit = async () => {
             memo,
         ];
 
-        await chain.get().transfer(...params, chain.getAuth());
+        await chain.getApi().transfer(...params, chain.getAuth());
         window.msg.success(t('wallet.transferSuccess'));
         router.go(-1);
     } catch (e) {
@@ -103,7 +103,7 @@ const handleSubmit = async () => {
         </div>
         <n-button type="primary" @click="handleSubmit" class="submit-button" :disabled="submiting">
             <span>{{ $t('wallet.transfer') }}</span>
-            <icon-loading-four class="ml-15" size="1rem" :spin="true" v-show="submiting"></icon-loading-four>
+            <icon-loading-four class="ml-4" size="1rem" :spin="true" v-show="submiting"></icon-loading-four>
         </n-button>
     </popup-bottom>
 </template>

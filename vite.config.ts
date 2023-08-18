@@ -10,7 +10,7 @@ export default defineConfig({
     css,
     build: {
         // assetsInlineLimit: 100000,
-        chunkSizeWarningLimit: 10000,
+        chunkSizeWarningLimit: 1000,
         // rollupOptions: {
         //     output: {
         //         inlineDynamicImports: true

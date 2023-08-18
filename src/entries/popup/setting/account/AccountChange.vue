@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import chain from '@/common/lib/chain';
+import { isValidPublic } from '@/common/lib/keyring';
 import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 
 const permissions = ref<Permission[]>([]);
@@ -30,9 +31,9 @@ const walleAuthType = computed(() => {
     else return 'active';
 });
 const onSubmit = async () => {
-    if (!chain.get(chainId.value).isValidPublic(newOperateKey.value))
+    if (!isValidPublic(newOperateKey.value))
         return window.msg.error(t('setting.invalidPublicKey'));
-    let newPerms = chain.get(chainId.value).updateNewPermissions(
+    let newPerms = chain.getApi(chainId.value).updateNewPermissions(
         perms.value,
         authType.value, // active or others
         operateType.value, // modify or add
@@ -42,7 +43,7 @@ const onSubmit = async () => {
     newPerms = newPerms.filter((x: any) => x.perm_name == authType.value);
     try {
         await chain
-            .get(chainId.value)
+            .getApi(chainId.value)
             .updatePerms(
                 account.value,
                 newPerms,

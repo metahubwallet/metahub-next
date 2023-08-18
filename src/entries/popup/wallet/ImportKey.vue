@@ -6,6 +6,7 @@ import bs58 from 'bs58';
 import { Address } from 'ethereumjs-util';
 import chain from '@/common/lib/chain';
 import { getKeyAccounts, lightKey } from '@/common/lib/remote';
+import { isValidPrivate, privateToPublic } from '@/common/lib/keyring';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -45,7 +46,7 @@ const handleImportKey = async () => {
     /** 循环遍历需要取的协议 */
     const importAccounts = [];
     let tipMessage = t('public.noAccountForPrivateKey');
-    let isKey = chain.get().isValidPrivate(privateKey.value);
+    let isKey = isValidPrivate(privateKey.value);
 
     let ethAddress = '';
 
@@ -72,7 +73,7 @@ const handleImportKey = async () => {
         chainAccount.blockchain = 'eos'; // eth, tron ...
         chainAccount.smoothMode = false; // 默认关闭顺畅模式
 
-        const publicKey = chain.get(network?.chainId).privateToPublic(privateKey.value);
+        const publicKey = privateToPublic(privateKey.value);
         const privateValue = encrypt(privateKey.value, md5(chainAccount.seed + store.user().password));
         const key = { publicKey, privateKey: privateValue, permissions: [] };
         chainAccount.keys = [key];
@@ -83,7 +84,7 @@ const handleImportKey = async () => {
             });
 
             if (accounts.length == 0)
-                if (accounts.length == 0) accounts = await chain.get(network?.chainId).getKeyAccounts(publicKey);
+                if (accounts.length == 0) accounts = await chain.getApi(network?.chainId).getKeyAccounts(publicKey);
             tipMessage = t('public.noAccountForPrivateKey');
 
             for (let account of accounts) {

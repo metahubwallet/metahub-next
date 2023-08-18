@@ -14,7 +14,6 @@ const submit = () => {
     if (passwordHash != store.user().passwordHash) return window.msg.error(t('password.error'));
 
     // 持久化存储锁屏状态，有效1d
-    store.setting().setIsLock(false);
     store.user().setPassword(password1(password.value));
     router.push({ name: 'index' });
 };

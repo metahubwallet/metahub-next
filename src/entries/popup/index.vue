@@ -15,12 +15,6 @@ onBeforeMount(async () => {
     await user.init();
     await setting.init();
 
-    if (Windows.getCount() == 0) {
-        // chrome.action.setIcon({
-        //     path: '../static/metahub-128.png',
-        // });
-    }
-
 });
 
 
@@ -52,7 +46,7 @@ watch(
 <template>
     <div class="overflow-hidden">
         <!-- 已解锁钱包 -->
-        <div v-if="!setting.isLock" class="bg">
+        <div v-if="!user.isLock" class="bg">
             <top-nav @change-account="showAccountSelector = true"></top-nav>
 
             <div class="app-content">
@@ -70,7 +64,7 @@ watch(
         </div>
 
         <!-- 未解锁钱包但已初始化 -->
-        <div class="bg" v-else-if="user.passwordHash">
+        <div class="bg" v-else-if="user.isInited">
             <password-unlock></password-unlock>
         </div>
 

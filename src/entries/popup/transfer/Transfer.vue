@@ -59,7 +59,7 @@ const checkReceiver = async () => {
         return (receiverError.value = t('wallet.errorReceiver'));
     else {
         isShowMemo.value = true;
-        let accountData = await chain.get().getAccount(transfer.receiver);
+        let accountData = await chain.getApi().getAccount(transfer.receiver);
         if (accountData == null) return (receiverError.value = t('wallet.accountNotExist'));
     }
     receiverError.value = '';
@@ -100,9 +100,7 @@ const handleChangeToken = (coin: Balance) => {
 
 // 获取余额
 const getBalance = async () => {
-    const balance = await chain
-        .get()
-        .getCurrencyBalance(transfer.token.contract, wallet.currentWallet.name, transfer.token.symbol);
+    const balance = await chain.getApi().getCurrencyBalance(transfer.token.contract, wallet.currentWallet.name, transfer.token.symbol);
     if (balance) {
         targeMaxAmount.value = Number(balance.split(' ')[0]);
     }

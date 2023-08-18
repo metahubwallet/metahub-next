@@ -66,11 +66,11 @@ const handleRemove = async (
     newOperateKey?: string
 ) => {
     let newPerms = await chain
-        .get(chainId.value)
+        .getApi(chainId.value)
         .updateNewPermissions(perms, authType, operateType, oldOperateKey, newOperateKey);
     try {
         await chain
-            .get(chainId.value)
+            .getApi(chainId.value)
             .updatePerms(account.value, newPerms, chain.getAuthByAccount(account.value.name, walletAuthType));
         perms = newPerms;
         window.msg.success(t('public.executeSuccess'));

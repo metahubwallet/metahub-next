@@ -26,8 +26,7 @@ watch(
 const emit = defineEmits(['close', 'importKey']);
 const handleLock = () => {
     emit('close');
-    store.user().setPassword('')
-    store.setting().setIsLock(true);
+    store.user().setLocked();
 };
 
 // 获取网络图标

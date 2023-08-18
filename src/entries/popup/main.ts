@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import { setupRouter } from '@/router';
+import { setupRouter } from './router';
 import App from './App.vue';
 import '@/asset/css/base.scss';
 import 'animate.css';

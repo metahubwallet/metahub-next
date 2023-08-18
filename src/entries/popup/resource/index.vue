@@ -74,7 +74,7 @@ const loadData = async () => {
         let stakeForOthersCPU = 0;
         let stakeForOthersNET = 0;
 
-        stakeList.value = await chain.get().getDelegatebwList(wallet.currentWallet.name);
+        stakeList.value = await chain.getApi().getDelegatebwList(wallet.currentWallet.name);
         stakeList.value.forEach((item: any) => {
             if (item.to != wallet.currentWallet.name) {
                 stakeForOthersNET += parseFloat(item.net_weight);
@@ -82,7 +82,7 @@ const loadData = async () => {
             }
         });
 
-        const account = (await chain.get().getAccount(wallet.currentWallet.name))!;
+        const account = (await chain.getApi().getAccount(wallet.currentWallet.name))!;
         const core_liquid_balance = account.core_liquid_balance ?? emptyCoin;
         resources.cpu = {
             core_liquid_balance,
@@ -139,7 +139,7 @@ const loadData = async () => {
         window.msg.error(e);
     }
     try {
-        let rammarketData = await chain.get().getRamMarket();
+        let rammarketData = await chain.getApi().getRamMarket();
         let balance1 = parseFloat(rammarketData!.rows[0].quote.balance);
         let balance2 = parseFloat(rammarketData!.rows[0].base.balance);
         ramprice.value = (balance1 / balance2) * 1024;

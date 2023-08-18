@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
+import { getRandomKeyPair } from '@/common/lib/keyring';
 
 interface Props {
     isShow: boolean;
@@ -20,7 +21,7 @@ watch(
 const publicKey = ref('');
 const privateKey = ref('');
 const handleGenerateKey = async () => {
-    let keypair = await chain.get(props.chainId).getRandomPairKey();
+    let keypair = await getRandomKeyPair();
     if (keypair) {
         publicKey.value = keypair.publicKey;
         privateKey.value = keypair.privateKey;

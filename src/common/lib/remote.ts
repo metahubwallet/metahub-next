@@ -99,7 +99,7 @@ export const getBalanceList = async (
         // to use: http://light-api/api/account/CHAIN/ACCOUNT
         const balances = [] as Balance[];
         for (const t of tokens) {
-            const balance = await chain.get().getCurrencyBalance(t.contract, account, t.symbol);
+            const balance = await chain.getApi().getCurrencyBalance(t.contract, account, t.symbol);
             const amount = balance ? parseFloat(balance.split(' ')[0]) : 0;
             const item: Balance = { ...t, amount };
             balances.push(item);

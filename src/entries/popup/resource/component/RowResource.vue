@@ -31,7 +31,7 @@ const wallet = store.wallet();
 const emit = defineEmits(['loadData']);
 const refundNow = async () => {
     try {
-        await chain.get().refund(wallet.currentWallet.name, chain.getAuth());
+        await chain.getApi().refund(wallet.currentWallet.name, chain.getAuth());
 
         window.msg.success(t('resource.stakeSuccess'));
         emit('loadData');
@@ -105,7 +105,7 @@ const formatValue = (value: number) => {
 const getPowupState = async () => {
     let powupState = (await localCache.get('powupState', null)) as any;
     if (powupState == null || (powupState && Date.now() - powupState.timestamp > 86400000)) {
-        const result = await chain.get().getPowupState();
+        const result = await chain.getApi().getPowupState();
         if (result) {
             powupState = {
                 state: result,
@@ -129,7 +129,7 @@ const handleSubmit = async () => {
     try {
         if (action.value == 'stake') {
             await chain
-                .get()
+                .getApi()
                 .delegatebw(
                     wallet.currentWallet.name,
                     receiver.value,
@@ -140,7 +140,7 @@ const handleSubmit = async () => {
                 );
         } else if (action.value == 'refund') {
             await chain
-                .get()
+                .getApi()
                 .undelegatebw(wallet.currentWallet.name, receiver.value, netQuantity, cpuQuantity, chain.getAuth());
         } else if (action.value == 'rent') {
             let parms = powerup(
@@ -152,7 +152,7 @@ const handleSubmit = async () => {
             );
             console.log(parms);
 
-            await chain.get().powerup(parms, chain.getAuth());
+            await chain.getApi().powerup(parms, chain.getAuth());
         }
         window.msg.success(t('resource.stakeSuccess'));
 

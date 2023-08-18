@@ -4,7 +4,7 @@ import * as MessageTypes from '../../common/lib/messages/types';
 import { API_URL } from '@/common/constants';
 
 /* eslint-disable */
-//todo: getIdentity, arbitrarySignature, transcation 要在页面显示一个加载符号？
+// todo: getIdentity, arbitrarySignature, transcation 要在页面显示一个加载符号？
 // disconnect
 // isConnected
 // isPaired
@@ -47,13 +47,7 @@ const signatureProvider = (chainId: string) => {
         },
 
         async sign(signatureArgs: SignaturePayloadArgs) {
-            // args
-            // abis
-            // chainId
-            // requiredKeys
-            // serializedTransaction
 
-            //signargs.network = network;
             const params: Partial<SignaturePayload> = {
                 chainId: signatureArgs.chainId,
                 requiredKeys: [],
@@ -61,6 +55,7 @@ const signatureProvider = (chainId: string) => {
                 serializedContextFreeData: [],
                 abis: [],
             };
+
             //Uint8Array to array
             params.serializedTransaction = Array.from(signatureArgs.serializedTransaction);
             if (signatureArgs.serializedContextFreeData) {
@@ -68,15 +63,6 @@ const signatureProvider = (chainId: string) => {
             }
             const result = (await Message.signal<SignaturePayload>(MessageTypes.REQUEST_SIGNATURE, params).request()) as SignatureResult;
 
-            // console.log(result);
-            
-            // const signBuf = Buffer.concat([
-            //   new Buffer(chainId, "hex"), new Buffer(serializedTransaction), new Buffer(new Uint8Array(32)),
-            // ]);
-            
-            // const signatures = requiredKeys.map(
-            //   (pub) => ecc.Signature.sign(signBuf, ecc.PublicKey.fromString(pub).toString()).toString(),
-            // );
             return {
                 signatures: result.signatures,
                 serializedTransaction: signatureArgs.serializedTransaction
@@ -97,8 +83,12 @@ class Dapp {
     }
 
     async init() {
-        this.identity = await this.getIdentityFromPermissions();
-
+        try {
+            this.identity = await this.getIdentityFromPermissions();
+        } catch (e) {
+            console.log(e);
+        }
+        console.log('inited');
         document.dispatchEvent(new CustomEvent("metahubLoaded"));
         document.dispatchEvent(new CustomEvent("scatterLoaded"));
     }
@@ -181,7 +171,7 @@ class Dapp {
     // support for eos1 is no longer available
     eos(network: Network, Api: any, options: any) {
         console.log('call eos2');
-        // const api = chain.get(network.chainId);
+        // const api = chain.getApi(network.chainId);
         const chainId = options.chainId ? options.chainId : network.chainId;
         options.chainId = chainId;
         options.signatureProvider = signatureProvider(chainId);

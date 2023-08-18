@@ -39,7 +39,7 @@ const pingEndpoints = async (endpoints: RPC[]) => {
     for (let item of endpoints) {
         const startTimestamp = new Date().getTime();
         try {
-            await chain.get().testHttpEndpoint(item.endpoint);
+            await chain.getApi().testHttpEndpoint(item.endpoint);
             const endTimestamp = new Date().getTime();
             const timeInterval = endTimestamp - startTimestamp;
             item.delay = timeInterval + 'ms';
@@ -58,7 +58,7 @@ const handleSelectNode = (item: RPC) => {
 
     // 更新URL
     try {
-        chain.get(chainId.value).updateHttpEndpoint(item.endpoint);
+        chain.getApi(chainId.value).updateHttpEndpoint(item.endpoint);
     } catch (error) {
         console.log(error);
         window.msg.error(error);
@@ -111,7 +111,7 @@ const addCustomEndpoint = async () => {
 
     const startTimestamp = new Date().getTime();
     try {
-        await chain.get().testHttpEndpoint(completeUrl);
+        await chain.getApi().testHttpEndpoint(completeUrl);
     } catch (e) {
         return window.msg.error(chain.getErrorMsg(e));
     }

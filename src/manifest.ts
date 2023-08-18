@@ -1,3 +1,4 @@
+import { AdditionalInput } from 'vite-plugin-web-extension';
 import pkg from '../package.json';
 
 const manifest: Partial<chrome.runtime.ManifestV3> = {
@@ -36,7 +37,7 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
     //       matches: [ '*://*/*' ],
     //     },
     // ],
-    permissions: ['storage', 'unlimitedStorage', 'alarms'],
+    permissions: ['storage', 'unlimitedStorage', 'alarms', 'system.display' ],
 };
 
 export function getManifest(): chrome.runtime.ManifestV3 {
@@ -50,7 +51,7 @@ export function getManifest(): chrome.runtime.ManifestV3 {
     };
 }
 
-export function additionalInputs() {
+export function additionalInputs() : { [key: string]: AdditionalInput[] } {
     return {
         scripts: [
             {
@@ -59,6 +60,12 @@ export function additionalInputs() {
                     matches: ["<all_urls>"],
                     isInject: true,
                 },
+            }
+        ],
+        html: [
+            {
+                fileName: 'src/entries/windows/index.html',
+                webAccessible: true,
             }
         ],
     };

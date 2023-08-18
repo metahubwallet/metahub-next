@@ -1,12 +1,13 @@
-import EOS from '@/common/lib/eos';
+import EosApi from '@/common/lib/eosApi';
 import { decrypt, md5 } from '@/common/util/crypto';
 import { ErrorCode } from '@/common/util/type';
 import { i18n } from '../plugin/lang';
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { signature } from './keyring';
 
 export default class Chain {
-    static chains: { [key: string]: EOS } = {};
+    static apis: { [key: string]: EosApi } = {};
 
     static getCurrentPrivateKey() {
         if (store.wallet().wallets.length == 0) return '';
@@ -65,12 +66,12 @@ export default class Chain {
         return store.wallet().currentWallet;
     }
 
-    static get(chainId: string = '') {
+    static getApi(chainId: string = '') {
         if (chainId == '') chainId = store.chain().currentChainId;
-        if (typeof this.chains[chainId] == 'undefined') {
-            this.chains[chainId] = new EOS(chainId, store.chain().getSelectedRpc(chainId) as string, this);
+        if (typeof this.apis[chainId] == 'undefined') {
+            this.apis[chainId] = new EosApi(chainId, store.chain().getSelectedRpc(chainId) as string, this);
         }
-        return this.chains[chainId];
+        return this.apis[chainId];
     }
 
     static getAuth() {
@@ -124,6 +125,7 @@ export default class Chain {
         return i18n.global.t('public.requestHttpEndpointTimeout');
     }
 
+    // todo: 分离出来
     static authorityProvider(chainId: string) {
         return {
             getRequiredKeys: async ({
@@ -179,8 +181,7 @@ export default class Chain {
 
                 const signatures = transaction.requiredKeys.map((pub: string) => {
                     const privateKey = Chain.getPrivateKeyByPublicKey(pub);
-                    const signature = Chain.get(transaction.chainId).signature(buffer, privateKey);
-                    return signature;
+                    return signature(buffer, privateKey);
                 });
 
                 // console.log('');
@@ -227,7 +228,7 @@ export default class Chain {
         let wallet = store.wallet().wallets[index];
 
         try {
-            const accinfo = await this.get(chainId).getAccount(account);
+            const accinfo = await Chain.getApi(chainId).getAccount(account);
             if (!accinfo) throw new Error('fetch account eror');
             result.permissions = accinfo.permissions;
 

@@ -12,9 +12,8 @@ const showConfirmModal = ref(false);
 const handleConfirm = async () => {
     store.wallet().setWallets([]);
     store.wallet().setUserTokens({});
-    store.user().setPassword('');
     store.user().setPasswordHash('');
-    store.setting().setIsLock(true);
+    store.user().setLocked();
 
     router.push('/');
     window.msg.success(t('password.deleteSuccess'));

@@ -33,7 +33,6 @@ const { values, errors, handleSubmit } = useForms(schema);
 const onSubmit = handleSubmit(() => {
     store.user().setPassword(password1(values.password));
     store.user().setPasswordHash(password2(values.password));
-    store.setting().setIsLock(false);
     router.push({ name: 'index' });
 });
 

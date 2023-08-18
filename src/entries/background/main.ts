@@ -1,29 +1,14 @@
-import { AccountPayload, ArbitrarySignaturePayload, SignatureResult, RequiredKeysPayload, LoginPayload, Message, Payload, SignaturePayload } from '@/common/lib/messages/message';
+import { AccountPayload, ArbitrarySignaturePayload, SignatureResult, RequiredKeysPayload, LoginPayload, Message, Payload, SignaturePayload, Identity } from '@/common/lib/messages/message';
 import * as MessageTypes from '@/common/lib/messages/types';
 import { Auth, AuthStore, Wallet, WhiteItem } from '@/store/wallet/type';
 import SdkError from '@/common/lib/sdkError';
 import Windows from '@/common/lib/windows';
-// import Eos from '@/common/lib/eos';
 import { Network as ChainNetwork, RPC } from '@/store/chain/type';
-// import { decrypt, md5 } from '@/common/util/crypto';
+import { signature } from '@/common/lib/keyring';
+import { decrypt, md5 } from '@/common/util/crypto';
+import { Api, JsonRpc } from 'eosjs';
 
 console.log('run...');
-// fake methods start
-function decrypt(key: string, content: string) {
-    return key + content;
-}
-
-function md5(str: string) {
-    return str;
-}
-
-const eos = {
-    endpoint: '',
-    signature: (data: any, privateKey: string, arbitrary = false, isHash = false) : string => {
-        return {} as any;
-    },
-}
-// fake methods end
 
 let cachedInfo: any;
 
@@ -98,46 +83,44 @@ async function dispenseMessage(sendResponse: Function, message: Message<any> ) {
     sendResponse(response);
 }
 
-function getIdentity(payload: LoginPayload) {
-    return new Promise(async (resolve) => {
-        // fill chainId
-        if (!payload.chainId && payload.accounts && payload.accounts.length) {
-            const network = payload.accounts[0];
-            payload.chainId = network.chainId;
+async function getIdentity(payload: LoginPayload) : Promise<Identity> {
+
+    // fill chainId
+    if (!payload.chainId && payload.accounts && payload.accounts.length) {
+        const network = payload.accounts[0];
+        payload.chainId = network.chainId;
+    }
+    if (!payload.newLogin) {
+        const accounts = await getAuthorizations(payload.domain, payload.chainId);
+        if (accounts && accounts.length) {
+            return generateIdengity(accounts);
         }
-        if (!payload.newLogin) {
-            const accounts = await getAuthorizations(payload.domain, payload.chainId);
-            if (accounts && accounts.length) {
-                resolve(generateIdengity(accounts));
-                return;
-            }
+    }
+    try {
+        const result = await Windows.createWindow('login', 450, 600, payload);
+        //save...
+        const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
+        const account = Object.assign({}, result.data);
+        account.expire = Date.now() + 86400 * 7 * 1000;
+        let auth = authorizations.find((x) => x.domain == payload.domain) as AuthStore;
+        if (!auth) {
+            auth = { domain: payload.domain, accounts: [], actor: '', permission: '' };
+            authorizations.push(auth);
         }
-        Windows.createWindow('login', 450, 600, payload, async (result: { code: number; data: any }) => {
-            if (result.code < 0) {
-                resolve(SdkError.signatureError('identity_rejected', 'User rejected the provision of an Identity'));
-                return;
-            }
-            //save...
-            const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
-            const account = Object.assign({}, result.data);
-            account.expire = Date.now() + 86400 * 7 * 1000;
-            let auth = authorizations.find((x) => x.domain == payload.domain) as AuthStore;
-            if (!auth) {
-                auth = { domain: payload.domain, accounts: [], actor: '', permission: '' };
-                authorizations.push(auth);
-            }
-            const index = auth.accounts.findIndex(
-                (x) => x.chainId == account.chainId && x.name == account.name && x.authority == account.authority
-            );
-            if (index >= 0) {
-                auth.accounts.splice(index, 1);
-            }
-            auth.accounts.unshift(account);
-            chrome.storage.local.set({ authorizations });
-            const accounts = await getAuthorizations(payload.domain, payload.chainId);
-            resolve(generateIdengity(accounts));
-        });
-    });
+        const index = auth.accounts.findIndex(
+            (x) => x.chainId == account.chainId && x.name == account.name && x.authority == account.authority
+        );
+        if (index >= 0) {
+            auth.accounts.splice(index, 1);
+        }
+        auth.accounts.unshift(account);
+        chrome.storage.local.set({ authorizations });
+        const accounts = await getAuthorizations(payload.domain, payload.chainId);
+        return generateIdengity(accounts);
+    } catch (e) {
+        console.log(e);
+        throw SdkError.signatureError('identity_rejected', 'User rejected the provision of an Identity');
+    }
 }
 
 
@@ -183,7 +166,7 @@ async function getAuthorizations(domain: string, chainId = '*') {
     return [];
 }
 
-function generateIdengity(accounts: any[]) {
+function generateIdengity(accounts: any[]) : Identity {
     return {
         accounts: accounts.map((x) => {
             const id = {
@@ -249,6 +232,7 @@ async function requestChainInfo(payload: Payload) {
 }
 
 async function cacheChainInfo(chainId: string) {
+    // todo: cachedInfo use localStoreage or sessionStoreage
     if (!cachedInfo) cachedInfo = {};
 
     const info = await getEosInfo(chainId);
@@ -295,13 +279,16 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         actions: [] as any[],
         authorization: {} as Auth,
         encryptText: '',
+        buffer: Buffer.from([]),
     };
     let account: any; // old
     const authAccounts: string[] = []; // new
     const authorizations = await getAuthorizations(payload.domain, payload.chainId);
     if ('serializedTransaction' in payload) {
         // payload.transaction
-        newPayload.actions = await parseEosjsRequest(payload, eos.endpoint);
+        const result = await parseEosjsRequest(payload);
+        newPayload.actions = result.actions;
+        newPayload.buffer = result.buffer;
 
         // -- old start --
         const authIdx = newPayload.actions[0].authorization.length - 1;
@@ -353,7 +340,7 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         throw SdkError.signatureError('signature_rejected', 'you have no permission for this operation');
     }
 
-    //check whitelist
+    // check whitelist
     if (newPayload.actions.length > 0) {
         //只检查单个的action
         const whitelist = (await localCache.get('whitelist', [])) as WhiteItem[];
@@ -377,7 +364,8 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
             } else allMatch = false;
         }
         if (allMatch) {
-            if (vars.isLock) {
+            const locked = (await getPassword()) == '';
+            if (locked) {
                 //to unlock
                 const result = (await new Promise((resolve) => {
                     Windows.createWindow('unlock', 500, 450, newPayload, async (result: any) => {
@@ -394,8 +382,8 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
             }
             // todo, through permission
             const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
-            const signature = eos.signature(payload, privateKey);
-            return { signatures: [ signature ] };
+            const sig = signature(newPayload.buffer, privateKey);
+            return { signatures: [ sig ] };
         } else {
             window.msg.error('not match');
         }
@@ -430,11 +418,12 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
                 }
 
                 const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
-                let arbitrary = false;
-                if (newPayload.actions.length == 0) arbitrary = true;
-
-                const signature = eos.signature(payload, privateKey, arbitrary, false);
-                resolve({ signatures: [ signature ] });
+                let arbitrary = newPayload.actions.length > 0;
+                if (newPayload.actions.length == 0) {
+                    arbitrary = true;
+                } 
+                const sig = signature(arbitrary ? newPayload.encryptText : newPayload.buffer, privateKey, arbitrary);
+                resolve({ signatures: [ sig ] });
             }
         );
     });
@@ -457,7 +446,8 @@ async function getPrivateKey(chainId: string, publicKey: string) {
     if (!privateKey) {
         return '';
     }
-    return decrypt(privateKey, md5(seed + vars.password));
+    const password = await getPassword();
+    return decrypt(privateKey, md5(seed + password));
 }
 
 async function requestArbitrarySignature(payload: ArbitrarySignaturePayload) {
@@ -517,26 +507,31 @@ async function cacheChainInfoInterval() {
     }
 }
 
-async function parseEosjsRequest(payload: SignaturePayload, endpoint: string) {
+async function parseEosjsRequest(payload: SignaturePayload) {
 
-    const buffer = Buffer.from(Uint8Array.from(payload.serializedTransaction).toString(), 'hex');
-    const parsed = await deserializeTransactionWithActions(buffer);
+    const trxBuf = Buffer.from(Uint8Array.from(payload.serializedTransaction).toString(), 'hex');
+    const parsed = await deserializeTransactionWithActions(trxBuf);
     const actions = parsed.actions.map((account: string, name: string, ...x: any[]) => ({
         ...x,
         code: account,
         type: name,
     }));
 
-    // payload.buf = Buffer.concat([
-    //     Buffer.from(transaction.chainId, 'hex'), // Chain ID
-    //     buffer, // Transaction
-    //     Buffer.from(new Uint8Array(32)), // Context free actions
-    // ]);
-    return actions;
+    const buffer = Buffer.concat([
+        Buffer.from(payload.chainId, 'hex'), // Chain ID
+        trxBuf, // Transaction
+        Buffer.from(new Uint8Array(32)), // Context free actions
+    ]);
+    return { actions, buffer };
 }
 
 async function deserializeTransactionWithActions(buffer: Buffer): Promise<any> {
-    return {};
+    // create empty api
+    const api = new Api({ rpc: new JsonRpc(''), signatureProvider: {
+        getAvailableKeys: async () => [],
+        sign: async (args : any) => ({ signatures: [], serializedTransaction: args.serializedTransaction }),
+    } });
+    return api.deserializeTransactionWithActions(buffer);
 }
 
 async function getEosInfo(chainId: string) {
@@ -558,6 +553,11 @@ async function getEosRawAbi(chainId: string, account_name: string) {
     return result.abi;
 }
 
+async function getPassword() {
+    const result: any = (await chrome.storage.session.get(['password'])) ?? {};
+    return result.password as string || '';
+}
+
 // Initialize the demo on install
 chrome.runtime.onInstalled.addListener(({ reason }) => {
     setupMessageListener();
@@ -569,17 +569,11 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
     });
 });
 
-
-export const vars = {
-    isLock: true,
-    password: '', // todo,改成异部方式获取？
-};
-
-// 监听退出了浏览器,下次需要输入密码
-chrome.windows.onRemoved.addListener((windowId) => {
-    chrome.windows.getAll((windows) => {
-        if (windows.length == 0) {
-            vars.isLock = true;
-        }
-    });
-});
+// // 监听退出了浏览器,下次需要输入密码
+// chrome.windows.onRemoved.addListener((windowId) => {
+//     chrome.windows.getAll((windows) => {
+//         if (windows.length == 0) {
+//              lock
+//         }
+//     });
+// });

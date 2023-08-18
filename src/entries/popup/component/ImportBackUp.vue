@@ -99,13 +99,15 @@ const importWalletsFromData = async (content: string) => {
     store.chain().setCurrentNetwork(importData.currentNetwork);
     store.chain().setSelectedRpc(importData.selectedRpc);
     store.chain().setCustomRpcs(importData.customRpcs);
+    
     store.wallet().setWallets(importData.wallets);
     store.wallet().setSelectedIndex(importData.selectedIndex);
     store.wallet().setUserTokens(importData.userTokens);
-    store.user().setPassword(importData.password);
+    
     store.user().setPasswordHash(importData.passwordHash);
+    store.user().setLocked();
+
     changeLang(importData.language);
-    store.setting().setIsLock(true);
 
     router.push({ name: 'index' });
 

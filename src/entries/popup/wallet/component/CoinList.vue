@@ -87,7 +87,7 @@ const handleGetEosPrice = async () => {
         emit('setAmount', eosToken.amount);
 
         if (eosToken.chain === 'eos') {
-            const eosPrice = await chain.get().getEosPrice();
+            const eosPrice = await chain.getApi().getEosPrice();
 
             emit('setUnit', 'usd');
             emit(
@@ -108,7 +108,7 @@ const getWalletCache = async () => {
     let rexEOS = 0.0;
     let rexCount = 0.0;
     if (chainStore.currentChainId === eosChainId) {
-        let response: any = await chain.get().getREXInfo(wallet.currentWallet.name);
+        let response: any = await chain.getApi().getREXInfo(wallet.currentWallet.name);
         rexEOS = response['rows'][0]['vote_stake'];
         rexCount = response['rows'][0]['rex_balance'];
     }

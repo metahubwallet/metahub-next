@@ -12,7 +12,7 @@ const handleAddToken = async () => {
         const newContract = contract.value.toLowerCase();
         const symbol = code.value.toUpperCase();
 
-        const result = await chain.get().getCurrencyStats(newContract, symbol);
+        const result = await chain.getApi().getCurrencyStats(newContract, symbol);
         if (result && result.max_supply) {
             const [amount] = result.max_supply.split(' ');
             const precision = amount.split('.').length > 1 ? amount.split('.')[1].length : 0;
