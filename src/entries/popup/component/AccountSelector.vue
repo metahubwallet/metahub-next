@@ -97,7 +97,7 @@ const handleSelectAccount = (account: Wallet) => {
 
                                 <div class="actions">
                                     <div v-if="searchName != '' || accounts.length >= 8" class="search-acts">
-                                        <i class="el-icon-search"></i>
+                                        <i class="n-icon-search"></i>
                                         <input v-model="searchName" :placeholder="$t('wallet.searchTip')" />
                                     </div>
                                     <img

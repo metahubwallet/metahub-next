@@ -1,5 +1,6 @@
 import MessageCenter from './messageCenter';
 import SdkError from '../sdkError';
+import { AuthAccount } from '@/store/wallet/type';
 
 const strippedHost = () => {
     let host = location.hostname;
@@ -67,6 +68,7 @@ export interface NetworkPayload extends Payload {
 export interface LoginPayload extends Payload {
     newLogin?: boolean;
     accounts?: Network[];
+    account?: AuthAccount;
 }
 
 export interface AccountPayload extends Payload {

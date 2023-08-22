@@ -120,19 +120,18 @@ export interface Auth {
     actor: string;
 }
 
+export interface AuthAccount {
+    chainId: string;
+    name: string;
+    authority: string;
+    publicKey: string;
+    expire?: number;
+}
+
 
 export interface AuthStore {
     permission: string;
     actor: string;
     domain: string;
-    accounts: {
-        authorizations: Auth[];
-        data: any;
-        account: string;
-        chainId: string;
-        name: string;
-        expire?: number;
-        authority: string;
-        publicKey: string;
-    }[];
+    accounts: AuthAccount[];
 }

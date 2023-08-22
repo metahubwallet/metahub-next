@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Windows from '@/common/lib/windows';
 
 // 初始化钱包情况
 

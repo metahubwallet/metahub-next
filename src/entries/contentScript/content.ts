@@ -104,8 +104,13 @@ class Dapp {
     }
 
     async getIdentity(params: Partial<LoginPayload>) {
-        const result = (await Message.signal(MessageTypes.GET_IDENTITY, params).request()) as Identity;
-        this.identity = result;
+        try {
+            const result = (await Message.signal(MessageTypes.GET_IDENTITY, params).request()) as Identity;
+            this.identity = result;
+            
+        } catch (e) {
+
+        }
         return this.identity;
     }
 

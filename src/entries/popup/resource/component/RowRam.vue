@@ -208,7 +208,7 @@ const onSubmit = async () => {
                 display: flex;
                 flex-direction: row;
                 justify-content: flex-end;
-                .el-button {
+                .n-button {
                     background: rgba(252, 252, 252, 0.4);
                     box-shadow: 0px 1px 3px 0px rgba(255, 66, 216, 0.11);
                     border-radius: 10px;
@@ -222,8 +222,8 @@ const onSubmit = async () => {
                     color: #222;
                     font-weight: 500;
                 }
-                .el-button:focus,
-                .el-button:hover {
+                .n-button:focus,
+                .n-button:hover {
                     background: rgba(252, 252, 252, 1);
                 }
             }
@@ -258,7 +258,7 @@ const onSubmit = async () => {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        .el-button {
+        .n-button {
             flex-flow: 1;
         }
     }

@@ -1,6 +1,6 @@
 import { AccountPayload, ArbitrarySignaturePayload, SignatureResult, RequiredKeysPayload, LoginPayload, Message, Payload, SignaturePayload, Identity } from '@/common/lib/messages/message';
 import * as MessageTypes from '@/common/lib/messages/types';
-import { Auth, AuthStore, Wallet, WhiteItem } from '@/store/wallet/type';
+import { Auth, AuthAccount, AuthStore, Wallet, WhiteItem } from '@/store/wallet/type';
 import SdkError from '@/common/lib/sdkError';
 import Windows from '@/common/lib/windows';
 import { Network as ChainNetwork, RPC } from '@/store/chain/type';
@@ -9,8 +9,6 @@ import { decrypt, md5 } from '@/common/util/crypto';
 import { Api, JsonRpc } from 'eosjs';
 
 console.log('run...');
-
-let cachedInfo: any;
 
 function setupMessageListener() {
     chrome.runtime.onMessage.addListener((request: any, sender, sendResponse: Function) => {
@@ -96,11 +94,15 @@ async function getIdentity(payload: LoginPayload) : Promise<Identity> {
             return generateIdengity(accounts);
         }
     }
+
+    if (!payload.account) {
+        throw SdkError.missingParameter('Missing account');
+    }
     try {
-        const result = await Windows.createWindow('login', 450, 600, payload);
+        // const result = await Windows.createWindow('login', 450, 600, payload);
         //save...
         const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
-        const account = Object.assign({}, result.data);
+        const account: AuthAccount =  payload.account!
         account.expire = Date.now() + 86400 * 7 * 1000;
         let auth = authorizations.find((x) => x.domain == payload.domain) as AuthStore;
         if (!auth) {
@@ -225,26 +227,9 @@ async function forgetIdentity(payload: AccountPayload) {
 }
 
 async function requestChainInfo(payload: Payload) {
-    if (cachedInfo && cachedInfo[payload.chainId]) {
-        return cachedInfo[payload.chainId];
-    }
-    return await cacheChainInfo(payload.chainId);
+    const info = await getEosInfo(payload.chainId);
+    return info;
 }
-
-async function cacheChainInfo(chainId: string) {
-    // todo: cachedInfo use localStoreage or sessionStoreage
-    if (!cachedInfo) cachedInfo = {};
-
-    const info = await getEosInfo(chainId);
-    const _cachedInfo = {
-        info,
-        time: new Date(info.head_block_time + 'Z').getTime(),
-    };
-    cachedInfo[chainId] = _cachedInfo;
-    return cachedInfo;
-}
-
-
 
 async function getEndPoint(chainId: string) {
     const selectedRpc = (await localCache.get('selectedRpc', {})) as RPC;
@@ -495,18 +480,6 @@ async function requestRequiredKeys(payload: RequiredKeysPayload) {
     return [ payload.availableKeys[0] ];
 }
 
-// Interval
-async function cacheChainInfoInterval() {
-    console.log('cacheChainInfoInterval');
-    const wallets = (await localCache.get('wallets', [])) as Wallet[];
-    const selectedIndex = (await localCache.get('selectedIndex', -1)) as number;
-    if (wallets.length > 0 && selectedIndex >= 0) {
-        const currentWallet = wallets[selectedIndex];
-        const currentChainId = currentWallet.chainId;
-        cacheChainInfo(currentChainId);
-    }
-}
-
 async function parseEosjsRequest(payload: SignaturePayload) {
 
     const trxBuf = Buffer.from(Uint8Array.from(payload.serializedTransaction).toString(), 'hex');
@@ -563,10 +536,10 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
     setupMessageListener();
 
     // timer
-    chrome.alarms.create({ delayInMinutes: 0, periodInMinutes: 1 });
-    chrome.alarms.onAlarm.addListener(() => {
-        cacheChainInfoInterval();
-    });
+    // chrome.alarms.create({ delayInMinutes: 0, periodInMinutes: 1 });
+    // chrome.alarms.onAlarm.addListener(() => {
+    //     cacheChainInfoInterval();
+    // });
 });
 
 // // 监听退出了浏览器,下次需要输入密码

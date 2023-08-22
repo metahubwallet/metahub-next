@@ -1,10 +1,12 @@
 export const ErrorCodes = {
+    MISSING_PARAMETER: 400,
     NO_SIGNATURE: 402,
     FORBIDDEN: 403,
     TIMED_OUT: 408,
     LOCKED: 423,
     UPGRADE_REQUIRED: 426,
     TOO_MANY_REQUESTS: 429,
+
 };
 
 export const ErrorTypes = {
@@ -12,6 +14,7 @@ export const ErrorTypes = {
     LOCKED: 'locked',
     PROMPT_CLOSED: 'prompt_closed',
     UPGRADE_REQUIRED: 'upgrade_required',
+    MISSING_PARAMETER: 'missing_parameter',
 };
 
 export default class SdkError {
@@ -51,6 +54,14 @@ export default class SdkError {
             ErrorTypes.UPGRADE_REQUIRED,
             "The required version is newer than the User's Scatter",
             ErrorCodes.UPGRADE_REQUIRED
+        );
+    }
+
+    static missingParameter(msg: string) {
+        return new SdkError(
+            ErrorTypes.MISSING_PARAMETER,
+            msg,
+            ErrorCodes.MISSING_PARAMETER
         );
     }
 

@@ -9,13 +9,13 @@ export const autoImport = () => {
             'pinia',
             // 自定义api
             {
+                'vue-i18n': ['useI18n'],
                 '@/store': ['store'],
+                '@/api': ['api'],
                 '@/common/util/env': ['env'],
                 '@/common/plugin/axios': ['http'],
-                '@/api': ['api'],
                 '@/common/plugin/validate': ['yup', 'useForms'],
                 '@/common/util/cache/index': ['localCache'],
-                'vue-i18n': ['useI18n'],
                 '@/common/util/tool': ['tool'],
             },
         ],
