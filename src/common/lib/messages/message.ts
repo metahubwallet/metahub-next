@@ -1,4 +1,3 @@
-import MessageCenter from './messageCenter';
 import SdkError from '../sdkError';
 import { AuthAccount } from '@/store/wallet/type';
 
@@ -68,7 +67,6 @@ export interface NetworkPayload extends Payload {
 export interface LoginPayload extends Payload {
     newLogin?: boolean;
     accounts?: Network[];
-    account?: AuthAccount;
 }
 
 export interface AccountPayload extends Payload {
@@ -105,6 +103,32 @@ export interface ChainInfoResult {
     info: any;
 }
 
+
+interface MessageWraper {
+    id: number;
+    response: string;
+  }
+  
+let msgId: number = 0;
+const msgMap = new Map<number, (response: string) => void>();
+
+export const watchBackgroundMessages = () => {
+    document.addEventListener('chromeMessageResponse', (event: any) => {
+        const data: MessageWraper = event.detail;
+        const callback = msgMap.get(data.id);
+        msgMap.delete(data.id);
+        callback!(data.response);
+    });
+}
+
+export const sendMessageToBackground = (msg: any) => {
+    return new Promise<any>((resolve) => {
+        const _msgId = ++msgId;
+        msgMap.set(_msgId, resolve);
+        document.dispatchEvent(new CustomEvent("chromeMessageRequest", { detail: {id: _msgId, msg: JSON.stringify(msg)} }));
+    });
+}
+
 export type Result = SignatureResult | Identity | ChainInfoResult;
 export class Message<T extends Payload> {
     public type: string;
@@ -136,21 +160,19 @@ export class Message<T extends Payload> {
         return m;
     }
 
-    request(): Promise<Result> {
+    async request(): Promise<Result> {
         // reset domain
         this.payload.domain = strippedHost();
-        return new Promise<any>((resolve, reject) => {
-            MessageCenter.send(this, (response: any) => {
-                if (response && response.isError) {
-                    reject(response);
-                } else {
-                    if (typeof response == 'undefined') {
-                        reject(SdkError.maliciousEvent());
-                    } else {
-                        resolve(response);
-                    }
-                }
-            });
-        });
+        const response = await sendMessageToBackground(this);
+        if (response && response.isError) {
+            throw response;
+        } else {
+            if (typeof response == 'undefined') {
+                throw SdkError.maliciousEvent();
+            } else {
+                return response;
+            }
+        }
     }
 }
+

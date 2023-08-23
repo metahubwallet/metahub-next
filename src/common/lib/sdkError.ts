@@ -6,7 +6,7 @@ export const ErrorCodes = {
     LOCKED: 423,
     UPGRADE_REQUIRED: 426,
     TOO_MANY_REQUESTS: 429,
-
+    EMPTY_DATA: 410,
 };
 
 export const ErrorTypes = {
@@ -15,6 +15,7 @@ export const ErrorTypes = {
     PROMPT_CLOSED: 'prompt_closed',
     UPGRADE_REQUIRED: 'upgrade_required',
     MISSING_PARAMETER: 'missing_parameter',
+    EMPTY_DATA: 'empty_data',
 };
 
 export default class SdkError {
@@ -62,6 +63,14 @@ export default class SdkError {
             ErrorTypes.MISSING_PARAMETER,
             msg,
             ErrorCodes.MISSING_PARAMETER
+        );
+    }
+
+    static noAccount() {
+        return new SdkError(
+            ErrorTypes.EMPTY_DATA,
+            'No accounts found',
+            ErrorCodes.EMPTY_DATA
         );
     }
 

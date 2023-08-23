@@ -1,8 +1,7 @@
-import { AccountPayload, ArbitrarySignaturePayload, SignatureResult, RequiredKeysPayload, LoginPayload, Message, Payload, SignaturePayload, Identity } from '@/common/lib/messages/message';
+import { AccountPayload, ArbitrarySignaturePayload, SignatureResult, RequiredKeysPayload, LoginPayload, Message, Payload, SignaturePayload, Identity, IdentityAccount } from '@/common/lib/messages/message';
 import * as MessageTypes from '@/common/lib/messages/types';
 import { Auth, AuthAccount, AuthStore, Wallet, WhiteItem } from '@/store/wallet/type';
 import SdkError from '@/common/lib/sdkError';
-import Windows from '@/common/lib/windows';
 import { Network as ChainNetwork, RPC } from '@/store/chain/type';
 import { signature } from '@/common/lib/keyring';
 import { decrypt, md5 } from '@/common/util/crypto';
@@ -11,6 +10,9 @@ import { Api, JsonRpc } from 'eosjs';
 console.log('run...');
 
 function setupMessageListener() {
+    chrome.windows.onRemoved.addListener((windowId) => {
+        closeWindow(windowId);
+    });
     chrome.runtime.onMessage.addListener((request: any, sender, sendResponse: Function) => {
         if (sender.id !== chrome.runtime.id) return true;
         if (typeof request == 'string') {
@@ -95,39 +97,36 @@ async function getIdentity(payload: LoginPayload) : Promise<Identity> {
         }
     }
 
-    if (!payload.account) {
-        throw SdkError.missingParameter('Missing account');
-    }
-    try {
-        // const result = await Windows.createWindow('login', 450, 600, payload);
-        //save...
-        const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
-        const account: AuthAccount =  payload.account!
-        account.expire = Date.now() + 86400 * 7 * 1000;
-        let auth = authorizations.find((x) => x.domain == payload.domain) as AuthStore;
-        if (!auth) {
-            auth = { domain: payload.domain, accounts: [], actor: '', permission: '' };
-            authorizations.push(auth);
-        }
-        const index = auth.accounts.findIndex(
-            (x) => x.chainId == account.chainId && x.name == account.name && x.authority == account.authority
-        );
-        if (index >= 0) {
-            auth.accounts.splice(index, 1);
-        }
-        auth.accounts.unshift(account);
-        chrome.storage.local.set({ authorizations });
-        const accounts = await getAuthorizations(payload.domain, payload.chainId);
-        return generateIdengity(accounts);
-    } catch (e) {
-        console.log(e);
+
+    let _account: AuthAccount | undefined = await createWindow('login', 450, 600, payload);
+    if (!_account) {
         throw SdkError.signatureError('identity_rejected', 'User rejected the provision of an Identity');
     }
+
+    const account = _account!;
+    account.expire = Date.now() + 86400 * 7 * 1000;
+
+    const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
+    let auth = authorizations.find((x) => x.domain == payload.domain) as AuthStore;
+    if (!auth) {
+        auth = { domain: payload.domain, accounts: [], actor: '', permission: '' };
+        authorizations.push(auth);
+    }
+    const index = auth.accounts.findIndex(
+        (x) => x.chainId == account.chainId && x.name == account.name && x.authority == account.authority
+    );
+    if (index >= 0) {
+        auth.accounts.splice(index, 1);
+    }
+    auth.accounts.unshift(account);
+    chrome.storage.local.set({ authorizations });
+    const accounts = await getAuthorizations(payload.domain, payload.chainId);
+    return generateIdengity(accounts);
+
 }
 
 
-
-async function getAuthorizations(domain: string, chainId = '*') {
+async function getAuthorizations(domain: string, chainId = '*') : Promise<IdentityAccount[]> {
     const wallets = (await localCache.get('wallets', [])) as Wallet[];
     const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
     for (let auth of authorizations) {
@@ -159,7 +158,7 @@ async function getAuthorizations(domain: string, chainId = '*') {
                 chainId == '*' ? filterAccounts : filterAccounts.filter((x) => x.chainId == chainId);
             const returnAccounts = [];
             for (const chainAccount of chainAccounts) {
-                const { expire, ...account } = Object.assign({ blockchain: 'eos' }, chainAccount);
+                const { expire, ...account } = Object.assign({ blockchain: 'eos', isHardware: false }, chainAccount);
                 returnAccounts.push(account);
             }
             return returnAccounts;
@@ -190,7 +189,9 @@ function generateIdengity(accounts: any[]) : Identity {
 
 async function getIdentityFromPermissions(payload: Payload) {
     const accounts = await getAuthorizations(payload.domain, '*');
-    if (!accounts || !accounts.length) return null;
+    if (!accounts || !accounts.length) {
+        throw SdkError.noAccount();
+    }
     return generateIdengity(accounts);
 }
 
@@ -290,7 +291,7 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
             const [actor, perm] = requestAuth.split('@');
             const account = authorizations.find((x) => x.name == actor && x.authority == perm);
             if (account) {
-                authAccounts.push(account.account + '@' + account.authority);
+                authAccounts.push(account.name + '@' + account.authority);
             }
         }
         // 说明： 正常来讲，有一个验证过就可以了。如果有多个，也要一起签名掉
@@ -352,18 +353,18 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
             const locked = (await getPassword()) == '';
             if (locked) {
                 //to unlock
-                const result = (await new Promise((resolve) => {
-                    Windows.createWindow('unlock', 500, 450, newPayload, async (result: any) => {
-                        if (result.code < 0) {
-                            resolve({ unlock: false });
-                            return;
-                        }
-                        resolve({ unlock: true });
-                    });
-                })) as any;
-                if (!result.unlock) {
-                    throw SdkError.signatureError('signature_rejected', 'User rejected the signature request');
-                }
+                // const result = (await new Promise((resolve) => {
+                //     Windows.createWindow('unlock', 500, 450, newPayload, async (result: any) => {
+                //         if (result.code < 0) {
+                //             resolve({ unlock: false });
+                //             return;
+                //         }
+                //         resolve({ unlock: true });
+                //     });
+                // })) as any;
+                // if (!result.unlock) {
+                //     throw SdkError.signatureError('signature_rejected', 'User rejected the signature request');
+                // }
             }
             // todo, through permission
             const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
@@ -378,39 +379,39 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         if (newPayload.actions.length > 0) windowHeight = 518;
         if (newPayload.actions.length > 1) windowHeight = 542;
 
-        Windows.createWindow(
-            'transcation',
-            600,
-            windowHeight,
-            newPayload,
-            async (result: { code: number; data: any }) => {
-                if (result.code < 0) {
-                    reject(SdkError.signatureError('signature_rejected', 'User rejected the signature request'));
-                    return;
-                }
-                //save whitelist...
-                if (result.data.whitelists.length > 0) {
-                    const whitelist = (await localCache.get('whitelist', [])) as WhiteItem[];
-                    for (const whitelistRow of result.data.whitelists) {
-                        let index = whitelist.findIndex((x) => x.hash === whitelistRow.hash);
-                        if (index == -1) {
-                            whitelist.push(whitelistRow);
-                        } else {
-                            whitelist.splice(index, 1, whitelistRow);
-                        }
-                    }
-                    chrome.storage.local.set({ whitelist: JSON.stringify(whitelist) });
-                }
+        // Windows.createWindow(
+        //     'transcation',
+        //     600,
+        //     windowHeight,
+        //     newPayload,
+        //     async (result: { code: number; data: any }) => {
+        //         if (result.code < 0) {
+        //             reject(SdkError.signatureError('signature_rejected', 'User rejected the signature request'));
+        //             return;
+        //         }
+        //         //save whitelist...
+        //         if (result.data.whitelists.length > 0) {
+        //             const whitelist = (await localCache.get('whitelist', [])) as WhiteItem[];
+        //             for (const whitelistRow of result.data.whitelists) {
+        //                 let index = whitelist.findIndex((x) => x.hash === whitelistRow.hash);
+        //                 if (index == -1) {
+        //                     whitelist.push(whitelistRow);
+        //                 } else {
+        //                     whitelist.splice(index, 1, whitelistRow);
+        //                 }
+        //             }
+        //             chrome.storage.local.set({ whitelist: JSON.stringify(whitelist) });
+        //         }
 
-                const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
-                let arbitrary = newPayload.actions.length > 0;
-                if (newPayload.actions.length == 0) {
-                    arbitrary = true;
-                } 
-                const sig = signature(arbitrary ? newPayload.encryptText : newPayload.buffer, privateKey, arbitrary);
-                resolve({ signatures: [ sig ] });
-            }
-        );
+        //         const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
+        //         let arbitrary = newPayload.actions.length > 0;
+        //         if (newPayload.actions.length == 0) {
+        //             arbitrary = true;
+        //         } 
+        //         const sig = signature(arbitrary ? newPayload.encryptText : newPayload.buffer, privateKey, arbitrary);
+        //         resolve({ signatures: [ sig ] });
+        //     }
+        // );
     });
 }
 
@@ -531,16 +532,48 @@ async function getPassword() {
     return result.password as string || '';
 }
 
-// Initialize the demo on install
-chrome.runtime.onInstalled.addListener(({ reason }) => {
-    setupMessageListener();
 
-    // timer
-    // chrome.alarms.create({ delayInMinutes: 0, periodInMinutes: 1 });
-    // chrome.alarms.onAlarm.addListener(() => {
-    //     cacheChainInfoInterval();
-    // });
-});
+// todo: 这个变量可能会被置空
+const closeCallbacks: { [key: number]: Function } = {};
+
+// Initialize the demo on install
+setupMessageListener();
+// chrome.runtime.onInstalled.addListener(({ reason }) => {
+//     setupMessageListener();
+// });
+
+
+
+async function closeWindow(windowId: number, forceClose = false) {
+    const callback = closeCallbacks[windowId];
+    if (typeof callback == 'function') {
+        delete closeCallbacks[windowId];
+        if (forceClose) {
+            chrome.windows.remove(windowId);
+        }
+        const result: any = await chrome.storage.session.get(['windowResult']);
+        setTimeout(() => callback(result.windowResult || null), 1);
+    }
+};
+
+async function createWindow(type: string, width: number, height: number, params: any) {
+    return new Promise(async (resolve: (value: any) => void) => {
+        const cw = await chrome.windows.getCurrent();
+        const left = cw.left! + (cw.width! - width) / 2;
+        const top = cw.top! + (cw.height! - height) / 2;
+        const win = await chrome.windows.create({
+            url: 'src/entries/windows/index.html#/' + type,
+            focused: true,
+            width,
+            height,
+            left,
+            top,
+            type: 'popup',
+        });
+        await chrome.storage.session.set({ windowParams: params });
+        closeCallbacks[win.id!] = resolve;
+    });
+};
 
 // // 监听退出了浏览器,下次需要输入密码
 // chrome.windows.onRemoved.addListener((windowId) => {

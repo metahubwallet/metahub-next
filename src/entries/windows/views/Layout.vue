@@ -33,11 +33,11 @@ const handleSubmit = async () => {
             <div class="tip tip2">{{ $t('password.unlockTip') }}</div>
         </header>
         <n-form :inline="true" :model="formData" @submit.native.prevent>
-            <n-input :placeholder="$t('password.toUnlock')" type="password" v-model="formData.password">
+            <n-input :placeholder="$t('password.toUnlock')" type="password" v-model="formData.password" @keydown.enter="handleSubmit">
                 <img class="prefix-img" slot="prefix" src="@/asset/img/initial_unlock@2x.png" />
             </n-input>
 
-            <n-button @click="handleSubmit()" class="submit-bottom" native-type="submit">{{ $t('password.unlock') }}</n-button>
+            <n-button @click="handleSubmit" class="submit-bottom" native-type="submit">{{ $t('password.unlock') }}</n-button>
         </n-form>
     </div>
     <div class="app-window" v-else>

@@ -35,6 +35,7 @@ const submit = () => {
                 class="w-full h-[50px] leading-[50px] pl-3 bg-gray-50"
                 round
                 style="border-radius: 200px"
+                @keydown.enter="submit"
             ></n-input>
 
             <n-button

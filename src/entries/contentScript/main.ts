@@ -7,12 +7,7 @@ script.onload = () => script.remove();
 
 document.addEventListener('chromeMessageRequest', (event: any) => {
     const data = event.detail;
-    //console.log('on chromeMessageRequest');
-    const message = data.msg;
-    //console.log(message);
-    chrome.runtime.sendMessage(message, (response) => {
-      //console.log('chrome.runtime callabck');
-      //console.log(response);
-      document.dispatchEvent(new CustomEvent("chromeMessageResponse", {detail: {id: data.id, response: response}}));
+    chrome.runtime.sendMessage(data.msg, (response) => {
+        document.dispatchEvent(new CustomEvent('chromeMessageResponse', { detail: { id: data.id, response: response } }));
     });
 });

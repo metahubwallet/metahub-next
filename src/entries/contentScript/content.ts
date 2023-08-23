@@ -1,7 +1,7 @@
-import MessageCenter from '@/common/lib/messages/messageCenter';
-import { SignatureResult, Message, SignaturePayload, Identity, LoginPayload, Network, Payload, NetworkPayload, AccountPayload, ArbitrarySignaturePayload, RequiredKeysPayload, SignaturePayloadArgs, ChainInfoResult, Transaction } from '../../common/lib/messages/message';
+import { SignatureResult, Message, SignaturePayload, Identity, LoginPayload, Network, Payload, NetworkPayload, AccountPayload, ArbitrarySignaturePayload, RequiredKeysPayload, SignaturePayloadArgs, ChainInfoResult, Transaction, watchBackgroundMessages } from '../../common/lib/messages/message';
 import * as MessageTypes from '../../common/lib/messages/types';
 import { API_URL } from '@/common/constants';
+import SdkError, { ErrorCodes } from '@/common/lib/sdkError';
 
 /* eslint-disable */
 // todo: getIdentity, arbitrarySignature, transcation 要在页面显示一个加载符号？
@@ -34,7 +34,7 @@ import { API_URL } from '@/common/constants';
 // identity
 
 // start watch message
-MessageCenter.watch();
+watchBackgroundMessages();
 
 const signatureProvider = (chainId: string) => {
     return {
@@ -84,7 +84,10 @@ class Dapp {
 
     async init() {
         try {
-            this.identity = await this.getIdentityFromPermissions();
+            const identity = await this.getIdentityFromPermissions();
+            if (identity) {
+                this.identity = identity;
+            }
         } catch (e) {
             console.log(e);
         }
@@ -103,14 +106,9 @@ class Dapp {
         return await Message.signal<NetworkPayload>(MessageTypes.REQUEST_HAS_ACCOUNT_FOR, { network }).request();
     }
 
-    async getIdentity(params: Partial<LoginPayload>) {
-        try {
-            const result = (await Message.signal(MessageTypes.GET_IDENTITY, params).request()) as Identity;
-            this.identity = result;
-            
-        } catch (e) {
-
-        }
+    async getIdentity(params: Partial<LoginPayload>): Promise<Identity> {
+        this.identity = (await Message.signal(MessageTypes.GET_IDENTITY, params).request()) as Identity;
+        console.log('getIdentity response');
         return this.identity;
     }
 
@@ -133,10 +131,17 @@ class Dapp {
         return this.identity;
     }
 
-    async getIdentityFromPermissions() : Promise<Identity> {
+    async getIdentityFromPermissions() : Promise<Identity | null> {
         console.log('getIdentityFromPermissions');
-        const result = (await Message.signal<Payload>(MessageTypes.GET_IDENTITY_FROM_PERMISSIONS).request()) as Identity;
-        return result;
+        try {
+            const result = (await Message.signal<Payload>(MessageTypes.GET_IDENTITY_FROM_PERMISSIONS).request()) as Identity;
+            return result;
+        } catch (e: any) {
+            if (e.code && e.code == ErrorCodes.EMPTY_DATA) {
+                return null;
+            }
+            throw e;
+        }
     }
 
     async suggestNetwork() {
@@ -175,7 +180,7 @@ class Dapp {
 
     // support for eos1 is no longer available
     eos(network: Network, Api: any, options: any) {
-        console.log('call eos2');
+        console.log('call eos hook');
         // const api = chain.getApi(network.chainId);
         const chainId = options.chainId ? options.chainId : network.chainId;
         options.chainId = chainId;

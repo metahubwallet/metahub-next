@@ -10,11 +10,13 @@ const messages = {
     en: enLocale,
 };
 
+const defaultLang = chrome && chrome.i18n ? chrome.i18n.getUILanguage() : 'en';
+
 export const i18n = createI18n({
     messages,
     legacy: false,
     globalInjection: true, // 全局生效$t
-    locale: (await localCache.get('lang', chrome.i18n.getUILanguage())) + '',
+    locale: (await localCache.get('lang', defaultLang)) + '',
 });
 
 export const setupI18n = async (app: App) => {

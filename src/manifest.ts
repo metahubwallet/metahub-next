@@ -16,11 +16,11 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
     content_scripts: [
         {
             js: ['src/entries/contentScript/main.ts'],
-            matches: ['*://*/*'],
+            matches: ['<all_urls>'],
             run_at: 'document_start',
         },
     ],
-    host_permissions: ['*://*/*'],
+    host_permissions: ['<all_urls>'],
     icons: {
         16: 'icons/16.png',
         32: 'icons/32.png',
@@ -37,7 +37,7 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
     //       matches: [ '*://*/*' ],
     //     },
     // ],
-    permissions: ['storage', 'unlimitedStorage', 'alarms', 'system.display' ],
+    permissions: ['storage', 'unlimitedStorage', 'alarms', 'tabs' ],
 };
 
 export function getManifest(): chrome.runtime.ManifestV3 {
