@@ -14,18 +14,11 @@ export interface WalletState {
 }
 
 export interface Wallet {
+    name: string;
+    chainId: string;
     keys: Key[];
     seed: string;
-    chainId: string;
-    name: string;
-    symbol: string;
-
-    account: string;
-    isSelected: boolean;
-    index: number;
-    chainName: string;
-    publicKey: string;
-    privateKey: string;
+    account: string; // to delete ?
     smoothMode: boolean;
 }
 

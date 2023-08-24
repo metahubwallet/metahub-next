@@ -56,7 +56,9 @@ const handleImportKey = async () => {
 
         let versionedKey = '80' + privateKey.value;
         const sha256dKey: any = sha256(Buffer.from(versionedKey, 'hex'));
-        const checksum = sha256(Buffer.from(sha256dKey, 'hex')).toString().substring(0, 8);
+        const checksum = sha256(Buffer.from(sha256dKey, 'hex'))
+            .toString()
+            .substring(0, 8);
         versionedKey += checksum;
 
         privateKey.value = bs58.encode(new Uint8Array(Buffer.from(versionedKey, 'hex')));
@@ -78,14 +80,18 @@ const handleImportKey = async () => {
         const key = { publicKey, privateKey: privateValue, permissions: [] };
         chainAccount.keys = [key];
         try {
-            let accounts: any = [];
-            accounts = await getKeyAccounts(network?.chain as lightKey, publicKey).catch(() => {
-                accounts = [];
-            });
+            let accounts: string[] = [];
+            try {
+                accounts = await getKeyAccounts(network?.chain as lightKey, publicKey);
+            } catch (_e) {}
 
-            if (accounts.length == 0)
-                if (accounts.length == 0) accounts = await chain.getApi(network?.chainId).getKeyAccounts(publicKey);
-            tipMessage = t('public.noAccountForPrivateKey');
+            if (accounts.length == 0) {
+                accounts = await chain.getApi(network?.chainId).getKeyAccounts(publicKey);
+            }
+
+            if (accounts.length == 0) {
+                tipMessage = t('public.noAccountForPrivateKey');
+            }
 
             for (let account of accounts) {
                 const newAccount = Object.assign({}, chainAccount);
@@ -100,8 +106,11 @@ const handleImportKey = async () => {
                         break;
                     }
                 }
-                if (existed) tipMessage = t('public.accountExists');
-                else importAccounts.push(newAccount);
+                if (existed) {
+                    tipMessage = t('public.accountExists');
+                } else {
+                    importAccounts.push(newAccount);
+                }
             }
         } catch (e) {
             console.log(1123);
@@ -110,7 +119,9 @@ const handleImportKey = async () => {
             window.msg.error(e);
             isLoad.value = false;
         }
-    } else tipMessage = t('public.invaildPrivateKey');
+    } else {
+        tipMessage = t('public.invaildPrivateKey');
+    }
 
     importAccounts.sort(sortAccounts);
     if (importAccounts.length > 1) {
@@ -176,9 +187,7 @@ const sortAccounts = (first: any, second: any) => {
                     <div class="import-key-tip mb-[10px]">{{ $t('public.importNetTip') }}:</div>
                     <n-popover style="max-height: 250px" trigger="click" scrollable placement="bottom">
                         <template #trigger>
-                            <div
-                                class="border border-[#DBDBDB] shadow-sm h-[71px] w-full rounded-[12px] flex items-center justify-between px-[20px]"
-                            >
+                            <div class="border border-[#DBDBDB] shadow-sm h-[71px] w-full rounded-[12px] flex items-center justify-between px-[20px]">
                                 <div class="flex items-center">
                                     <img :src="getNetworkIcon(chainId)" class="icon-img mr-[6px]" />
                                     <span style="color: #3a3949; font-size: 14px">

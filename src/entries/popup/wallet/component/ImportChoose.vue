@@ -2,6 +2,12 @@
 import _ from 'lodash';
 import { Wallet } from '@/store/wallet/type';
 
+interface ShownWallet extends Wallet {
+    index: number,
+    chainName: string,
+    isSelected: boolean,
+}
+
 interface Props {
     isShow: boolean;
     accountList: Wallet[];
@@ -9,31 +15,26 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {});
 
 // 初始化wallets(用onMount取不到值)
-const wallets = ref<Wallet[]>([]);
-watch(
-    () => props.accountList,
-    () => {
-        props.accountList.forEach((item, index) => {
-            item.index = index;
-            let network = store.chain().findNetwork(item.chainId);
-            item.chainName = network ? network.name : 'Unknown';
-            item.isSelected = true;
-        });
-        wallets.value = props.accountList;
-    },
-    { immediate: true }
-);
-
-nextTick(() => {
-    wallets.value = props.accountList;
+const wallets = computed(() => {
+    return props.accountList.map((item, index) => {
+        const network = store.chain().findNetwork(item.chainId);
+        return Object.assign(item, {
+            index,
+            chainName: network ? network.name : 'Unknown',
+            isSelected: true,
+        }) as ShownWallet;
+    });
 });
+
 
 // 导入wallet
 const emit = defineEmits(['import', 'close']);
 const handleImportWallet = () => {
     let selectedWallets = [];
     for (const wallet of wallets.value) {
-        if (wallet.isSelected) selectedWallets.push(props.accountList[wallet.index]);
+        if (wallet.isSelected) {
+            selectedWallets.push(props.accountList[wallet.index]);
+        }
     }
     emit('import', selectedWallets);
 };
@@ -74,15 +75,15 @@ const handleSelectWallet = (wallet: any) => {
 
             <!-- list -->
             <div class="list-container">
-                <div :key="item.index" @click="handleSelectWallet(item)" class="account-cell" v-for="item in wallets">
+                <div :key="'wallet-' + item.index" @click="handleSelectWallet(item)" class="account-cell" v-for="item in wallets">
                     <div class="account-left">
                         <div class="account-left-name">
                             {{ item.chainName }}：
                             <span style="color: #666666">{{ item.name }}</span>
                         </div>
                         <div class="account-left-key">
-                            <div class="span-left">{{ item.publicKey }}</div>
-                            <div class="span-right">{{ item.publicKey }}</div>
+                            <div class="span-left">{{ item.keys[0].publicKey }}</div>
+                            <div class="span-right">{{ item.keys[0].publicKey }}</div>
                         </div>
                     </div>
                     <img v-if="item.isSelected === true" class="close" src="@/asset/img/account_select@2x.png" />

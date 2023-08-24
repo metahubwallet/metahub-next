@@ -1,57 +1,54 @@
 <script setup lang="ts">
-// import { indexOf } from '../config/mnemonic';
-import { eosChainId } from '@/common/util/network';
+
+interface LoginAccount {
+    name: string,
+    permissions: string[],
+    selectedPermission: string,
+}
+
 const briefAccount = tool.briefAccount;
 
-const word = ref('-');
+const word = ref('');
 
-const payload = reactive({ domain: '', chainId: '' });
-const chainId = ref('');
-const accounts = ref([] as any);
+const accounts = ref([] as LoginAccount[]);
 
-// computed
-// allAccounts: function() {
-//   let accounts = this.$store.state.wallets.filter( x => x.chainId == this.chainId );
-//   // console.log(this.$store.state.wallets);
-//   accounts.map(x => {
-//     x.permissions = x.keys.flatMap(y => y.permissions);
-//     x.permission = x.permissions[0];
-//     return x;
-//   });
-//   // console.log(accounts);
-//   return accounts;
-// }
-
-// watch:
-// word(m, o) {
-//   if (m !== o) {
-//     this.accounts = this.allAccounts.filter(account => {
-//       return account.account.includes(this.word);
-//     });
-//   }
-// }
-
-// this.windows = chrome.extension.getBackgroundPage().background.windows;
-
-onMounted(() => {
-    // this.payload = await this.windows.getParams();
-
-    word.value = '';
-    chainId.value = payload.chainId;
+const params: any = await chrome.storage.session.get(['windowParams']);
+console.log(params);
+const payload = reactive({ 
+  domain: params.domain || window.location, 
+  chainId: params.chainId || '', 
 });
 
-const changePermision = ({ account, permission } : { account: any, permission: any })  => {
-    account.permission = permission;
-    let idx = accounts.indexOf(account);
+const allAccounts = computed(() => {
+  const accounts = store.wallet().wallets.filter( x => x.chainId == payload.chainId );
+  // console.log(this.$store.state.wallets);
+  return accounts.map(x => {
+    return {
+        name: x.name,
+        permissions:  x.keys.flatMap(y => y.permissions),
+    } as LoginAccount;
+  });
+});
+
+watch(word, (nw: string) => {
+    accounts.value = allAccounts.value.filter(account => {
+      return account.name.includes(nw);
+    });
+});
+
+const changePermision = ({ account, permission } : { account: LoginAccount, permission: string })  => {
+    account.selectedPermission = permission;
+    let idx = accounts.value.indexOf(account);
     if (idx >= 0) {
-        accounts[idx] = account;
+        accounts.value[idx] = account;
     }
 };
 
-const login = (walletAccount: any) => {
+const login = async (account: LoginAccount) => {
     let publicKey = '';
-    const permission = walletAccount.permission;
-    for (const key of walletAccount.keys) {
+    const permission = account.selectedPermission;
+    const wallet = store.wallet().wallets.find(x => x.chainId == payload.chainId && x.name == account.name)!;
+    for (const key of wallet.keys) {
         if (key.permissions.indexOf(permission) >= 0) {
             publicKey = key.publicKey;
         }
@@ -60,16 +57,15 @@ const login = (walletAccount: any) => {
         alert('key error');
         return;
     }
-    const account = {
-        name: walletAccount.name,
+    const result = {
+        name: account.name,
         publicKey: publicKey,
         authority: permission,
-        chainId: chainId.value,
+        chainId: payload.chainId,
     };
 
-    // console.log(account);
-    // this.windows.returnMessage(account);
-    //console.log(account.name);
+    // save result
+    await chrome.storage.session.set({ windowResult: result });
 };
 </script>
 
@@ -93,11 +89,11 @@ const login = (walletAccount: any) => {
             <ul class="accounts">
                 <li v-for="account in accounts" :key="account.name">
                     <div class="account-name">
-                        <h3>{{ briefAccount(account.account, 12, 10) }}</h3>
+                        <h3>{{ briefAccount(account.name, 12, 10) }}</h3>
                         <n-popover trigger="click" placement="bottom">
                             <template #trigger>
                                 <span class="n-dropdown-link">
-                                    {{ account.permission }}
+                                    {{ account.selectedPermission }}
                                     <i class="n-icon-arrow-down n-icon--right"></i>
                                 </span>
                             </template>

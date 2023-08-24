@@ -84,7 +84,7 @@ const handleSelectAccount = (account: Wallet) => {
                 size="small"
                 style="height: 400px"
             >
-                <n-tab-pane v-for="item in chain.networks" :key="item.chainId" :name="item.chainId">
+                <n-tab-pane v-for="(item, index) in chain.networks" :key="item.chainId" :name="item.chainId">
                     <template #tab>
                         <div @click="handleSelectNetwork(item)">
                             <img :src="getNetworkIcon(item)" class="icon-img m-[7px]" />
@@ -115,7 +115,7 @@ const handleSelectAccount = (account: Wallet) => {
                                 </n-button>
                             </div>
                             <div
-                                :key="item.index"
+                                :key="'wallet-' + index"
                                 @click="handleSelectAccount(item)"
                                 class="account-cell"
                                 v-for="item in accounts"
@@ -134,7 +134,7 @@ const handleSelectAccount = (account: Wallet) => {
                                 <img
                                     class="close"
                                     src="@/asset/img/account_select.png"
-                                    v-show="wallet.selectedIndex == item.index && chain.currentChainId === item.chainId"
+                                    v-show="wallet.selectedIndex == index && chain.currentChainId === item.chainId"
                                 />
                             </div>
                         </div>

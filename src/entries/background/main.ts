@@ -167,7 +167,7 @@ async function getAuthorizations(domain: string, chainId = '*') : Promise<Identi
     return [];
 }
 
-function generateIdengity(accounts: any[]) : Identity {
+function generateIdengity(accounts: AuthAccount[]) : Identity {
     return {
         accounts: accounts.map((x) => {
             const id = {

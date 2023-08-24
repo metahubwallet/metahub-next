@@ -9,13 +9,6 @@ import { signature } from './keyring';
 export default class Chain {
     static apis: { [key: string]: EosApi } = {};
 
-    static getCurrentPrivateKey() {
-        if (store.wallet().wallets.length == 0) return '';
-        const account = this.currentAccount();
-
-        return decrypt(account.privateKey, md5(account.seed + store.user().password));
-    }
-
     static getPrivateKeyByPublicKey(publicKey: string) {
         for (const wallet of store.wallet().wallets) {
             for (const key of wallet.keys) {

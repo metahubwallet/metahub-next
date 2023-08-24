@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { Wallet } from '@/store/wallet/type';
-import _ from 'lodash';
+
+interface ShownWallet extends Wallet {
+    symbol: string,
+}
 
 const chainId = ref(useRoute().query.chainId);
 const wallets = computed(() => {
-    let ws: any = [];
-    store
+    return store
         .wallet()
         .wallets.filter((x) => x.chainId === chainId.value)
         .map((x) => {
-            const wallet = _.clone(x);
-            wallet.symbol = store.chain().findNetwork(x.chainId)?.token.symbol || '';
-            ws.push(wallet);
+            const symbol = store.chain().findNetwork(x.chainId)?.token.symbol || '';
+            return Object.assign(x, { symbol }) as ShownWallet;
         });
-    return ws;
 });
 
 // 查看账号详情
