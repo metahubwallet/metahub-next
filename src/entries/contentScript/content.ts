@@ -1,4 +1,4 @@
-import { SignatureResult, Message, SignaturePayload, Identity, LoginPayload, Network, Payload, NetworkPayload, AccountPayload, ArbitrarySignaturePayload, RequiredKeysPayload, SignaturePayloadArgs, ChainInfoResult, Transaction, watchBackgroundMessages } from '../../common/lib/messages/message';
+import { SignatureResult, Message, SignaturePayload, Identity, LoginPayload, ChainNetwork, Payload, NetworkPayload, AccountPayload, ArbitrarySignaturePayload, RequiredKeysPayload, SignaturePayloadArgs, ChainInfoResult, Transaction, watchBackgroundMessages } from '../../common/lib/messages/message';
 import * as MessageTypes from '../../common/lib/messages/types';
 import { API_URL } from '@/common/constants';
 import SdkError, { ErrorCodes } from '@/common/lib/sdkError';
@@ -101,7 +101,7 @@ class Dapp {
         return await this.getIdentity(payload);
     }
 
-    async hasAccountFor(network: Network) {
+    async hasAccountFor(network: ChainNetwork) {
         console.log('hasAccountFor');
         return await Message.signal<NetworkPayload>(MessageTypes.REQUEST_HAS_ACCOUNT_FOR, { network }).request();
     }
@@ -173,13 +173,13 @@ class Dapp {
         return result;
     }
 
-    eosHook(network: Network) {
+    eosHook(network: ChainNetwork) {
         console.log('call eosHook');
         return signatureProvider(network.chainId);
     }
 
     // support for eos1 is no longer available
-    eos(network: Network, Api: any, options: any) {
+    eos(network: ChainNetwork, Api: any, options: any) {
         console.log('call eos hook');
         // const api = chain.getApi(network.chainId);
         const chainId = options.chainId ? options.chainId : network.chainId;

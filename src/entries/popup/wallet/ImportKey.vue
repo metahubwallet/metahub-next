@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Wallet } from '@/store/wallet/type';
 import { eosChainId, getNetworkLocalIcon } from '@/common/util/network';
 import { sha256, md5, decrypt, encrypt } from '@/common/util/crypto';
 import bs58 from 'bs58';
@@ -7,6 +6,7 @@ import { Address } from 'ethereumjs-util';
 import chain from '@/common/lib/chain';
 import { getKeyAccounts, lightKey } from '@/common/lib/remote';
 import { isValidPrivate, privateToPublic } from '@/common/lib/keyring';
+import { Wallet } from '@/types/wallet';
 
 const { t } = useI18n();
 const route = useRoute();

@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { Network } from '@/types/settings';
 import QRCode from 'qrcode';
-import { Network } from '@/store/chain/type';
 
 const { briefAccount } = tool;
 
@@ -23,9 +23,9 @@ const draw = () => {
     canvas = document.getElementById('qrccode-canvas');
     let to = wallet.currentWallet.name;
     let memo = '';
-    if (wallet.currentWallet.account.length > 12) {
+    if (wallet.currentWallet.name.length > 12) {
         to = 'etheraccount';
-        memo = wallet.currentWallet.account;
+        memo = wallet.currentWallet.name;
     }
 
     let data = {
@@ -64,7 +64,7 @@ const draw = () => {
                         </div>
                         <clip-button
                             class="coin-other2"
-                            :value="briefAccount(wallet.currentWallet.account, 10, 8)"
+                            :value="briefAccount(wallet.currentWallet.name, 10, 8)"
                         ></clip-button>
                         <div class="coin-other3">
                             <canvas class="qrcode_box" id="qrccode-canvas"></canvas>

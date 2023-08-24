@@ -1,4 +1,4 @@
-import { Token } from '../wallet/type';
+import { Network, RPC } from "@/types/settings";
 
 export interface ChainState {
     networks: Network[]; // 默认节点列表
@@ -12,17 +12,4 @@ export interface ChainState {
     }; // 用户自定义节点相关信息
 }
 
-export interface Network {
-    name: string;
-    chain: string;
-    chainId: string;
-    endpoint: string;
-    token: Token;
-}
-
-export interface RPC {
-    name: string;
-    endpoint: string;
-    [key: string]: any;
-}
 

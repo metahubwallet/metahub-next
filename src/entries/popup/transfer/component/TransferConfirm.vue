@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { TransferRecord, Transfer } from '@/store/wallet/type';
 import chain from '@/common/lib/chain';
+import { Transfer, TransferRecord } from '@/types/transcation';
 
 interface Props {
     isShow: boolean;

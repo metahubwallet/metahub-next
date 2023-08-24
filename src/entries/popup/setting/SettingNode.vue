@@ -2,7 +2,7 @@
 import chain from '@/common/lib/chain';
 import { getEndpoints } from '@/common/lib/remote';
 import { theme } from '@/common/util/theme';
-import { RPC } from '@/store/chain/type';
+import { RPC } from '@/types/settings';
 import _ from 'lodash';
 
 const route = useRoute();

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { WhiteItem } from '@/store/wallet/type';
+import { WhiteItem } from '@/types/settings';
+
 
 // 初始化
 onBeforeMount(() => {
@@ -9,13 +10,13 @@ onBeforeMount(() => {
 // 删除白名单
 const domain = ref(Number(useRoute().query.domain));
 const handleDeleteWhiteList = (list: WhiteItem[]) => {
-    store.wallet().whitelist.forEach((item1, index) => {
+    store.setting().whitelist.forEach((item1, index) => {
         list.forEach((item2) => {
             if (JSON.stringify(item1) === JSON.stringify(item2))
-                store.wallet().whitelist.splice(index, 1);
+                store.setting().whitelist.splice(index, 1);
         });
     });
-    store.wallet().setWhitelist(store.wallet().whitelist);
+    store.setting().setWhitelist(store.setting().whitelist);
     getData();
 };
 
@@ -24,7 +25,7 @@ const whiteActors = ref<Record<string, Record<string, WhiteItem[]>>>({});
 const getData = () => {
     whiteActors.value = {};
     let list: Record<string, WhiteItem[]> = {};
-    const domianWhiteList = store.wallet().whitelist.filter((item) => item.domain === domain.value);
+    const domianWhiteList = store.setting().whitelist.filter((item) => item.domain === domain.value);
 
     domianWhiteList.forEach((item) => {
         if (list[item.actor] && list[item.actor].length > 0) {

@@ -1,9 +1,10 @@
 import { Api, JsonRpc } from 'eosjs';
 import { ErrorCode } from '../util/type';
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
-import { Auth, Wallet } from '@/store/wallet/type';
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { Auth } from '@/types/account';
+import { Wallet } from '@/types/wallet';
 
 export default class EOS {
     public rpc;

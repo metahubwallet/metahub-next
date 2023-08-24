@@ -1,7 +1,10 @@
-import { Balance, Coin, TransferRecord, Wallet, WalletState, WhiteItem } from './type';
+import { WalletState } from './type';
 import localTokens from '@/asset/json/tokens.json';
 import axios from 'axios';
 import chain from '../chain';
+import { Balance, Coin } from '@/types/tokens';
+import { Wallet } from '@/types/wallet';
+import { TransferRecord } from '@/types/transcation';
 
 type AllTokens = { [key: string]: Coin[] };
 
@@ -10,7 +13,6 @@ const store = defineStore('wallet', {
         wallets: [],
         selectedIndex: 0,
         walletCaches: {},
-        whitelist: [],
         recentTransfers: [],
         allTokens: {},
         userTokens: {},
@@ -66,10 +68,6 @@ const store = defineStore('wallet', {
         async setCurrentUserTokens(coins: Balance[]) {
             this.userTokens[this.currentWalletKey] = coins;
             await localCache.set('userTokens', this.userTokens);
-        },
-        async setWhitelist(list: WhiteItem[]) {
-            this.whitelist = list;
-            await localCache.set('whitelist', list);
         },
         async addRecentTransfer(recent: TransferRecord) {
             const recentTransfers = this.recentTransfers.filter(oldItem => {

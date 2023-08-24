@@ -216,7 +216,7 @@ export default class Chain {
         let result = { code: ErrorCode.OK, permissions: [] as Permission[], msg: '' };
 
         const index = store.wallet().wallets.findIndex((item) => {
-            return item.account === account && item.chainId === chainId;
+            return item.name === account && item.chainId === chainId;
         });
         let wallet = store.wallet().wallets[index];
 

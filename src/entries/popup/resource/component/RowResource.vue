@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
 import { powerup } from '@/common/lib/powerup';
-import { ResourceData } from '@/store/wallet/type';
+import { ResourceData } from '@/types/resouse';
 
 interface Props {
     resources: { [key: string]: ResourceData };

@@ -1,6 +1,7 @@
 import { eosChainId } from '@/common/util/network';
-import { ChainState, Network, RPC } from './type';
+import { ChainState } from './type';
 import { supportNetworks } from '@/common/util/network';
+import { Network, RPC } from '@/types/settings';
 
 
 export default defineStore('chain', {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ResourceData } from '@/store/wallet/type';
+import { ResourceData } from '@/types/resouse';
 
 interface Props {
     isShow: boolean;

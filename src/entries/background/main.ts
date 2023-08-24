@@ -1,11 +1,12 @@
 import { AccountPayload, ArbitrarySignaturePayload, SignatureResult, RequiredKeysPayload, LoginPayload, Message, Payload, SignaturePayload, Identity, IdentityAccount } from '@/common/lib/messages/message';
 import * as MessageTypes from '@/common/lib/messages/types';
-import { Auth, AuthAccount, AuthStore, Wallet, WhiteItem } from '@/store/wallet/type';
 import SdkError from '@/common/lib/sdkError';
-import { Network as ChainNetwork, RPC } from '@/store/chain/type';
+import { Network, RPC, WhiteItem } from '@/types/settings';
 import { signature } from '@/common/lib/keyring';
 import { decrypt, md5 } from '@/common/util/crypto';
 import { Api, JsonRpc } from 'eosjs';
+import { Auth, AuthAccount, AuthorizedData } from '@/types/account';
+import { Wallet } from '@/types/wallet';
 
 console.log('run...');
 
@@ -106,8 +107,8 @@ async function getIdentity(payload: LoginPayload) : Promise<Identity> {
     const account = _account!;
     account.expire = Date.now() + 86400 * 7 * 1000;
 
-    const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
-    let auth = authorizations.find((x) => x.domain == payload.domain) as AuthStore;
+    const authorizations = (await localCache.get('authorizations', [])) as AuthorizedData[];
+    let auth = authorizations.find((x) => x.domain == payload.domain) as AuthorizedData;
     if (!auth) {
         auth = { domain: payload.domain, accounts: [], actor: '', permission: '' };
         authorizations.push(auth);
@@ -128,7 +129,7 @@ async function getIdentity(payload: LoginPayload) : Promise<Identity> {
 
 async function getAuthorizations(domain: string, chainId = '*') : Promise<IdentityAccount[]> {
     const wallets = (await localCache.get('wallets', [])) as Wallet[];
-    const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
+    const authorizations = (await localCache.get('authorizations', [])) as AuthorizedData[];
     for (let auth of authorizations) {
         if (auth.domain == domain) {
             let now = Date.now();
@@ -205,7 +206,7 @@ async function getAccountSmoothMode(payload: AccountPayload) {
 
 async function forgetIdentity(payload: AccountPayload) {
     //可以指定域名，指定链，指定账号
-    const authorizations = (await localCache.get('authorizations', [])) as AuthStore[];
+    const authorizations = (await localCache.get('authorizations', [])) as AuthorizedData[];
     let authorization = authorizations.find((x) => x.domain == payload.domain);
     if (!authorization) return generateIdengity([]);
 
@@ -237,7 +238,7 @@ async function getEndPoint(chainId: string) {
     let endpoint = selectedRpc[chainId];
 
     if (!endpoint) {
-        const networks = (await localCache.get('networks', [])) as ChainNetwork[];
+        const networks = (await localCache.get('networks', [])) as Network[];
         const network = networks.find((x) => x.chainId == chainId);
         endpoint = network ? network.endpoint : '';
     }

@@ -1,4 +1,4 @@
-import { CacheABI } from '@/store/wallet/type';
+import { CacheABI } from '@/types/settings';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 

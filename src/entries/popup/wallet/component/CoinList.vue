@@ -2,10 +2,11 @@
 import EOSIcon from '@/asset/img/eos_icon.png';
 import ErrorIcon from '@/asset/img/placeholder.png';
 import ErrorCoinImg from '@/asset/img/placeholder.png';
-import { Balance, Coin } from '@/store/wallet/type';
 import { eosChainId } from '@/common/util/network';
 import { getBalanceList, isSupportChain } from '@/common/lib/remote';
+import { Balance, Coin } from '@/types/tokens';
 import chain from '@/common/lib/chain';
+
 
 const chainStore = store.chain();
 const showAddToken = ref(false);
@@ -19,7 +20,7 @@ onMounted(async () => {
     await loadTokens();
 });
 watch(
-    () => wallet.currentWallet.account,
+    () => wallet.currentWallet.name,
     async (v) => {
         await loadTokens();
     }
@@ -67,7 +68,7 @@ const getUserBalance = async () => {
         return { contract: x.contract, symbol: x.symbol };
     }) as Coin[];
 
-    await getBalanceList(store.wallet().currentWallet.account, userCoins, (coin: Balance) => {
+    await getBalanceList(store.wallet().currentWallet.name, userCoins, (coin: Balance) => {
         // console.log(coin);
         const selectedToken = tokens.value.find((x) => x.contract === coin.contract && x.symbol == coin.symbol);
 

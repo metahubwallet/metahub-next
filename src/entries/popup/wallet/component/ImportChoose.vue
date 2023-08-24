@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import { Wallet } from '@/types/wallet';
 import _ from 'lodash';
-import { Wallet } from '@/store/wallet/type';
 
 interface ShownWallet extends Wallet {
     index: number,

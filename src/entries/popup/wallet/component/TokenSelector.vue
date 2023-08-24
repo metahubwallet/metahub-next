@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Balance, Coin } from '@/store/wallet/type';
+import { Balance, Coin } from '@/types/tokens';
 import CoinAddSelected from '@/asset/img/coin_add_selected.png';
 import CoinAdd from '@/asset/img/coin_add.png';
+
 
 interface Props {
     isShow: boolean;

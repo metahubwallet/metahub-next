@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import axios from 'axios';
 import chain from './chain.js';
-import { Balance, Coin } from '@/store/wallet/type';
+import { Balance, Coin } from '@/types/tokens.js';
 
 let manifestData = chrome.runtime.getManifest();
 

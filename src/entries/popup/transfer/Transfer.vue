@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
-import { Balance, Transfer, TransferRecord } from '@/store/wallet/type';
+import { Balance } from '@/types/tokens';
+import { Transfer, TransferRecord } from '@/types/transcation';
 
 const { t } = useI18n();
 
@@ -41,7 +42,7 @@ onBeforeMount(() => {
         }
     });
 
-    transfer.sender = tool.briefAccount(wallet.currentWallet.account, 14, 8);
+    transfer.sender = tool.briefAccount(wallet.currentWallet.name, 14, 8);
 
     getBalance();
 });

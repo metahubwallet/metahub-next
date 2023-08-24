@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
-import { Wallet } from '@/store/wallet/type';
+import { Wallet } from '@/types/wallet';
 import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 
 interface Params {

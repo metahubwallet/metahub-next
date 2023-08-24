@@ -24,8 +24,8 @@ watch(
                     <div class="account">
                         <span>
                             {{
-                                wallet.currentWallet?.account
-                                    ? briefAccount(wallet.currentWallet.account)
+                                wallet.currentWallet?.name
+                                    ? briefAccount(wallet.currentWallet.name)
                                     : $t('public.noAccount')
                             }}
                         </span>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Wallet } from '@/store/wallet/type';
+import { Wallet } from '@/types/wallet';
 
 interface ShownWallet extends Wallet {
     symbol: string,

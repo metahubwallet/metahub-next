@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
 import { eosChainId } from '@/common/util/network';
-import { ResourceBase, ResourceData } from '@/store/wallet/type';
+import { ResourceBase, ResourceData } from '@/types/resouse';
 import { toInteger } from 'lodash';
 
 // 初始化

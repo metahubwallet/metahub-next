@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import chain from '@/common/lib/chain';
-import { ResourceBase } from '@/store/wallet/type';
+import { ResourceBase } from '@/types/resouse';
 const { t } = useI18n();
 
 interface Props {

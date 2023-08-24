@@ -2,9 +2,9 @@
 import EOSIcon from '@/asset/img/eos_icon.png';
 import CoinGet from '@/asset/img/coin_get@2x.png';
 import CoinOut from '@/asset/img/coin_out@2x.png';
-import { Balance, Coin } from '@/store/wallet/type';
 import chain from '@/common/lib/chain';
 import { getTransactionList } from '@/common/lib/remote';
+import { Coin } from '@/types/tokens';
 
 const { timeFormat } = tool;
 

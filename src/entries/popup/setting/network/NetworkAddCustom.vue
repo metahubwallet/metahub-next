@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import _ from 'lodash';
 import { supportNetworks } from '@/common/util/network';
-import { Network } from '@/store/chain/type';
 import { FormItemRule, FormRules } from 'naive-ui';
+import { Network } from '@/types/settings';
 
 const { t } = useI18n();
 const router = useRouter();

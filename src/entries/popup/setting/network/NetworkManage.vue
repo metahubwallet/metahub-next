@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Network } from '@/store/chain/type';
 import { eosChainId } from '@/common/util/network';
+import { Network } from '@/types/settings';
 import _ from 'lodash';
 
 // 确定移除

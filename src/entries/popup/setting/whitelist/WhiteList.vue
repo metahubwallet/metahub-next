@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { WhiteItem } from '@/store/wallet/type';
+import { WhiteItem } from '@/types/settings';
+
 
 const domains = ref<number[]>([]);
 onBeforeMount(() => {
-    store.wallet().whitelist.forEach((whiteItem: WhiteItem) => {
+    store.setting().whitelist.forEach((whiteItem: WhiteItem) => {
         if (domains.value.indexOf(whiteItem.domain) == -1) {
             domains.value.push(whiteItem.domain);
         }

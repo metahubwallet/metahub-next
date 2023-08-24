@@ -1,5 +1,4 @@
 import SdkError from '../sdkError';
-import { AuthAccount } from '@/store/wallet/type';
 
 const strippedHost = () => {
     let host = location.hostname;
@@ -8,7 +7,7 @@ const strippedHost = () => {
     return host;
 };
 
-export interface Network {
+export interface ChainNetwork {
     blockchain: string;
     chainId: string;
     host: string;
@@ -61,12 +60,12 @@ export interface Payload {
 }
 
 export interface NetworkPayload extends Payload {
-    network: Network;
+    network: ChainNetwork;
 }
 
 export interface LoginPayload extends Payload {
     newLogin?: boolean;
-    accounts?: Network[];
+    accounts?: ChainNetwork[];
 }
 
 export interface AccountPayload extends Payload {

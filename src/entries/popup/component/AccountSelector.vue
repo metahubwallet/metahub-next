@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import _ from 'lodash';
 import { getNetworkLocalIcon } from '@/common/util/network';
-import { Wallet } from '@/store/wallet/type';
-import { Network } from '@/store/chain/type';
+import { Network } from '@/types/settings';
+import { Wallet } from '@/types/wallet';
 
 interface Props {
     isShow: boolean;
@@ -44,7 +44,7 @@ const searchName = ref('');
 const wallet = store.wallet();
 const accounts = computed(() => {
     return wallet.wallets.filter(
-        (x) => x.chainId == activeChainId.value && (searchName.value == '' || x.account.includes(searchName.value))
+        (x) => x.chainId == activeChainId.value && (searchName.value == '' || x.name.includes(searchName.value))
     );
 });
 
@@ -123,7 +123,7 @@ const handleSelectAccount = (account: Wallet) => {
                                 <div class="account-left">
                                     <clip-button
                                         class="account-left-name"
-                                        :value="showAccount(item.account)"
+                                        :value="showAccount(item.name)"
                                     ></clip-button>
                                     <div class="account-left-key">
                                         {{ item.keys[0].publicKey.substring(0, 8) }}...{{

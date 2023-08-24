@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
-import { Balance } from '@/store/wallet/type';
+import { Balance } from '@/types/tokens';
+
 
 const code = ref('');
 const contract = ref('');
