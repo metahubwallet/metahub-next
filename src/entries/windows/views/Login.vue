@@ -6,22 +6,23 @@ interface LoginAccount {
     selectedPermission: string,
 }
 
+const route = useRoute();
+
+
 const briefAccount = tool.briefAccount;
 
-const word = ref('');
-
+const word = ref('-');
 const accounts = ref([] as LoginAccount[]);
-
-const params: any = await chrome.storage.session.get(['windowParams']);
-console.log(params);
 const payload = reactive({ 
-  domain: params.domain || window.location, 
-  chainId: params.chainId || '', 
+  domain: window.location, 
+  chainId: '', 
 });
+
+
 
 const allAccounts = computed(() => {
   const accounts = store.wallet().wallets.filter( x => x.chainId == payload.chainId );
-  // console.log(this.$store.state.wallets);
+  console.log(accounts);
   return accounts.map(x => {
     return {
         name: x.name,
@@ -31,9 +32,26 @@ const allAccounts = computed(() => {
 });
 
 watch(word, (nw: string) => {
-    accounts.value = allAccounts.value.filter(account => {
+    console.log('watch');
+    accounts.value = nw == '' ?  allAccounts.value : allAccounts.value.filter(account => {
       return account.name.includes(nw);
     });
+});
+
+onMounted(async () => {
+    console.log('onMounted');
+    
+    const { windowParams } = await chrome.storage.session.get(['windowParams']);
+    if (windowParams.domain) {
+        payload.domain = windowParams.domain;
+    }
+    if (windowParams.chainId) {
+        payload.chainId = windowParams.chainId;
+    }
+
+    // update list
+    word.value = '';
+
 });
 
 const changePermision = ({ account, permission } : { account: LoginAccount, permission: string })  => {
@@ -103,7 +121,7 @@ const login = async (account: LoginAccount) => {
                     <n-button @click="login(account)" class="select-botton" type="primary">{{ $t('auth.login') }}</n-button>
                 </li>
                 <li v-if="accounts.length === 0" class="no-account">
-                    <img class="no-account-img" src="@/asset/img/no_account.png" />
+                    <img class="no-account-img" src="@/assets/images/no_account.png" />
                     <div class="no-account-tip">{{ $t('public.noImport') }}</div>
                 </li>
             </ul>

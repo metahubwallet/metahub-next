@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import EOSIcon from '@/asset/img/eos_icon.png';
-import ErrorIcon from '@/asset/img/placeholder.png';
-import ErrorCoinImg from '@/asset/img/placeholder.png';
+import EOSIcon from '@/assets/images/eos_icon.png';
+import ErrorIcon from '@/assets/images/placeholder.png';
+import ErrorCoinImg from '@/assets/images/placeholder.png';
 import { eosChainId } from '@/common/util/network';
 import { getBalanceList, isSupportChain } from '@/common/lib/remote';
 import { Balance, Coin } from '@/types/tokens';
@@ -144,10 +144,10 @@ const handleViewCoin = (item: Coin) => {
             </div>
 
             <!-- refresh btn -->
-            <img @click="loadTokens" class="list-refresh-img" src="@/asset/img/home_refresh.png" />
+            <img @click="loadTokens" class="list-refresh-img" src="@/assets/images/home_refresh.png" />
 
             <!-- add btn -->
-            <img @click="showAddToken = true" class="list-refresh-img ml15" src="@/asset/img/home_add.png" />
+            <img @click="showAddToken = true" class="list-refresh-img ml15" src="@/assets/images/home_add.png" />
         </div>
 
         <!-- body -->

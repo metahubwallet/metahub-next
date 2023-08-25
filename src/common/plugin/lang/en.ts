@@ -304,8 +304,7 @@ export default {
         error: 'Password Error',
         unlock: 'Unlock',
         welcome: 'Welcome back!',
-        unlockTip:
-            'When Metahub asks for a password, the icon of the plugin will turn red. Please pay attention!',
+        unlockTip:'Please enter the unlock password and take care to recognize the correct unlock window.',
     },
 
     // 授权

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import EOSIcon from '@/asset/img/eos_icon.png';
+import EOSIcon from '@/assets/images/eos_icon.png';
 
 interface Props {
     isShow: boolean;

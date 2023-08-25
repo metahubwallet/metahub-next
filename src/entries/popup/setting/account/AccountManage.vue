@@ -42,7 +42,7 @@ const viewAccountDetail = (account: Wallet) => {
                             v-for="item in wallets"
                         >
                             <div class="cell-name">{{ item.name }}</div>
-                            <img class="arrow-img" src="@/asset/img/right_arrow@2x.png" />
+                            <img class="arrow-img" src="@/assets/images/right_arrow@2x.png" />
                         </div>
 
                         <!-- import wallet -->

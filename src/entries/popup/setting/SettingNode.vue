@@ -149,7 +149,7 @@ const addCustomEndpoint = async () => {
                             <div class="setting-right flex items-center">
                                 <div class="right-text">{{ item.delay }}</div>
                                 <img
-                                    src="@/asset/img/account_select@2x.png"
+                                    src="@/assets/images/account_select@2x.png"
                                     class="!w-[20px]"
                                     v-show="selectedHttpApi === item.endpoint"
                                 />
@@ -188,7 +188,7 @@ const addCustomEndpoint = async () => {
                             <div class="setting-right flex items-center">
                                 <div class="right-text">{{ item.delay }}</div>
                                 <img
-                                    src="@/asset/img/account_select@2x.png"
+                                    src="@/assets/images/account_select@2x.png"
                                     class="!w-[20px]"
                                     v-show="selectedHttpApi === item.endpoint"
                                 />

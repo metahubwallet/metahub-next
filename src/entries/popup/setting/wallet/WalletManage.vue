@@ -40,7 +40,7 @@ const handleClearCache = async () => {
                                 <div class="item-title">{{ $t('setting.managePermissions') }}</div>
                             </div>
                             <div class="setting-item-right">
-                                <img class="bg-img" src="@/asset/img/right_arrow@2x.png" />
+                                <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
                             </div>
                         </div>
 
@@ -50,7 +50,7 @@ const handleClearCache = async () => {
                                 <div class="item-title">{{ $t('setting.exportWallet') }}</div>
                             </div>
                             <div class="setting-item-right">
-                                <img class="bg-img" src="@/asset/img/right_arrow@2x.png" />
+                                <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
                             </div>
                         </div>
 
@@ -60,7 +60,7 @@ const handleClearCache = async () => {
                                 <div class="item-title">{{ $t('setting.destroyWallet') }}</div>
                             </div>
                             <div class="setting-item-right">
-                                <img class="bg-img" src="@/asset/img/right_arrow@2x.png" />
+                                <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
                             </div>
                         </div>
 
@@ -70,7 +70,7 @@ const handleClearCache = async () => {
                                 <div class="item-title">{{ $t('setting.changePassword') }}</div>
                             </div>
                             <div class="setting-item-right">
-                                <img class="bg-img" src="@/asset/img/right_arrow@2x.png" />
+                                <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
                             </div>
                         </div>
 
@@ -80,7 +80,7 @@ const handleClearCache = async () => {
                                 <div class="item-title">{{ $t('setting.clearAbiCache') }}</div>
                             </div>
                             <div class="setting-item-right">
-                                <img class="bg-img" src="@/asset/img/right_arrow@2x.png" />
+                                <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
                             </div>
                         </div>
                     </div>

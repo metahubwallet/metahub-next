@@ -10,7 +10,6 @@ const formData = reactive({
 const user = store.user();
 
 const handleSubmit = async () => {
-    console.log('submit');
     if (!formData.password) {
         return window.msg.warning(t('password.empty'));
     }
@@ -28,16 +27,16 @@ const handleSubmit = async () => {
 <template>
     <div class="app-window app-unlock" v-if="user.isLock">
         <header>
-            <img class="logo" src="@/asset/img/logo@2x.png" />
+            <img class="logo" src="@/assets/images/logo@2x.png" />
             <div class="tip">{{ $t('password.inputPasswrod') }}</div>
             <div class="tip tip2">{{ $t('password.unlockTip') }}</div>
         </header>
-        <n-form :inline="true" :model="formData" @submit.native.prevent>
-            <n-input :placeholder="$t('password.toUnlock')" type="password" v-model="formData.password" @keydown.enter="handleSubmit">
-                <img class="prefix-img" slot="prefix" src="@/asset/img/initial_unlock@2x.png" />
+        <n-form :model="formData">
+            <n-input :placeholder="$t('password.toUnlock')" type="password" v-model:value="formData.password" @keyup.enter="handleSubmit">
+                <img class="prefix-img" slot="prefix" src="@/assets/images/initial_unlock@2x.png" />
             </n-input>
 
-            <n-button @click="handleSubmit" class="submit-bottom" native-type="submit">{{ $t('password.unlock') }}</n-button>
+            <n-button @click="handleSubmit" class="submit-bottom">{{ $t('password.unlock') }}</n-button>
         </n-form>
     </div>
     <div class="app-window" v-else>
@@ -46,11 +45,6 @@ const handleSubmit = async () => {
 </template>
 
 <style lang="scss">
-body {
-    margin: 0;
-    padding: 0;
-    font-family: PingFang SC;
-}
 
 .app-window {
     width: 100%;
@@ -58,9 +52,6 @@ body {
     overflow: hidden;
 }
 
-* {
-    box-sizing: border-box;
-}
 </style>
 
 <style lang="scss" scoped>

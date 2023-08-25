@@ -73,7 +73,7 @@ const handleSelectAccount = (account: Wallet) => {
 <template>
     <popup-bottom :is-show="props.isShow" :title="$t('auth.chooseAccount')" @close="$emit('close')">
         <template #headLeft>
-            <img @click="handleLock" class="lock-icon" src="@/asset/img/lock.png" />
+            <img @click="handleLock" class="lock-icon" src="@/assets/images/lock.png" />
         </template>
         <div class="list-container">
             <n-tabs
@@ -104,7 +104,7 @@ const handleSelectAccount = (account: Wallet) => {
                                         v-show="searchName != '' || accounts.length"
                                         @click="handleImportKey(item.chainId)"
                                         class="add-icon"
-                                        src="@/asset/img/account_add.png"
+                                        src="@/assets/images/account_add.png"
                                     />
                                 </div>
                             </div>
@@ -133,7 +133,7 @@ const handleSelectAccount = (account: Wallet) => {
                                 </div>
                                 <img
                                     class="close"
-                                    src="@/asset/img/account_select.png"
+                                    src="@/assets/images/account_select.png"
                                     v-show="wallet.selectedIndex == index && chain.currentChainId === item.chainId"
                                 />
                             </div>

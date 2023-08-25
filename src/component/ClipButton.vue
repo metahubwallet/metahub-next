@@ -24,7 +24,7 @@ const clip = () => {
 <template>
     <div v-if="props.type === '1'">
         <span class="wrap-line">{{ props.value }}</span>
-        <img class="account-cell-key-copy" src="@/asset/img/account_copy2.png" @click="clip" />
+        <img class="account-cell-key-copy" src="@/assets/images/account_copy2.png" @click="clip" />
     </div>
 
     <div v-else class="flex items-center">

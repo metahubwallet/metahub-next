@@ -24,7 +24,7 @@ const handleQuery = (url: string) => {
                             <div class="transation-success">
                                 <img
                                     class="transation-img"
-                                    src="@/asset/img/transaction_successful@2x.png"
+                                    src="@/assets/images/transaction_successful@2x.png"
                                 />
                                 <div class="transation-type">
                                     {{ $t('wallet.transferSuccess') }}
@@ -86,17 +86,17 @@ const handleQuery = (url: string) => {
                                     <div class="item-title">{{ $t('wallet.moreDetail') }}</div>
                                     <div class="item-search">
                                         <div @click="handleQuery('https://bloks.io/transaction/')">
-                                            <img src="@/asset/img/bloks.png" />
+                                            <img src="@/assets/images/bloks.png" />
                                             <span>bloks</span>
                                         </div>
                                         <div @click="handleQuery('https://eosflare.io/tx/')">
-                                            <img src="@/asset/img/eosflare.png" />
+                                            <img src="@/assets/images/eosflare.png" />
                                             <span>eosflare</span>
                                         </div>
                                     </div>
                                     <div class="item-search">
                                         <div @click="handleQuery('https://www.eosx.io/tx/')">
-                                            <img src="@/asset/img/eosx.png" />
+                                            <img src="@/assets/images/eosx.png" />
                                             <span>eosx</span>
                                         </div>
                                         <div
@@ -104,7 +104,7 @@ const handleQuery = (url: string) => {
                                                 handleQuery('https://eos.eosq.eosnation.io/tx/')
                                             "
                                         >
-                                            <img src="@/asset/img/eosq.png" />
+                                            <img src="@/assets/images/eosq.png" />
                                             <span>eosq</span>
                                         </div>
                                     </div>

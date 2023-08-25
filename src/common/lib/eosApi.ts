@@ -494,12 +494,12 @@ export default class EOS {
 
     async getAbiJson(contract: string, version = 2) {
         if (contract == 'eosio') {
-            if (version == 1) return import('@/asset/abi/eosio1.abi.json');
-            if (version == 1) return import('@/asset/abi/eosio1.abi.json');
-            else return import('@/asset/abi/eosio.abi.json');
+            if (version == 1) return import('@/assets/abi/eosio1.abi.json');
+            if (version == 1) return import('@/assets/abi/eosio1.abi.json');
+            else return import('@/assets/abi/eosio.abi.json');
         } else if (contract == 'eosio.token') {
-            if (version == 1) return import('@/asset/abi/eosio.token1.abi.json');
-            else return import('@/asset/abi/eosio.token.abi.json');
+            if (version == 1) return import('@/assets/abi/eosio.token1.abi.json');
+            else return import('@/assets/abi/eosio.token.abi.json');
         }
         const cachedABI = await tool.getCachedABI(this.chainId, contract);
         const nowTime = new Date().getTime();

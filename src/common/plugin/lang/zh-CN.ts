@@ -296,7 +296,7 @@ export default {
         error: '密码错误',
         unlock: '解锁',
         welcome: '欢迎您回来!',
-        unlockTip: 'Metahub要求输入密码时插件的图标会变成红色，请注意识别！',
+        unlockTip: '请输入解锁密码，并注意识别正确的解锁窗口。',
     },
 
     // 授权

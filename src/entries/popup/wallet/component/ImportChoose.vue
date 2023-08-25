@@ -86,7 +86,7 @@ const handleSelectWallet = (wallet: any) => {
                             <div class="span-right">{{ item.keys[0].publicKey }}</div>
                         </div>
                     </div>
-                    <img v-if="item.isSelected === true" class="close" src="@/asset/img/account_select@2x.png" />
+                    <img v-if="item.isSelected === true" class="close" src="@/assets/images/account_select@2x.png" />
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Global from '@/component/Global.vue';
 import { themeOverrides } from '@/common/util/theme';
+import Global from '@/component/Global';
 import Layout from '@/entries/windows/views/Layout.vue';
 
 const chain = store.chain();
@@ -21,9 +21,14 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-    <n-config-provider :theme-overrides="themeOverrides">
-        <Global></Global>
-        <Layout></Layout>
+    <n-config-provider :theme-overrides="themeOverrides" abstract>
+        <n-dialog-provider>
+            <n-message-provider>
+                <Global>
+                    <Layout></Layout>
+                </Global>
+            </n-message-provider>
+        </n-dialog-provider>
     </n-config-provider>
 </template>
 

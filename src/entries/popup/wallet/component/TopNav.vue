@@ -18,7 +18,7 @@ watch(
     <header class="app-header">
         <div :class="{ '_effect--50': decline }" class="_effect">
             <div class="cover-top">
-                <img class="logo-img" src="@/asset/img/metahub@2x.png" />
+                <img class="logo-img" src="@/assets/images/metahub@2x.png" />
 
                 <div @click="$emit('change-account')" class="right-box">
                     <div class="account">

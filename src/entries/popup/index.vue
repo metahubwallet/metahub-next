@@ -43,35 +43,34 @@ watch(
 </script>
 
 <template>
-    <div class="overflow-hidden">
-        <!-- 已解锁钱包 -->
-        <div v-if="!user.isLock" class="bg">
-            <top-nav @change-account="showAccountSelector = true"></top-nav>
+    <!-- 已解锁钱包 -->
+    <div v-if="!user.isLock" class="bg">
+        <top-nav @change-account="showAccountSelector = true"></top-nav>
 
-            <div class="app-content">
-                <keep-alive include="wallet">
-                    <router-view class="animate__animated" :class="`animate__${transitionName}`"></router-view>
-                </keep-alive>
-            </div>
-
-            <account-selector
-                :is-show="showAccountSelector"
-                v-model="showAccountSelector"
-                @close="showAccountSelector = false"
-                @importKey="handleImportKey"
-            ></account-selector>
+        <div class="app-content">
+            <keep-alive include="wallet">
+                <router-view class="animate__animated" :class="`animate__${transitionName}`"></router-view>
+            </keep-alive>
         </div>
 
-        <!-- 未解锁钱包但已初始化 -->
-        <div class="bg" v-else-if="user.isInited">
-            <password-unlock></password-unlock>
-        </div>
-
-        <!-- 未初始化钱包 -->
-        <div class="bg" v-else>
-            <password-setting></password-setting>
-        </div>
+        <account-selector
+            :is-show="showAccountSelector"
+            v-model="showAccountSelector"
+            @close="showAccountSelector = false"
+            @importKey="handleImportKey"
+        ></account-selector>
     </div>
+
+    <!-- 未解锁钱包但已初始化 -->
+    <div class="bg" v-else-if="user.isInited">
+        <password-unlock></password-unlock>
+    </div>
+
+    <!-- 未初始化钱包 -->
+    <div class="bg" v-else>
+        <password-setting></password-setting>
+    </div>
+
 </template>
 
 <style lang="scss" scoped>

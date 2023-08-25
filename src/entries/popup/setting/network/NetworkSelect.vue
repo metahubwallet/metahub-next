@@ -39,7 +39,7 @@ const handleNodeSelect = (chainId: string) => {
                             </div>
                             <div class="setting-item-right">
                                 <div class="item-subtitle">{{ getSelectedRpc(item.chainId) }}</div>
-                                <img class="bg-img" src="@/asset/img/right_arrow@2x.png" />
+                                <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
                             </div>
                         </div>
                     </div>

@@ -192,7 +192,7 @@ const removeAccountClicked = () => {
                                 <img
                                     @click="viewAccountChange('owner', 'add')"
                                     class="account-type-right"
-                                    src="@/asset/img/authority_manager_add@2x.png"
+                                    src="@/assets/images/authority_manager_add@2x.png"
                                     v-if="walleAuthType === 'owner'"
                                 />
                             </div>
@@ -240,7 +240,7 @@ const removeAccountClicked = () => {
                                     <img
                                         @click="viewAccountChange('active', 'add')"
                                         class="account-type-right"
-                                        src="@/asset/img/authority_manager_add@2x.png"
+                                        src="@/assets/images/authority_manager_add@2x.png"
                                     />
                                 </div>
                             </div>

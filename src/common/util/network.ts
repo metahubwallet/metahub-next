@@ -152,5 +152,5 @@ export const getNetworkLocalIcon = (chain: string = 'eos', active = true) => {
     // 是否激活
     if (!active) icon += '-ic';
 
-    return new URL(`../../asset/img/network_icon/${icon}.png`, import.meta.url).href;
+    return new URL(`../../assets/images/network_icon/${icon}.png`, import.meta.url).href;
 };

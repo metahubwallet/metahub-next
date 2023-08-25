@@ -1,5 +1,5 @@
 import { WalletState } from './type';
-import localTokens from '@/asset/json/tokens.json';
+import localTokens from '@/assets/json/tokens.json';
 import axios from 'axios';
 import chain from '../chain';
 import { Balance, Coin } from '@/types/tokens';

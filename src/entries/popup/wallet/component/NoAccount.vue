@@ -9,7 +9,7 @@ const signupClick = () => {
         <div class="no-account-tip">{{ $t('public.noImport') }}</div>
         <img
             class="no-account-img"
-            src="@/asset/img/import-btn.png"
+            src="@/assets/images/import-btn.png"
             @click="$router.push({ name: 'import-key' })"
         />
         <div class="no-account-btn">{{ $t('public.importAccountNow') }}</div>

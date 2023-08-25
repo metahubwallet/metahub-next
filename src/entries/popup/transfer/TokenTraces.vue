@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import EOSIcon from '@/asset/img/eos_icon.png';
-import CoinGet from '@/asset/img/coin_get@2x.png';
-import CoinOut from '@/asset/img/coin_out@2x.png';
+import EOSIcon from '@/assets/images/eos_icon.png';
+import CoinGet from '@/assets/images/coin_get@2x.png';
+import CoinOut from '@/assets/images/coin_out@2x.png';
 import chain from '@/common/lib/chain';
 import { getTransactionList } from '@/common/lib/remote';
 import { Coin } from '@/types/tokens';

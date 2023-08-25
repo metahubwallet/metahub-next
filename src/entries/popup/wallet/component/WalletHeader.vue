@@ -42,19 +42,19 @@ const handleViewTransfer = () => {
         </div>
         <div class="bottom-btn-container">
             <div @click="handleViewTransfer" class="one-btn-container">
-                <img src="@/asset/img/wallet_transfer@2x.png" style="width: 25px; height: 25px" />
+                <img src="@/assets/images/wallet_transfer@2x.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('wallet.transfer') }}</div>
             </div>
             <div @click="$router.push({ name: 'receive' })" class="one-btn-container">
-                <img src="@/asset/img/wallet_collection@2x.png" style="width: 25px; height: 25px" />
+                <img src="@/assets/images/wallet_collection@2x.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('wallet.receive') }}</div>
             </div>
             <div @click="$router.push({ name: 'resource' })" class="one-btn-container">
-                <img src="@/asset/img/wallet_voting@2x.png" style="width: 25px; height: 25px" />
+                <img src="@/assets/images/wallet_voting@2x.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('resource.resources') }}</div>
             </div>
             <div @click="$router.push({ name: 'setting' })" class="one-btn-container">
-                <img src="@/asset/img/setting.png" style="width: 25px; height: 25px" />
+                <img src="@/assets/images/setting.png" style="width: 25px; height: 25px" />
                 <div>{{ $t('setting.setting') }}</div>
             </div>
         </div>
@@ -75,7 +75,7 @@ const handleViewTransfer = () => {
     height: 120px;
     border-radius: 15px;
     margin-top: 0;
-    background-image: url('@/asset/img/money-bg.png');
+    background-image: url('@/assets/images/money-bg.png');
     background-size: 360px 120px;
     background-repeat: no-repeat;
     padding: 0 30px;

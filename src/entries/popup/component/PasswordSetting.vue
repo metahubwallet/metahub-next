@@ -49,7 +49,7 @@ const isShow = ref(false);
                 </div>
             </div>
             <div class="nav-view-item flex justify-center items-center mr-2">
-                <img class="w-[16px] h-[16px]" src="@/asset/img/change_language@2x.png" />
+                <img class="w-[16px] h-[16px]" src="@/assets/images/change_language@2x.png" />
                 <n-popselect
                     v-model:value="currentLang"
                     :options="langOptions"
@@ -67,7 +67,7 @@ const isShow = ref(false);
         <div class="container" v-if="currentPage == 1">
             <div class="title">
                 <p>{{ $t('public.welcomeTo') }}</p>
-                <img class="logo-img" src="@/asset/img/metahub@2x.png" />
+                <img class="logo-img" src="@/assets/images/metahub@2x.png" />
             </div>
 
             <div class="tip">{{ $t('public.settingPasswordTip') }}</div>
@@ -127,7 +127,7 @@ const isShow = ref(false);
     position: relative;
     height: 100%;
     width: 100%;
-    background-image: url(@/asset/img/bg-2.png);
+    background-image: url(@/assets/images/bg-2.png);
     background-repeat: no-repeat;
     background-position: right bottom;
     background-size: 210px 250px;

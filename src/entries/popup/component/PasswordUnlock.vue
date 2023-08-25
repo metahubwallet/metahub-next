@@ -22,7 +22,7 @@ const submit = () => {
 <template>
     <div class="no-account-container">
         <div class="cover-top">
-            <img class="logo-img" src="@/asset/img/metahub@2x.png" />
+            <img class="logo-img" src="@/assets/images/metahub@2x.png" />
         </div>
         <div class="tip">{{ $t('password.welcome') }}</div>
 
