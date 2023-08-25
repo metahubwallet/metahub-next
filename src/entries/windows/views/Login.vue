@@ -22,25 +22,23 @@ const payload = reactive({
 
 const allAccounts = computed(() => {
   const accounts = store.wallet().wallets.filter( x => x.chainId == payload.chainId );
-  console.log(accounts);
   return accounts.map(x => {
+    const permissions = x.keys.flatMap(y => y.permissions);
     return {
         name: x.name,
-        permissions:  x.keys.flatMap(y => y.permissions),
+        permissions,
+        selectedPermission: permissions[0], 
     } as LoginAccount;
   });
 });
 
 watch(word, (nw: string) => {
-    console.log('watch');
     accounts.value = nw == '' ?  allAccounts.value : allAccounts.value.filter(account => {
       return account.name.includes(nw);
     });
 });
 
 onMounted(async () => {
-    console.log('onMounted');
-    
     const { windowParams } = await chrome.storage.session.get(['windowParams']);
     if (windowParams.domain) {
         payload.domain = windowParams.domain;
@@ -84,6 +82,8 @@ const login = async (account: LoginAccount) => {
 
     // save result
     await chrome.storage.session.set({ windowResult: result });
+
+    window.close();
 };
 </script>
 

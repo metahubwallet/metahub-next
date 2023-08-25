@@ -1,4 +1,15 @@
-import { AccountPayload, ArbitrarySignaturePayload, SignatureResult, RequiredKeysPayload, LoginPayload, Message, Payload, SignaturePayload, Identity, IdentityAccount } from '@/common/lib/messages/message';
+import {
+    AccountPayload,
+    ArbitrarySignaturePayload,
+    SignatureResult,
+    RequiredKeysPayload,
+    LoginPayload,
+    Message,
+    Payload,
+    SignaturePayload,
+    Identity,
+    IdentityAccount,
+} from '@/common/lib/messages/message';
 import * as MessageTypes from '@/common/lib/messages/types';
 import SdkError from '@/common/lib/sdkError';
 import { Network, RPC, WhiteItem } from '@/types/settings';
@@ -28,7 +39,7 @@ function setupMessageListener() {
     });
 }
 
-async function dispenseMessage(sendResponse: Function, message: Message<any> ) {
+async function dispenseMessage(sendResponse: Function, message: Message<any>) {
     let response;
     try {
         switch (message.type) {
@@ -78,14 +89,13 @@ async function dispenseMessage(sendResponse: Function, message: Message<any> ) {
                 response = await requestRequiredKeys(message.payload);
                 break;
         }
-    } catch (err: any) {
+    } catch (err) {
         response = err;
     }
     sendResponse(response);
 }
 
-async function getIdentity(payload: LoginPayload) : Promise<Identity> {
-
+async function getIdentity(payload: LoginPayload): Promise<Identity> {
     // fill chainId
     if (!payload.chainId && payload.accounts && payload.accounts.length) {
         const network = payload.accounts[0];
@@ -98,13 +108,12 @@ async function getIdentity(payload: LoginPayload) : Promise<Identity> {
         }
     }
 
-
-    let _account: AuthAccount | undefined = await createWindow('login', 450, 600, payload);
-    if (!_account) {
+    const selectedAccount: AuthAccount | undefined = await createWindow('login', 450, 600, payload);
+    if (!selectedAccount) {
         throw SdkError.signatureError('identity_rejected', 'User rejected the provision of an Identity');
     }
 
-    const account = _account!;
+    const account = selectedAccount!;
     account.expire = Date.now() + 86400 * 7 * 1000;
 
     const authorizations = (await localCache.get('authorizations', [])) as AuthorizedData[];
@@ -113,62 +122,52 @@ async function getIdentity(payload: LoginPayload) : Promise<Identity> {
         auth = { domain: payload.domain, accounts: [], actor: '', permission: '' };
         authorizations.push(auth);
     }
-    const index = auth.accounts.findIndex(
-        (x) => x.chainId == account.chainId && x.name == account.name && x.authority == account.authority
-    );
+    const index = auth.accounts.findIndex((x) => x.chainId == account.chainId && x.name == account.name && x.authority == account.authority);
     if (index >= 0) {
         auth.accounts.splice(index, 1);
     }
     auth.accounts.unshift(account);
-    chrome.storage.local.set({ authorizations });
+
+    await localCache.set('authorizations', authorizations, 86400 * 30);
     const accounts = await getAuthorizations(payload.domain, payload.chainId);
     return generateIdengity(accounts);
-
 }
 
-
-async function getAuthorizations(domain: string, chainId = '*') : Promise<IdentityAccount[]> {
+async function getAuthorizations(domain: string, chainId = '*'): Promise<IdentityAccount[]> {
     const wallets = (await localCache.get('wallets', [])) as Wallet[];
     const authorizations = (await localCache.get('authorizations', [])) as AuthorizedData[];
-    for (let auth of authorizations) {
-        if (auth.domain == domain) {
-            let now = Date.now();
-
-            let filterAccounts = auth.accounts.filter((x) => {
-                if (x.expire && x.expire < now) return false;
-
-                return (
-                    wallets.findIndex(
-                        (y) =>
-                            x.chainId == y.chainId &&
-                            x.name == y.name &&
-                            y.keys.findIndex((z) => {
-                                return z.permissions.findIndex((item) => {
-                                    return item === x.authority;
-                                });
-                            }) >= 0
-                    ) >= 0
-                );
-            });
-            if (auth.accounts.length != filterAccounts.length) {
-                auth.accounts = filterAccounts;
-                chrome.storage.local.set({ authorizations });
-            }
-
-            const chainAccounts =
-                chainId == '*' ? filterAccounts : filterAccounts.filter((x) => x.chainId == chainId);
-            const returnAccounts = [];
-            for (const chainAccount of chainAccounts) {
-                const { expire, ...account } = Object.assign({ blockchain: 'eos', isHardware: false }, chainAccount);
-                returnAccounts.push(account);
-            }
-            return returnAccounts;
-        }
+    const auth = authorizations.find(x => x.domain == domain);
+    if (!auth) {
+        return [];
     }
-    return [];
+
+    let now = Date.now();
+    let filterAccounts = auth.accounts.filter((x) => {
+        if (x.expire && x.expire < now) {
+            return false;
+        }
+        const index = wallets.findIndex(
+            (y) => x.chainId == y.chainId && x.name == y.name && y.keys.findIndex((z) => z.permissions.indexOf(x.authority) >= 0) >= 0
+        );
+        return index >= 0;
+    });
+    if (auth.accounts.length != filterAccounts.length) {
+        auth.accounts = filterAccounts;
+        await localCache.set('authorizations', authorizations, 86400 * 30);
+    }
+
+    const chainAccounts = chainId == '*' ? filterAccounts : filterAccounts.filter((x) => x.chainId == chainId);
+    const returnAccounts = [];
+    for (const chainAccount of chainAccounts) {
+        const { expire, ...account } = Object.assign({ blockchain: 'eos', isHardware: false }, chainAccount);
+        returnAccounts.push(account);
+    }
+    return returnAccounts;
+        
+   
 }
 
-function generateIdengity(accounts: AuthAccount[]) : Identity {
+function generateIdengity(accounts: AuthAccount[]): Identity {
     return {
         accounts: accounts.map((x) => {
             const id = {
@@ -219,11 +218,11 @@ async function forgetIdentity(payload: AccountPayload) {
             const idx = authorization?.accounts.indexOf(x) || 0;
             authorization?.accounts.splice(idx, 1);
         });
-        chrome.storage.local.set({ authorizations });
+        await localCache.set('authorizations', authorizations, 86400 * 30);
     } else if (deletes.length == authorization.accounts.length) {
         const idx = authorizations.indexOf(authorization);
         authorizations.splice(idx, 1);
-        chrome.storage.local.set({ authorizations });
+        await localCache.set('authorizations', authorizations, 86400 * 30);
     }
     return generateIdengity(authorization.accounts);
 }
@@ -255,7 +254,7 @@ async function requestAvailableKeys(payload: Payload) {
     return Array.from(new Set(authorizations.map((x) => x.publicKey)));
 }
 
-async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePayload) : Promise<SignatureResult> {
+async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePayload): Promise<SignatureResult> {
     if (!payload.chainId) {
         throw SdkError.noNetwork();
     }
@@ -280,13 +279,9 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         // -- old start --
         const authIdx = newPayload.actions[0].authorization.length - 1;
         newPayload.authorization = newPayload.actions[0].authorization[authIdx]; //todo: 是否正确 ???
-        account = authorizations.find(
-            (x) => x.name == newPayload.authorization.actor && x.authority == newPayload.authorization.permission
-        );
+        account = authorizations.find((x) => x.name == newPayload.authorization.actor && x.authority == newPayload.authorization.permission);
         // -- new start ---
-        const allAuths = newPayload.actions
-            .flatMap((a) => a.authorization)
-            .map((auth) => auth.actor + '@' + auth.permission);
+        const allAuths = newPayload.actions.flatMap((a) => a.authorization).map((auth) => auth.actor + '@' + auth.permission);
         const requestAuths = Array.from(new Set(allAuths));
         for (const requestAuth of requestAuths) {
             const [actor, perm] = requestAuth.split('@');
@@ -301,10 +296,7 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
     } else if ('data' in payload) {
         const tooLongWord = payload.data.split(/\s+/).findIndex((x) => x.length > 12);
         if (tooLongWord >= 0) {
-            throw SdkError.signatureError(
-                'signature_rejected',
-                'Each word cannot exceed 12 characters in length.'
-            );
+            throw SdkError.signatureError('signature_rejected', 'Each word cannot exceed 12 characters in length.');
         }
         if (payload.data.length >= 1024) {
             throw SdkError.signatureError('signature_rejected', 'String length cannot greater than 1024.');
@@ -333,11 +325,7 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         const whitelist = (await localCache.get('whitelist', [])) as WhiteItem[];
         let allMatch = true;
         for (const action of newPayload.actions) {
-            const hash = md5(
-                [payload.domain, payload.chainId, account.name, account.authority, action.code, action.type].join(
-                    '-'
-                )
-            );
+            const hash = md5([payload.domain, payload.chainId, account.name, account.authority, action.code, action.type].join('-'));
             const wli = whitelist.find((x) => x.hash == hash);
             if (wli) {
                 for (const key in action.data) {
@@ -370,7 +358,7 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
             // todo, through permission
             const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
             const sig = signature(newPayload.buffer, privateKey);
-            return { signatures: [ sig ] };
+            return { signatures: [sig] };
         } else {
             window.msg.error('not match');
         }
@@ -401,14 +389,15 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         //                     whitelist.splice(index, 1, whitelistRow);
         //                 }
         //             }
-        //             chrome.storage.local.set({ whitelist: JSON.stringify(whitelist) });
+        //             await localCache.set('whitelist', JSON.stringify(whitelist), 86400 * 365);
+
         //         }
 
         //         const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
         //         let arbitrary = newPayload.actions.length > 0;
         //         if (newPayload.actions.length == 0) {
         //             arbitrary = true;
-        //         } 
+        //         }
         //         const sig = signature(arbitrary ? newPayload.encryptText : newPayload.buffer, privateKey, arbitrary);
         //         resolve({ signatures: [ sig ] });
         //     }
@@ -456,13 +445,9 @@ async function requestGetVersion() {
     return 'Metahub ' + clientVersion;
 }
 
-async function requestVersionUpdate(payload: Payload) {
+async function requestVersionUpdate(payload: Payload) {}
 
-}
-
-async function authenticate(payload: Payload) {
-    
-}
+async function authenticate(payload: Payload) {}
 
 async function requestHasAccountFor(payload: LoginPayload) {
     const wallets = (await localCache.get('wallets', [])) as Wallet[];
@@ -479,11 +464,10 @@ async function requestRequiredKeys(payload: RequiredKeysPayload) {
         return payload.availableKeys;
     }
     // todo: this is wrong method, to find required keys
-    return [ payload.availableKeys[0] ];
+    return [payload.availableKeys[0]];
 }
 
 async function parseEosjsRequest(payload: SignaturePayload) {
-
     const trxBuf = Buffer.from(Uint8Array.from(payload.serializedTransaction).toString(), 'hex');
     const parsed = await deserializeTransactionWithActions(trxBuf);
     const actions = parsed.actions.map((account: string, name: string, ...x: any[]) => ({
@@ -502,10 +486,13 @@ async function parseEosjsRequest(payload: SignaturePayload) {
 
 async function deserializeTransactionWithActions(buffer: Buffer): Promise<any> {
     // create empty api
-    const api = new Api({ rpc: new JsonRpc(''), signatureProvider: {
-        getAvailableKeys: async () => [],
-        sign: async (args : any) => ({ signatures: [], serializedTransaction: args.serializedTransaction }),
-    } });
+    const api = new Api({
+        rpc: new JsonRpc(''),
+        signatureProvider: {
+            getAvailableKeys: async () => [],
+            sign: async (args: any) => ({ signatures: [], serializedTransaction: args.serializedTransaction }),
+        },
+    });
     return api.deserializeTransactionWithActions(buffer);
 }
 
@@ -530,9 +517,8 @@ async function getEosRawAbi(chainId: string, account_name: string) {
 
 async function getPassword() {
     const result: any = (await chrome.storage.session.get(['password'])) ?? {};
-    return result.password as string || '';
+    return (result.password as string) || '';
 }
-
 
 // todo: 这个变量可能会被置空
 const closeCallbacks: { [key: number]: Function } = {};
@@ -543,9 +529,8 @@ setupMessageListener();
 //     setupMessageListener();
 // });
 
-
-
 async function closeWindow(windowId: number, forceClose = false) {
+    // console.log('close window', windowId);
     const callback = closeCallbacks[windowId];
     if (typeof callback == 'function') {
         delete closeCallbacks[windowId];
@@ -555,13 +540,13 @@ async function closeWindow(windowId: number, forceClose = false) {
         const result: any = await chrome.storage.session.get(['windowResult']);
         setTimeout(() => callback(result.windowResult || null), 1);
     }
-};
+}
 
 async function createWindow(type: string, width: number, height: number, params: any) {
     return new Promise(async (resolve: (value: any) => void) => {
         const cw = await chrome.windows.getCurrent();
-        const left = cw.left! + (cw.width! - width) / 2;
-        const top = cw.top! + (cw.height! - height) / 2;
+        const left = parseInt(cw.left! + (cw.width! - width) / 2 + '');
+        const top = parseInt(cw.top! + (cw.height! - height) / 2 + '');
         const win = await chrome.windows.create({
             url: 'src/entries/windows/index.html#/' + type,
             focused: true,
@@ -572,9 +557,10 @@ async function createWindow(type: string, width: number, height: number, params:
             type: 'popup',
         });
         await chrome.storage.session.set({ windowParams: params });
+        // console.log('create window', win.id);
         closeCallbacks[win.id!] = resolve;
     });
-};
+}
 
 // // 监听退出了浏览器,下次需要输入密码
 // chrome.windows.onRemoved.addListener((windowId) => {
