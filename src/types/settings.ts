@@ -1,24 +1,25 @@
 import { Token } from "./tokens";
 
 export interface WhiteItem {
-    id: string;
+    chainId: string;
+    domain: string;
+    contract: string;
     action: string;
     actor: string;
-    contract: string;
+    permission: string;
     properties: {
         [key: string]: string;
     };
-    domain: number;
     hash: string;
 }
 
 export interface CacheABI {
     chainId: string;
     contract: string;
+    updated: number;
     expire: number;
-    timestamp: number;
     abi: any;
-    hash: string;
+    raw: any;
 }
 
 export interface Network {
@@ -32,5 +33,5 @@ export interface Network {
 export interface RPC {
     name: string;
     endpoint: string;
-    [key: string]: any;
+    delay?: string;
 }

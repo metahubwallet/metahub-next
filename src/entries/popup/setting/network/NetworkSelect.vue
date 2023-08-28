@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { networks, getSelectedRpc } = store.chain();
+const { networks, selectedRpc } = store.chain();
 const router = useRouter();
 
 // 选择网络
@@ -38,7 +38,7 @@ const handleNodeSelect = (chainId: string) => {
                                 <div class="item-title">{{ item.name }}</div>
                             </div>
                             <div class="setting-item-right">
-                                <div class="item-subtitle">{{ getSelectedRpc(item.chainId) }}</div>
+                                <div class="item-subtitle">{{ selectedRpc(item.chainId) }}</div>
                                 <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
                             </div>
                         </div>

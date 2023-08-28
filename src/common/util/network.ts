@@ -7,7 +7,8 @@ export const supportNetworks: Network[] = [
         name: 'EOS',
         chain: 'eos',
         chainId: eosChainId,
-        endpoint: 'https://eospush.tokenpocket.pro',
+        // endpoint: 'https://eospush.tokenpocket.pro',
+        endpoint: 'https://eospush.mytokenpocket.vip',
         token: {
             contract: 'eosio.token',
             symbol: 'EOS',

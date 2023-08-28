@@ -8,7 +8,7 @@ onBeforeMount(() => {
 });
 
 // 删除白名单
-const domain = ref(Number(useRoute().query.domain));
+const domain = ref(useRoute().query.domain);
 const handleDeleteWhiteList = (list: WhiteItem[]) => {
     store.setting().whitelist.forEach((item1, index) => {
         list.forEach((item2) => {

@@ -97,7 +97,7 @@ const importWalletsFromData = async (content: string) => {
 
     store.chain().setNetworks(importData.networks);
     store.chain().setCurrentNetwork(importData.currentNetwork);
-    store.chain().setSelectedRpc(importData.selectedRpc);
+    store.chain().setSelectedRpcs(importData.selectedRpc);
     store.chain().setCustomRpcs(importData.customRpcs);
     
     store.wallet().setWallets(importData.wallets);

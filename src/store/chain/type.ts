@@ -6,7 +6,9 @@ export interface ChainState {
     rpcs: {
         [key: string]: RPC;
     }; // 所有节点
-    selectedRpc: RPC; // 当前选中节点
+    selectedRpcs: {
+        [key: string]: string;
+    };
     customRpcs: {
         [key: string]: RPC[];
     }; // 用户自定义节点相关信息

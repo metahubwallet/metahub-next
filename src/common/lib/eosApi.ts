@@ -1,10 +1,10 @@
 import { Api, JsonRpc } from 'eosjs';
 import { ErrorCode } from '../util/type';
-import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
 import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { Auth } from '@/types/account';
 import { Wallet } from '@/types/wallet';
+import { getContractAbi } from '../util/abi';
 
 export default class EOS {
     public rpc;
@@ -487,46 +487,11 @@ export default class EOS {
     }
 
     async getRawAbi(accountName: string) {
-        const abi = await this.getAbiJson(accountName);
-        const rawAbi: any = this.api.jsonToRawAbi(abi as any);
-        return { accountName, abi: rawAbi };
+        const abi = await getContractAbi(this.api, this.chainId, accountName);
+        return { accountName, abi: abi.raw };
     }
 
-    async getAbiJson(contract: string, version = 2) {
-        if (contract == 'eosio') {
-            if (version == 1) return import('@/assets/abi/eosio1.abi.json');
-            if (version == 1) return import('@/assets/abi/eosio1.abi.json');
-            else return import('@/assets/abi/eosio.abi.json');
-        } else if (contract == 'eosio.token') {
-            if (version == 1) return import('@/assets/abi/eosio.token1.abi.json');
-            else return import('@/assets/abi/eosio.token.abi.json');
-        }
-        const cachedABI = await tool.getCachedABI(this.chainId, contract);
-        const nowTime = new Date().getTime();
-
-        if (cachedABI && cachedABI.expire && cachedABI.expire > nowTime) {
-            const codeUpdateTime = new Date(
-                ((await this.getAccount(contract)) as any).last_code_update + 'Z'
-            ).getTime();
-            if (cachedABI.timestamp > codeUpdateTime) {
-                return cachedABI.abi;
-            }
-        }
-
-        const rawAbi = await this.rpc.get_raw_abi(contract);
-        const abi = this.api.rawAbiToJson(base64ToBinary(rawAbi.abi));
-
-        const savableAbi = {
-            chainId: this.chainId,
-            contract,
-            abi,
-            hash: rawAbi.abi_hash,
-            timestamp: nowTime,
-            expire: nowTime + 86400000 * 7,
-        };
-        await tool.setCacheABI(savableAbi);
-        return abi;
-    }
+    
 
     async getAccount(account = '') {
         if (account == '') throw { code: ErrorCode.NAME_EMPTY };

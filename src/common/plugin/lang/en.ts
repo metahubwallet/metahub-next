@@ -64,6 +64,7 @@ export default {
         welcomeTo: 'Welcome to',
         importAccountNow: 'Import key now',
         freeSignup: 'No account? Signup one for free!',
+        parmasError: 'Parameter error, do not use the wallet illegally!'
     },
 
     // 资源页面

@@ -68,7 +68,7 @@ const props = withDefaults(defineProps<Props>(), {});
         </div>
 
         <div class="dialog-item" v-show="transferVisible">
-            <n-checkbox :model-value="props.transfer" @change="$emit('update:transfer', $event)">
+            <n-checkbox v-model:checked="props.transfer" @change="$emit('update:transfer', $event)">
                 {{ $t('resource.transferStake') }}
             </n-checkbox>
         </div>

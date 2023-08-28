@@ -63,6 +63,7 @@ export default {
         welcomeTo: '欢迎来到',
         importAccountNow: '马上导入私钥',
         freeSignup: '没有账号？来免费注册一个',
+        parmasError: '参数错误，请勿非法使用钱包！'
     },
 
     // 资源页面

@@ -62,7 +62,7 @@ export default class Chain {
     static getApi(chainId: string = '') {
         if (chainId == '') chainId = store.chain().currentChainId;
         if (typeof this.apis[chainId] == 'undefined') {
-            this.apis[chainId] = new EosApi(chainId, store.chain().getSelectedRpc(chainId) as string, this);
+            this.apis[chainId] = new EosApi(chainId, store.chain().selectedRpc(chainId) as string, this);
         }
         return this.apis[chainId];
     }

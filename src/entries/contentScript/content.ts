@@ -1,7 +1,7 @@
 import { SignatureResult, Message, SignaturePayload, Identity, LoginPayload, ChainNetwork, Payload, NetworkPayload, AccountPayload, ArbitrarySignaturePayload, RequiredKeysPayload, SignaturePayloadArgs, ChainInfoResult, Transaction, watchBackgroundMessages } from '../../common/lib/messages/message';
 import * as MessageTypes from '../../common/lib/messages/types';
 import { API_URL } from '@/common/constants';
-import SdkError, { ErrorCodes } from '@/common/lib/sdkError';
+import { ErrorCodes } from '@/common/lib/sdkError';
 
 /* eslint-disable */
 // todo: getIdentity, arbitrarySignature, transcation 要在页面显示一个加载符号？
@@ -39,10 +39,10 @@ watchBackgroundMessages();
 const signatureProvider = (chainId: string) => {
     return {
         async getAvailableKeys() {
-            console.log('getAvailableKeys');
+            // console.log('getAvailableKeys');
             //console.log(payload);
             const keys = await Message.signal<Payload>(MessageTypes.REQUEST_AVAILABLE_KEYS, { chainId }).request();
-            //console.log(keys);
+            // console.log(keys);
             return keys;
         },
 
@@ -62,7 +62,7 @@ const signatureProvider = (chainId: string) => {
                 params.serializedContextFreeData = Array.from(signatureArgs.serializedContextFreeData);
             }
             const result = (await Message.signal<SignaturePayload>(MessageTypes.REQUEST_SIGNATURE, params).request()) as SignatureResult;
-
+            // console.log(result.signatures);
             return {
                 signatures: result.signatures,
                 serializedTransaction: signatureArgs.serializedTransaction
@@ -168,6 +168,7 @@ class Dapp {
     }
 
     async requestRequiredKeys(transaction: any, availableKeys: string[]) {
+        console.log('requestRequiredKeys');
         const params = { transaction, availableKeys }
         const result = await Message.signal<RequiredKeysPayload>(MessageTypes.REQUEST_REQUIRED_KEYS, params).request();
         return result;
@@ -187,10 +188,18 @@ class Dapp {
         options.signatureProvider = signatureProvider(chainId);
         options.abiProvider = {
             getRawAbi: async (accountName: string) => {
-                const rawAbi: any = await this.requestRawAbi(accountName, chainId);
+                const abi: any = await this.requestRawAbi(accountName, chainId);
+                
                 // reset abi
-                rawAbi.abi = Uint8Array.from(Object.values(rawAbi.abi));
-                return rawAbi;
+                const rawAbi = Uint8Array.from(Object.values(abi.abi));
+                // console.log({
+                //     accountName: accountName,
+                //     abi: rawAbi
+                // });
+                return {
+                    accountName: accountName,
+                    abi: rawAbi
+                };
             }
         };
         options.authorityProvider = {
@@ -245,10 +254,16 @@ class Dapp {
             if ((typeof blocksBehind == 'undefined' && typeof useLastIrreversible == 'undefined' && (!ref_block_num || !ref_block_prefix))) {
                 transaction = await generateTapos(transaction, expireSeconds);
             }
+            // add authorityProvider
+            options.authorityProvider = {
+                getRequiredKeys: async ({ transaction, availableKeys } : { transaction: any, availableKeys: string[] }) => {
+                    return await this.requestRequiredKeys(transaction, availableKeys);
+                }
+            };
 
             const account = transaction.actions[0].authorization[0].actor;
             const smoothMode = await Message.signal<AccountPayload>(MessageTypes.GET_ACCOUNT_SMOOTH_MODE, { chainId, account }).request();
-            // console.log('smoothMode', account, smoothMode); 
+            console.log('smoothMode', account, smoothMode); 
             if (!smoothMode || (typeof options.broadcast != 'undefined' && options.broadcast == false)) {
                 return await api.oTransact(transaction, options);
             }
@@ -262,14 +277,15 @@ class Dapp {
             options = options || {};
             options.broadcast = false;
             options.sign = true;
-            options.authorityProvider = {
-                getRequiredKeys: async ({ transaction, availableKeys } : { transaction: any, availableKeys: string[] }) => {
-                    return await this.requestRequiredKeys(transaction, availableKeys);
-                }
-            };
+
+            console.log('call orgin transact');
             const signedTrx = await api.oTransact(transaction, options);
+            console.log(signedTrx);
+
             const trx = api.deserializeTransaction(signedTrx.serializedTransaction);
-            trx.signatures = [ signedTrx.signatures[0] ];
+            trx.signatures = signedTrx.signatures;
+
+            console.log(trx);
 
             const data = { signed: JSON.stringify(trx) };
             const url = API_URL + '/cpu/pushtx';
@@ -281,12 +297,15 @@ class Dapp {
                 },
                 body: JSON.stringify(data),
             });
+
+            console.log(response);
             if (response && response.status == 200) {
                 const data = await response.json();
                 if (data && data.result) {
                     const serverSignature = data.result.signature;
                     // console.log(serverSignature);
                     const signatures = [ serverSignature, signedTrx.signatures[0] ];
+                    console.log(signatures);
                     return api.rpc.push_transaction({
                         signatures,
                         serializedTransaction: signedTrx.serializedTransaction,
@@ -327,7 +346,7 @@ window.scatter = dapp;
 
 let checkTime = 1000;
 function resetScatter() {
-    if (typeof window.scatter == 'object' && window.scatter != dapp && typeof window.scatter.getIdentity == 'function') {
+    if (window && typeof window.scatter == 'object' && window.scatter != dapp && typeof window.scatter.getIdentity == 'function') {
         window.scatter = dapp;
     }
     checkTime += 1000;

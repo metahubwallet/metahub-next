@@ -25,7 +25,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-    <div class="app-window app-unlock" v-if="user.isLock">
+    <div class="app-unlock" v-if="user.isLock">
         <header>
             <img class="logo" src="@/assets/images/logo@2x.png" />
             <div class="tip">{{ $t('password.inputPasswrod') }}</div>
@@ -39,23 +39,13 @@ const handleSubmit = async () => {
             <n-button @click="handleSubmit" class="submit-bottom">{{ $t('password.unlock') }}</n-button>
         </n-form>
     </div>
-    <div class="app-window" v-else>
-        <router-view></router-view>
-    </div>
+    <router-view v-else></router-view>
 </template>
-
-<style lang="scss">
-
-.app-window {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-</style>
 
 <style lang="scss" scoped>
 .app-unlock {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

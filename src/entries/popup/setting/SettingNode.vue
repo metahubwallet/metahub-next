@@ -11,10 +11,15 @@ const network = ref(store.chain().findNetwork(chainId.value));
 
 // 初始化
 const selectedHttpApi = ref('');
+// 选择节点
+const recommendEndpoints = ref<RPC[]>([]);
+
 onMounted(async () => {
     const customRpcs = store.chain().customRpcs[chainId.value];
+
     customEndpoints.value = Array.isArray(customRpcs) ? customRpcs : [];
-    selectedHttpApi.value = store.chain().selectedRpc[chainId.value];
+    selectedHttpApi.value = store.chain().selectedRpc(chainId.value);
+
     await loadRecommendEndpoints();
     pingEndpoints(customEndpoints.value);
 });
@@ -49,11 +54,10 @@ const pingEndpoints = async (endpoints: RPC[]) => {
     }
 };
 
-// 选择节点
-const recommendEndpoints = ref<RPC[]>([]);
+
 const handleSelectNode = (item: RPC) => {
-    store.chain().selectedRpc[chainId.value] = item.endpoint;
-    store.chain().setSelectedRpc(store.chain().selectedRpc);
+    // store.chain().selectedRpc[chainId.value] = item.endpoint;
+    store.chain().setSelectedRpc(chainId.value, item.endpoint);
     selectedHttpApi.value = item.endpoint;
 
     // 更新URL
@@ -91,7 +95,9 @@ const saveNode = () => {
     for (const api of endpoints) delete api.delay;
 
     let allCustomRpcs = store.chain().customRpcs;
-    if (!allCustomRpcs) allCustomRpcs = {};
+    if (!allCustomRpcs) {
+        allCustomRpcs = {};
+    }
     allCustomRpcs[chainId.value] = endpoints;
     store.chain().setCustomRpcs(allCustomRpcs);
 };
@@ -103,7 +109,9 @@ const addCustomEndpoint = async () => {
     let completeUrl = userEnterUrl.value;
     for (let index in customEndpoints.value) {
         let obj = customEndpoints.value[index];
-        if (completeUrl === obj.endpoint) return window.msg.error('Endpoint Exists');
+        if (completeUrl === obj.endpoint) {
+            return window.msg.error('Endpoint Exists');
+        }
     }
     let isHttp = completeUrl.startsWith('http://');
     let isHttps = completeUrl.startsWith('https://');

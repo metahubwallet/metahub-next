@@ -18,6 +18,8 @@ import { decrypt, md5 } from '@/common/util/crypto';
 import { Api, JsonRpc } from 'eosjs';
 import { Auth, AuthAccount, AuthorizedData } from '@/types/account';
 import { Wallet } from '@/types/wallet';
+import { eosChainId } from '@/common/util/network';
+import { getContractAbi } from '@/common/util/abi';
 
 console.log('run...');
 
@@ -233,8 +235,8 @@ async function requestChainInfo(payload: Payload) {
 }
 
 async function getEndPoint(chainId: string) {
-    const selectedRpc = (await localCache.get('selectedRpc', {})) as RPC;
-    let endpoint = selectedRpc[chainId];
+    const selectedRpcs = (await localCache.get('selectedRpcs', {}));
+    let endpoint = selectedRpcs[chainId];
 
     if (!endpoint) {
         const networks = (await localCache.get('networks', [])) as Network[];
@@ -255,6 +257,7 @@ async function requestAvailableKeys(payload: Payload) {
 }
 
 async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePayload): Promise<SignatureResult> {
+    console.log('requestSignature');
     if (!payload.chainId) {
         throw SdkError.noNetwork();
     }
@@ -263,7 +266,8 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         chainId: payload.chainId,
         domain: payload.domain,
         actions: [] as any[],
-        authorization: {} as Auth,
+        dataKeys: [] as any[],
+        authorization: { actor: '', permission: ''} as Auth,
         encryptText: '',
         buffer: Buffer.from([]),
     };
@@ -325,7 +329,8 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         const whitelist = (await localCache.get('whitelist', [])) as WhiteItem[];
         let allMatch = true;
         for (const action of newPayload.actions) {
-            const hash = md5([payload.domain, payload.chainId, account.name, account.authority, action.code, action.type].join('-'));
+            const hash = md5([payload.domain, payload.chainId, account.name, account.authority, action.account, action.name].join('-'));
+            // console.log('hash', hash);
             const wli = whitelist.find((x) => x.hash == hash);
             if (wli) {
                 for (const key in action.data) {
@@ -335,74 +340,65 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
                         break;
                     }
                 }
-                if (!allMatch) break;
-            } else allMatch = false;
+                if (!allMatch) {
+                    break;
+                }
+            } else {
+                allMatch = false;
+            }
         }
+        // console.log('allMatch', allMatch);
         if (allMatch) {
             const locked = (await getPassword()) == '';
             if (locked) {
-                //to unlock
-                // const result = (await new Promise((resolve) => {
-                //     Windows.createWindow('unlock', 500, 450, newPayload, async (result: any) => {
-                //         if (result.code < 0) {
-                //             resolve({ unlock: false });
-                //             return;
-                //         }
-                //         resolve({ unlock: true });
-                //     });
-                // })) as any;
-                // if (!result.unlock) {
-                //     throw SdkError.signatureError('signature_rejected', 'User rejected the signature request');
-                // }
+                // to unlock
+                const result = await createWindow('unlock', 500, 450, null);
+                if (!result || !result.unlock) {
+                    throw SdkError.signatureError('signature_rejected', 'User rejected the signature request');
+                }
             }
-            // todo, through permission
+            // todo: through permission
             const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
             const sig = signature(newPayload.buffer, privateKey);
             return { signatures: [sig] };
-        } else {
-            window.msg.error('not match');
         }
     }
-    return new Promise((resolve, reject) => {
-        let windowHeight = 400;
-        if (newPayload.actions.length > 0) windowHeight = 518;
-        if (newPayload.actions.length > 1) windowHeight = 542;
 
-        // Windows.createWindow(
-        //     'transcation',
-        //     600,
-        //     windowHeight,
-        //     newPayload,
-        //     async (result: { code: number; data: any }) => {
-        //         if (result.code < 0) {
-        //             reject(SdkError.signatureError('signature_rejected', 'User rejected the signature request'));
-        //             return;
-        //         }
-        //         //save whitelist...
-        //         if (result.data.whitelists.length > 0) {
-        //             const whitelist = (await localCache.get('whitelist', [])) as WhiteItem[];
-        //             for (const whitelistRow of result.data.whitelists) {
-        //                 let index = whitelist.findIndex((x) => x.hash === whitelistRow.hash);
-        //                 if (index == -1) {
-        //                     whitelist.push(whitelistRow);
-        //                 } else {
-        //                     whitelist.splice(index, 1, whitelistRow);
-        //                 }
-        //             }
-        //             await localCache.set('whitelist', JSON.stringify(whitelist), 86400 * 365);
+    let windowHeight = 400;
+    if (newPayload.actions.length > 0) windowHeight = 518;
+    if (newPayload.actions.length > 1) windowHeight = 542;
 
-        //         }
+    for (const action of newPayload.actions) {
+        const keys: string[] = [];
+        for (const key in action.data) {
+            keys.push(key);
+        }
+        newPayload.dataKeys.push(keys);
+    }
+    // dataKeys
+    const result = await createWindow('transcation', 600, windowHeight, newPayload);
+    if (!result || !result.approve) {
+        throw SdkError.signatureError('signature_rejected', 'User rejected the signature request');
+    }
+    //save whitelist...
+    if (result.whitelist && result.whitelist.length > 0) {
+        const whitelist = (await localCache.get('whitelist', [])) as WhiteItem[];
+        for (const whitelistRow of result.whitelist) {
+            let index = whitelist.findIndex((x) => x.hash === whitelistRow.hash);
+            if (index == -1) {
+                whitelist.push(whitelistRow);
+            } else {
+                whitelist.splice(index, 1, whitelistRow);
+            }
+        }
+        await localCache.set('whitelist', JSON.stringify(whitelist), 86400 * 365);
 
-        //         const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
-        //         let arbitrary = newPayload.actions.length > 0;
-        //         if (newPayload.actions.length == 0) {
-        //             arbitrary = true;
-        //         }
-        //         const sig = signature(arbitrary ? newPayload.encryptText : newPayload.buffer, privateKey, arbitrary);
-        //         resolve({ signatures: [ sig ] });
-        //     }
-        // );
-    });
+    }
+    const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
+    const arbitrary = newPayload.actions.length == 0;
+    const sig = signature(arbitrary ? newPayload.encryptText : newPayload.buffer, privateKey, arbitrary);
+    return { signatures: [ sig ] };
+            
 }
 
 async function getPrivateKey(chainId: string, publicKey: string) {
@@ -456,63 +452,63 @@ async function requestHasAccountFor(payload: LoginPayload) {
 }
 
 async function requestRawAbi(payload: AccountPayload) {
-    return await getEosRawAbi(payload.chainId, payload.account);
+    console.log('requestRawAbi', payload.account);
+    const api = await tempApi(payload.chainId);
+    const abi = await getContractAbi(api, payload.chainId, payload.account);
+    return { account: payload.account, abi: abi.raw };
 }
 
 async function requestRequiredKeys(payload: RequiredKeysPayload) {
+    console.log('requestRequiredKeys');
     if (payload.availableKeys.length == 1) {
         return payload.availableKeys;
     }
     // todo: this is wrong method, to find required keys
-    return [payload.availableKeys[0]];
+    return [ payload.availableKeys[0] ];
 }
 
 async function parseEosjsRequest(payload: SignaturePayload) {
-    const trxBuf = Buffer.from(Uint8Array.from(payload.serializedTransaction).toString(), 'hex');
-    const parsed = await deserializeTransactionWithActions(trxBuf);
-    const actions = parsed.actions.map((account: string, name: string, ...x: any[]) => ({
-        ...x,
-        code: account,
-        type: name,
-    }));
+    const trxBuf = Buffer.from(Uint8Array.from(payload.serializedTransaction));
+    const parsed = await deserializeTransactionWithActions(payload.chainId, trxBuf);
+    // const actions = parsed.actions.map((account: string, name: string, ...x: any[]) => ({
+    //     ...x,
+    //     code: account,
+    //     type: name,
+    // }));
 
     const buffer = Buffer.concat([
         Buffer.from(payload.chainId, 'hex'), // Chain ID
         trxBuf, // Transaction
         Buffer.from(new Uint8Array(32)), // Context free actions
     ]);
-    return { actions, buffer };
+    return { actions: parsed.actions, buffer };
 }
 
-async function deserializeTransactionWithActions(buffer: Buffer): Promise<any> {
+async function deserializeTransactionWithActions(chainId: string, buffer: Buffer): Promise<any> {
+    console.log('deserializeTransactionWithActions');
+    const api = await tempApi(chainId);
+    return api.deserializeTransactionWithActions(buffer);
+}
+
+async function tempApi(chainId: string = eosChainId) : Promise<Api> {
     // create empty api
+    const endpoint = await getEndPoint(chainId);
     const api = new Api({
-        rpc: new JsonRpc(''),
+        rpc: new JsonRpc(endpoint),
+        chainId,
         signatureProvider: {
             getAvailableKeys: async () => [],
             sign: async (args: any) => ({ signatures: [], serializedTransaction: args.serializedTransaction }),
         },
     });
-    return api.deserializeTransactionWithActions(buffer);
+    return api;
 }
 
 async function getEosInfo(chainId: string) {
-    const baseUrl = await getEndPoint(chainId);
-    const response = await fetch(baseUrl + '/v1/chain/get_info');
-    return response.json();
-}
-
-async function getEosRawAbi(chainId: string, account_name: string) {
-    const baseUrl = await getEndPoint(chainId);
-    const response = await fetch(baseUrl + '/v1/chain/get_raw_abi', {
-        method: 'post',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ account_name }),
-    });
-    const result = response.json() as any;
-    return result.abi;
+    console.log('getEosInfo', chainId);
+    const endpoint = await getEndPoint(chainId);
+    const response = await fetch(endpoint + '/v1/chain/get_info');
+    return await response.json();
 }
 
 async function getPassword() {
@@ -538,6 +534,7 @@ async function closeWindow(windowId: number, forceClose = false) {
             chrome.windows.remove(windowId);
         }
         const result: any = await chrome.storage.session.get(['windowResult']);
+        await chrome.storage.session.remove(['windowResult']);
         setTimeout(() => callback(result.windowResult || null), 1);
     }
 }
@@ -556,7 +553,9 @@ async function createWindow(type: string, width: number, height: number, params:
             top,
             type: 'popup',
         });
-        await chrome.storage.session.set({ windowParams: params });
+        if (params != null) {
+            await chrome.storage.session.set({ windowParams: params });
+        }
         // console.log('create window', win.id);
         closeCallbacks[win.id!] = resolve;
     });

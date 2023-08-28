@@ -6,8 +6,6 @@ interface LoginAccount {
     selectedPermission: string,
 }
 
-const route = useRoute();
-
 
 const briefAccount = tool.briefAccount;
 
@@ -88,7 +86,7 @@ const login = async (account: LoginAccount) => {
 </script>
 
 <template>
-    <div class="window">
+    <div class="app-window">
         <!-- <TitleBar  :height="20"></TitleBar> -->
         <div class="header">
             <div class="title">{{ $t('auth.authorizeLogin') }}</div>
@@ -130,7 +128,7 @@ const login = async (account: LoginAccount) => {
 </template>
 
 <style lang="scss" scoped>
-.window {
+.app-window {
     width: 100%;
     height: 100%;
     font-weight: 400;

@@ -112,9 +112,7 @@ const handleAdd = (e: any) => {
 const addNetwork = async (network: Network) => {
     store.chain().setNetworks([...store.chain().networks, network]);
 
-    const selectedRpc = store.chain().selectedRpc;
-    selectedRpc[network.chainId] = network.endpoint;
-    store.chain().setSelectedRpc(selectedRpc);
+    store.chain().setSelectedRpc(network.chainId, network.endpoint);
 
     const customRpcs = {
         ...store.chain().customRpcs,

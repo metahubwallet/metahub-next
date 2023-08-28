@@ -5,7 +5,7 @@ export type CacheKey =
     | 'cachedAbis'
     | 'wallets'
     | 'authorizations'
-    | 'selectedRpc'
+    | 'selectedRpcs'
     | 'customRpcs'
     | 'networks'
     | 'currentNetwork'

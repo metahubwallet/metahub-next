@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import { WhiteItem } from '@/types/settings';
 
-
-const domains = ref<number[]>([]);
-onBeforeMount(() => {
-    store.setting().whitelist.forEach((whiteItem: WhiteItem) => {
-        if (domains.value.indexOf(whiteItem.domain) == -1) {
-            domains.value.push(whiteItem.domain);
+const domains: string[] = reactive([]);
+onMounted(() => {
+    store.setting().whitelist.forEach((item: WhiteItem) => {
+        if (domains.indexOf(item.domain) == -1) {
+            domains.push(item.domain);
         }
     });
 });

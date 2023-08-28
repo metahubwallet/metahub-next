@@ -10,7 +10,7 @@ export default defineStore('chain', {
             networks: [],
             currentNetwork: {} as Network,
             rpcs: {},
-            selectedRpc: {} as RPC,
+            selectedRpcs: {},
             customRpcs: {},
         }
     },
@@ -26,13 +26,13 @@ export default defineStore('chain', {
             const network = state.networks.find((x) => x.chainId == chainId);
             return network ?? state.networks[0];
         },
-        getSelectedRpc: (state) => (chainId: string) : string => {
-            let selectedRpc = state.rpcs[chainId];
-            if (!selectedRpc) {
+        selectedRpc: (state) => (chainId: string) : string => {
+            let _selectedRpc = state.selectedRpcs[chainId];
+            if (!_selectedRpc) {
                 const network = state.networks.find((x) => x.chainId == chainId);
                 return network ? network.endpoint : '';
             }
-            return selectedRpc.endpoint;
+            return _selectedRpc;
         },
         currentSymbol: (state) => {
             const network = state.networks.find((x: Network) => x.chainId == state.currentNetwork.chainId);
@@ -43,8 +43,8 @@ export default defineStore('chain', {
         async init() {
             this.networks = (await localCache.get('networks', supportNetworks.slice(0, 3))) as Network[];
             this.currentNetwork = (await localCache.get('currentNetwork', this.networks[0])) as Network;
-            this.selectedRpc = (await localCache.get('selectedRpc', null)) as RPC;
-            this.customRpcs = (await localCache.get('customRpcs', null)) as any;
+            this.selectedRpcs = (await localCache.get('selectedRpcs', {}));
+            this.customRpcs = (await localCache.get('customRpcs', {}));
         },
         async setNetworks(networks: Network[]) {
             this.networks = networks;
@@ -54,9 +54,12 @@ export default defineStore('chain', {
             this.currentNetwork = network;
             await localCache.set('currentNetwork', network);
         },
-        async setSelectedRpc(rpc: RPC) {
-            this.selectedRpc = rpc;
-            await localCache.set('selectedRpc', rpc);
+        async setSelectedRpc(chainId: string, endpoint: string) {
+            this.selectedRpcs[chainId] = endpoint;
+            await localCache.set('selectedRpcs', this.selectedRpcs);
+        },
+        async setSelectedRpcs(endpoints: string[]) {
+            await localCache.set('selectedRpcs', endpoints);
         },
         async setCustomRpcs(rpcs: Record<string, RPC[]>) {
             this.customRpcs = rpcs;
