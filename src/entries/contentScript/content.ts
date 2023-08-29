@@ -278,14 +278,11 @@ class Dapp {
             options.broadcast = false;
             options.sign = true;
 
-            console.log('call orgin transact');
+            // console.log('call orgin transact');
             const signedTrx = await api.oTransact(transaction, options);
-            console.log(signedTrx);
 
             const trx = api.deserializeTransaction(signedTrx.serializedTransaction);
             trx.signatures = signedTrx.signatures;
-
-            console.log(trx);
 
             const data = { signed: JSON.stringify(trx) };
             const url = API_URL + '/cpu/pushtx';
@@ -298,14 +295,14 @@ class Dapp {
                 body: JSON.stringify(data),
             });
 
-            console.log(response);
+            // console.log(response);
             if (response && response.status == 200) {
                 const data = await response.json();
                 if (data && data.result) {
                     const serverSignature = data.result.signature;
                     // console.log(serverSignature);
                     const signatures = [ serverSignature, signedTrx.signatures[0] ];
-                    console.log(signatures);
+                    // console.log(signatures);
                     return api.rpc.push_transaction({
                         signatures,
                         serializedTransaction: signedTrx.serializedTransaction,
