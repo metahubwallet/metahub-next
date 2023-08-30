@@ -1,4 +1,4 @@
-import { AdditionalInput } from 'vite-plugin-web-extension';
+import { AdditionalInput } from 'vite-plugin-web-extension-support-inject';
 import pkg from '../package.json';
 
 const manifest: Partial<chrome.runtime.ManifestV3> = {

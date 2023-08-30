@@ -352,7 +352,7 @@
   resolved "https://registry.npmjs.org/@jridgewell/set-array/-/set-array-1.1.2.tgz"
   integrity sha512-xnkseuNADM0gt2bs+BvhO0p78Mk762YnZdsuzFV018NoG1Sj1SCQvpSqa7XUaTam5vAGasABV9qXASMKnFMwMw==
 
-"@jridgewell/sourcemap-codec@^1.4.10", "@jridgewell/sourcemap-codec@^1.4.13":
+"@jridgewell/sourcemap-codec@^1.4.10", "@jridgewell/sourcemap-codec@^1.4.13", "@jridgewell/sourcemap-codec@^1.4.15":
   version "1.4.15"
   resolved "https://registry.npmmirror.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.15.tgz"
   integrity sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==
@@ -482,6 +482,14 @@
     "@types/filesystem" "*"
     "@types/har-format" "*"
 
+"@types/chrome@^0.0.233":
+  version "0.0.233"
+  resolved "https://registry.npmjs.org/@types/chrome/-/chrome-0.0.233.tgz"
+  integrity sha512-T3HUW8LDhHfYPbUkOZilhnqX04sZqEFIQO0OIG8byZ7PBIk2jYys1AkNg56UbtKbsh3dABmOniK+0Q3oyo7Sxg==
+  dependencies:
+    "@types/filesystem" "*"
+    "@types/har-format" "*"
+
 "@types/crypto-js@^4.1.1":
   version "4.1.1"
   resolved "https://registry.npmmirror.com/@types/crypto-js/-/crypto-js-4.1.1.tgz"
@@ -491,6 +499,13 @@
   version "1.0.0"
   resolved "https://registry.npmmirror.com/@types/estree/-/estree-1.0.0.tgz"
   integrity sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==
+
+"@types/etag@^1.8.1":
+  version "1.8.1"
+  resolved "https://registry.npmjs.org/@types/etag/-/etag-1.8.1.tgz"
+  integrity sha512-bsKkeSqN7HYyYntFRAmzcwx/dKW4Wa+KVMTInANlI72PWLQmOpZu96j0OqHZGArW4VQwCmJPteQlXaUDeOB0WQ==
+  dependencies:
+    "@types/node" "*"
 
 "@types/filesystem@*":
   version "0.0.32"
@@ -1704,6 +1719,11 @@ constants-browserify@^1.0.0:
   resolved "https://registry.npmmirror.com/constants-browserify/-/constants-browserify-1.0.0.tgz"
   integrity sha512-xFxOwqIzR/e1k1gLiWEophSCMqXcwVHIH7akf7b/vxcUeGunlj3hvZaaqxwHsTgn+IndtkQJgSztIDWeumWJDQ==
 
+content-security-policy-parser@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.npmjs.org/content-security-policy-parser/-/content-security-policy-parser-0.4.1.tgz"
+  integrity sha512-NNJS8XPnx3OKr/CUOSwDSJw+lWTrZMYnclLKj0Y9CYOfJNJTWLFGPg3u2hYgbXMXKVRkZR2fbyReNQ1mUff/Qg==
+
 conventional-changelog-angular@^5.0.11:
   version "5.0.13"
   resolved "https://registry.npmmirror.com/conventional-changelog-angular/-/conventional-changelog-angular-5.0.13.tgz"
@@ -2438,6 +2458,11 @@ esutils@^2.0.2:
   resolved "https://registry.npmmirror.com/esutils/-/esutils-2.0.3.tgz"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
+etag@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.npmjs.org/etag/-/etag-1.8.1.tgz"
+  integrity sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==
+
 ethereum-cryptography@^0.1.3:
   version "0.1.3"
   resolved "https://registry.npmmirror.com/ethereum-cryptography/-/ethereum-cryptography-0.1.3.tgz"
@@ -2757,6 +2782,15 @@ fs-extra@^11.0.0, fs-extra@11.1.0:
   version "11.1.0"
   resolved "https://registry.npmmirror.com/fs-extra/-/fs-extra-11.1.0.tgz"
   integrity sha512-0rcTq621PD5jM/e0a3EJoGC/1TC5ZBCERW82LQuwfGnCa1V8w7dpYH1yNu+SLb6E5dkeCBzKEyLGlFrnr+dUyw==
+  dependencies:
+    graceful-fs "^4.2.0"
+    jsonfile "^6.0.1"
+    universalify "^2.0.0"
+
+fs-extra@^11.1.1:
+  version "11.1.1"
+  resolved "https://registry.npmjs.org/fs-extra/-/fs-extra-11.1.1.tgz"
+  integrity sha512-MGIE4HOvQCeUCzmlHs0vXpih4ysz4wg9qiSAu6cd42lVwPbTM1TjV7RusoyQqMmk/95gdQZX72u+YW+c3eEpFQ==
   dependencies:
     graceful-fs "^4.2.0"
     jsonfile "^6.0.1"
@@ -6177,9 +6211,10 @@ vite-plugin-node-stdlib-browser@^0.2.1:
   dependencies:
     "@rollup/plugin-inject" "^5.0.3"
 
-"vite-plugin-web-extension@file:../vite-plugin-web-extension":
+vite-plugin-web-extension-support-inject@^5.0.0:
   version "5.0.0"
-  resolved "file:../vite-plugin-web-extension"
+  resolved "https://registry.npmjs.org/vite-plugin-web-extension-support-inject/-/vite-plugin-web-extension-support-inject-5.0.0.tgz"
+  integrity sha512-AxBM0hpB7Z6Tq2C83ZrtiijJfbZ1Y3ZuaQgALFCLl8B2Rw0UYJk811aUKQ02f3ae1A3oJAevwQOZtzV+h68e3g==
   dependencies:
     "@types/chrome" "^0.0.233"
     "@types/etag" "^1.8.1"
@@ -6189,7 +6224,7 @@ vite-plugin-node-stdlib-browser@^0.2.1:
     magic-string "^0.30.0"
     vite "^4.3.2"
 
-"vite@^2.0.0 || ^3.0.0 || ^4.0.0", vite@^4.0.0, vite@^4.4.9:
+"vite@^2.0.0 || ^3.0.0 || ^4.0.0", vite@^4.0.0, vite@^4.3.2, vite@^4.4.9:
   version "4.4.9"
   resolved "https://registry.npmjs.org/vite/-/vite-4.4.9.tgz"
   integrity sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==
