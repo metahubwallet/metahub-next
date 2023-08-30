@@ -33,7 +33,7 @@ const handleChangeLang = async (value: any) => {
                         class="setting-item cursor-pointer"
                         v-for="item in lang"
                     >
-                        <div class="title">{{ item.name }} {{ item.value  }}</div>
+                        <div class="title">{{ item.name }}</div>
                         <icon-check v-show="item.value == setting.language" :fill="theme.primaryColor" />
                     </div>
                 </div>

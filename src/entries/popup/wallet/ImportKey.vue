@@ -15,6 +15,7 @@ const route = useRoute();
 const { networks } = store.chain();
 const chainId = ref(route.query.chainId ? (route.query.chainId as string) : eosChainId);
 const activeIndex = ref(networks.findIndex((item) => item.chainId === chainId.value));
+const showPopover = ref(false);
 const getNetworkIcon = (chainId: string) => {
     const chain = store.chain().findNetwork(chainId)?.chain;
     return getNetworkLocalIcon(chain);
@@ -185,9 +186,9 @@ const sortAccounts = (first: any, second: any) => {
             <div class="cover-content _effect pr-[15px]">
                 <div class="import-key-container">
                     <div class="import-key-tip mb-[10px]">{{ $t('public.importNetTip') }}:</div>
-                    <n-popover style="max-height: 250px" trigger="click" scrollable placement="bottom">
+                    <n-popover class="max-h-[250px] w-full" trigger="manual" width="trigger" :show="showPopover" scrollable placement="bottom">
                         <template #trigger>
-                            <div class="border border-[#DBDBDB] shadow-sm h-[71px] w-full rounded-[12px] flex items-center justify-between px-[20px]">
+                            <div class="border border-[#DBDBDB] shadow-sm h-[71px] w-full rounded-[12px] flex items-center justify-between px-[20px] cursor-pointer" @click="showPopover = true;">
                                 <div class="flex items-center">
                                     <img :src="getNetworkIcon(chainId)" class="icon-img mr-[6px]" />
                                     <span style="color: #3a3949; font-size: 14px">
@@ -201,9 +202,9 @@ const sortAccounts = (first: any, second: any) => {
                         <div
                             v-for="(item, index) of networks"
                             :key="index"
-                            class="flex items-center !w-full py-[10px] pr-[90px] pl-[10px] duration-200"
+                            class="flex items-center !w-full py-[10px] pr-[90px] pl-[10px] duration-200 rounded-[12px] cursor-pointer"
                             :class="activeIndex === index ? 'bg-slate-200' : ''"
-                            @click="activeIndex = index"
+                            @click="activeIndex = index;showPopover = false;"
                         >
                             <img :src="getNetworkIcon(item.chainId)" class="icon-img mr-[6px]" />
                             <span style="color: #3a3949; font-size: 14px">

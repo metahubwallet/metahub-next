@@ -12,34 +12,17 @@ const props = withDefaults(defineProps<Props>(), {});
 <template>
     <popup-bottom :is-show="props.isShow" :title="$t('resource.stakeInfo')" @close="$emit('close')">
         <div class="list-container">
-            <!-- cpu -->
-            <div v-if="props.type == 'cpu'">
+            <div>
                 <div class="info-cell">
-                    <span class="info-cell-key">{{ $t('resource.selfStake') }}：</span>
+                    <span class="info-cell-key">{{ $t('resource.selfStake') }}:</span>
                     <span class="info-cell-value">
-                        {{ props.resources.cpu.self_delegated_bandwidth_weight }}
+                        {{ props.resources[props.type].self_delegated_bandwidth_weight }}
                     </span>
                 </div>
                 <div class="info-cell">
-                    <span class="info-cell-key">{{ $t('resource.otherStake') }}：</span>
+                    <span class="info-cell-key">{{ $t('resource.otherStake') }}:</span>
                     <span class="info-cell-value">
-                        {{ props.resources.cpu.staked_for_user }} EOS
-                    </span>
-                </div>
-            </div>
-
-            <!-- net -->
-            <div v-if="props.type == 'net'">
-                <div class="info-cell">
-                    <span class="info-cell-key">{{ $t('resource.selfStake') }}：</span>
-                    <span class="info-cell-value">
-                        {{ props.resources.net.self_delegated_bandwidth_weight }}
-                    </span>
-                </div>
-                <div class="info-cell">
-                    <span class="info-cell-key">{{ $t('resource.otherStake') }}：</span>
-                    <span class="info-cell-value">
-                        {{ props.resources.net.staked_for_user }} EOS
+                        {{ props.resources[props.type].staked_for_user }} EOS
                     </span>
                 </div>
             </div>
@@ -49,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {});
 
 <style lang="scss" scoped>
 .list-container {
-    max-height: 400px;
+    max-height: 250px;
     overflow-x: hidden;
     overflow-y: auto;
 }

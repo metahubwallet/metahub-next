@@ -111,7 +111,7 @@ const loadData = async () => {
                 left_time: '',
             } : empayRefund,
             total_resources_weight: account.total_resources ? account.total_resources.net_weight : emptyCoin,
-            self_delegated_bandwidth_weight: account.self_delegated_bandwidth ? account.self_delegated_bandwidth.cpu_weight : emptyCoin,
+            self_delegated_bandwidth_weight: account.self_delegated_bandwidth ? account.self_delegated_bandwidth.net_weight : emptyCoin,
             staked_for_others: Number(stakeForOthersNET.toFixed(4)),
             staked_for_user: 0,
         };

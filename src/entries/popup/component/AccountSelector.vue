@@ -82,7 +82,7 @@ const handleSelectAccount = (account: Wallet) => {
                 type="line"
                 animated
                 size="small"
-                style="height: 400px"
+                style="height: 100%"
             >
                 <n-tab-pane v-for="(item, index) in chain.networks" :key="item.chainId" :name="item.chainId">
                     <template #tab>
@@ -195,28 +195,41 @@ const handleSelectAccount = (account: Wallet) => {
     cursor: pointer;
 }
 
-.selector-bg {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 99;
-    background-color: rgba(0, 0, 0, 0.75);
+.list-container {
+    padding: 0;
+    overflow: hidden;
+    height: 400px;
+
+    :deep(.n-tabs-tab-pad) {
+        display: none !important;
+    }
+
+    .icon-img {
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+    }
+
+    .import-key-btn {
+        margin-top: 15px;
+        background: $color-primary;
+        border-radius: 6px;
+        width: 100%;
+        height: 40px;
+        font-size: 15px;
+        font-weight: 400;
+        color: #ffffff;
+        letter-spacing: 0;
+    }
 }
 
-.selector-container {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 440px;
-    z-index: 100;
-    border-radius: 8px 8px 0 0;
-    background-color: white;
-    font-size: 16px;
+.accounts {
+    padding: 0 15px;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
 
-    .selector-header {
+    .title-cell {
         font-size: 16px;
         color: #222;
         height: 40px;
@@ -224,126 +237,70 @@ const handleSelectAccount = (account: Wallet) => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        .title {
-            font-size: 16px;
-            color: #222;
-            font-weight: bold;
-        }
-        i {
-            margin-right: 17px;
-        }
     }
 
-    .import-wallet {
-        height: 65px;
-        margin-left: 15px;
-    }
-
-    .list-container {
-        padding: 0;
-        overflow: hidden;
-
-        :deep(.n-tabs-tab-pad) {
-            display: none !important;
-        }
-
-        .icon-img {
-            width: 30px;
-            height: 30px;
-            border-radius: 15px;
-        }
-
-        .import-key-btn {
-            margin-top: 15px;
-            background: $color-primary;
-            border-radius: 6px;
-            width: 100%;
-            height: 40px;
-            font-size: 15px;
-            font-weight: 400;
-            color: #ffffff;
-            letter-spacing: 0;
-        }
-    }
-
-    .accounts {
-        padding: 0 15px;
-        overflow: visible;
+    .actions {
         display: flex;
-        flex-direction: column;
-
-        .title-cell {
-            font-size: 16px;
-            color: #222;
-            height: 40px;
-            border-bottom: 1px solid $color-separate;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .actions {
+        flex-direction: row;
+        align-items: center;
+        height: 24px;
+        line-height: 1em;
+        .search-acts {
+            margin-right: 8px;
             display: flex;
             flex-direction: row;
             align-items: center;
+            border-bottom: #ddd 1px solid;
             height: 24px;
-            line-height: 1em;
-            .search-acts {
-                margin-right: 8px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                border-bottom: #ddd 1px solid;
-                height: 24px;
-                i {
-                    font-size: 12px;
-                    margin-right: 3px;
-                }
-                input {
-                    border: none;
-                    width: 70px;
-                    color: #666;
-                    font-size: 12px;
-                    &::placeholder {
-                        color: #999;
-                    }
+            i {
+                font-size: 12px;
+                margin-right: 3px;
+            }
+            input {
+                border: none;
+                width: 70px;
+                color: #666;
+                font-size: 12px;
+                &::placeholder {
+                    color: #999;
                 }
             }
         }
+    }
 
-        .account-cell {
-            cursor: pointer;
+    .account-cell {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 72px;
+        background: #030134;
+        box-shadow: 0px 2px 4px 0px rgba(3, 1, 52, 0.12);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 10px;
+
+        .account-left {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 72px;
-            background: #030134;
-            box-shadow: 0px 2px 4px 0px rgba(3, 1, 52, 0.12);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
+            flex-direction: column;
+            justify-content: center;
 
-            .account-left {
+            .account-left-name {
+                font-size: 14px;
+                color: #ffffff;
+                font-weight: 600;
+            }
+            .account-left-key {
+                color: #ffffff;
                 display: flex;
-                flex-direction: column;
-                justify-content: center;
-
-                .account-left-name {
-                    font-size: 14px;
-                    color: #ffffff;
-                    font-weight: 600;
-                }
-                .account-left-key {
-                    color: #ffffff;
-                    display: flex;
-                    flex-direction: row;
-                    font-size: 12px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
+                flex-direction: row;
+                font-size: 12px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
     }
 }
+
 </style>

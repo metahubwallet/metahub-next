@@ -57,7 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
     left: 0;
     bottom: 0;
     width: 100%;
-    height: 440px;
+    max-height: 500px;
     z-index: 100;
     border-radius: 8px 8px 0 0;
     background-color: white;

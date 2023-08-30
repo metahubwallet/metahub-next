@@ -17,7 +17,7 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
         {
             js: ['src/entries/contentScript/main.ts'],
             matches: ['<all_urls>'],
-            run_at: 'document_start',
+            // run_at: 'document_start',
         },
     ],
     host_permissions: ['<all_urls>'],
