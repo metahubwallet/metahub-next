@@ -9,7 +9,6 @@ export default defineStore('chain', {
         return {
             networks: [],
             currentNetwork: {} as Network,
-            rpcs: {},
             selectedRpcs: {},
             customRpcs: {},
         }

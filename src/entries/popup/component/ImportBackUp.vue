@@ -111,9 +111,6 @@ const importWalletsFromData = async (content: string) => {
         }
     }
 
-
-    // recentTransfers: old version no token field
-
     store.chain().setNetworks(importData.networks);
     if (importData.currentNetwork) {
         store.chain().setCurrentNetwork(importData.currentNetwork);
