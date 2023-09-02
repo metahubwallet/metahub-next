@@ -44,6 +44,7 @@ const store = defineStore('wallet', {
 
     actions: {
         async init() {
+            // to delete wallet.account && wallet.symbol
             this.wallets = (await localCache.get('wallets', [])) as Wallet[];
             this.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
             this.recentTransfers = (await localCache.get('recentTransfers', [])) as TransferRecord[];
@@ -77,6 +78,10 @@ const store = defineStore('wallet', {
         async setCurrentUserTokens(coins: Balance[]) {
             this.userTokens[this.currentWalletKey] = coins;
             await localCache.set('userTokens', this.userTokens);
+        },
+        async setRecentTransfers(transfers: TransferRecord[]) {
+            this.recentTransfers = transfers;
+            await localCache.set('recentTransfers', this.recentTransfers);
         },
         async addRecentTransfer(recent: TransferRecord) {
             const recentTransfers = this.recentTransfers.filter(oldItem => {

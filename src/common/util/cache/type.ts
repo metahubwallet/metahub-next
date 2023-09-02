@@ -14,4 +14,7 @@ export type CacheKey =
     | 'allTokens'
     | 'userTokens'
     | 'updateAt'
-    | 'recentTransfers';
+    | 'recentTransfers'
+    
+    | 'currentChainId' // old key
+    ;

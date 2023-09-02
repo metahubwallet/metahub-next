@@ -42,7 +42,15 @@ export default defineStore('chain', {
     actions: {
         async init() {
             this.networks = (await localCache.get('networks', supportNetworks.slice(0, 3))) as Network[];
-            this.currentNetwork = (await localCache.get('currentNetwork', this.networks[0])) as Network;
+            let currentNetwork = await localCache.get('currentNetwork', null);
+            if (!currentNetwork) {
+                // compatible with old data
+                const chainId = await localCache.get('currentChainId', '');
+                if (chainId) {
+                    currentNetwork = this.networks.find((x) => x.chainId == chainId);
+                }
+            } 
+            this.currentNetwork = currentNetwork || this.networks[0];
             this.selectedRpcs = (await localCache.get('selectedRpcs', {}));
             this.customRpcs = (await localCache.get('customRpcs', {}));
         },

@@ -140,6 +140,10 @@ const importWalletsFromData = async (content: string) => {
     }
     store.wallet().setWallets(wallets);
 
+    if (importData.recentTransfers) {
+        store.wallet().setRecentTransfers(importData.recentTransfers);
+    }
+
     store.wallet().setSelectedIndex(importData.selectedIndex);
     store.wallet().setUserTokens(importData.userTokens);
 

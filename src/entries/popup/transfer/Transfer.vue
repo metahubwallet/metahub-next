@@ -71,6 +71,9 @@ const handleSelectTransfer = (tr: TransferRecord) => {
     recentVisible.value = false;
     transfer.receiver = tr.account;
     transfer.memo = tr.memo;
+    if (transfer.token) {
+        // todo something
+    }
     receiverError.value = '';
     checkReceiver();
 };

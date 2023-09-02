@@ -17,7 +17,6 @@ onBeforeMount(async () => {
 });
 
 
-
 // 钱包选择
 const showAccountSelector = ref(false);
 const router = useRouter();
