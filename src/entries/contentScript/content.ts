@@ -36,57 +36,28 @@ import { ErrorCodes } from '@/common/lib/sdkError';
 // start watch message
 watchBackgroundMessages();
 
-const signatureProvider = (chainId: string) => {
-    return {
-        async getAvailableKeys() {
-            // console.log('getAvailableKeys');
-            //console.log(payload);
-            const keys = await Message.signal<Payload>(MessageTypes.REQUEST_AVAILABLE_KEYS, { chainId }).request();
-            // console.log(keys);
-            return keys;
-        },
-
-        async sign(signatureArgs: SignaturePayloadArgs) {
-
-            const params: Partial<SignaturePayload> = {
-                chainId: signatureArgs.chainId,
-                requiredKeys: [],
-                serializedTransaction: [],
-                serializedContextFreeData: [],
-                abis: [],
-            };
-
-            //Uint8Array to array
-            params.serializedTransaction = Array.from(signatureArgs.serializedTransaction);
-            if (signatureArgs.serializedContextFreeData) {
-                params.serializedContextFreeData = Array.from(signatureArgs.serializedContextFreeData);
-            }
-            const result = (await Message.signal<SignaturePayload>(MessageTypes.REQUEST_SIGNATURE, params).request()) as SignatureResult;
-            // console.log(result.signatures);
-            return {
-                signatures: result.signatures,
-                serializedTransaction: signatureArgs.serializedTransaction
-            }
-        }
-    }
-}
 
 class Dapp {
-    public identity?: Identity;
+    private _identity: Identity | null = null;
+    private chainId: string = '';
 
     constructor() {
         this.init();
     }
 
-    async getVersion() {
-        return await Message.signal<Payload>(MessageTypes.REQUEST_GET_VERSION).request();
+    public get identity(): Identity | null {
+        return this._identity;
     }
 
-    async init() {
+    public async getVersion() {
+        return await this.signal<Payload>(MessageTypes.REQUEST_GET_VERSION).request();
+    }
+
+    public async init() {
         try {
             const identity = await this.getIdentityFromPermissions();
             if (identity) {
-                this.identity = identity;
+                this._identity = identity;
             }
         } catch (e) {
             console.log(e);
@@ -96,45 +67,45 @@ class Dapp {
         document.dispatchEvent(new CustomEvent("scatterLoaded"));
     }
 
-    async login(payload: LoginPayload): Promise<Identity> {
+    public async login(payload: LoginPayload): Promise<Identity> {
         console.log('login');
         return await this.getIdentity(payload);
     }
 
-    async hasAccountFor(network: ChainNetwork) {
+    public async hasAccountFor(network: ChainNetwork) {
         console.log('hasAccountFor');
-        return await Message.signal<NetworkPayload>(MessageTypes.REQUEST_HAS_ACCOUNT_FOR, { network }).request();
+        return await this.signal<NetworkPayload>(MessageTypes.REQUEST_HAS_ACCOUNT_FOR, { network }).request();
     }
 
-    async getIdentity(params: Partial<LoginPayload>): Promise<Identity> {
-        this.identity = (await Message.signal(MessageTypes.GET_IDENTITY, params).request()) as Identity;
+    public async getIdentity(params: Partial<LoginPayload>): Promise<Identity> {
+        this._identity = (await this.signal(MessageTypes.GET_IDENTITY, params).request()) as Identity;
         console.log('getIdentity response');
-        return this.identity;
+        return this._identity;
     }
 
-    async useIdentity(id: string) {
+    public async useIdentity(id: string) {
         console.log('useIdentity');
         // console.log(id);
     }
 
-    async logout(account?: string) {
+    public async logout(account?: string) {
         console.log('logout');
         return await this.forgetIdentity(account);
     }
 
-    async forgetIdentity(account?: string) {
+    public async forgetIdentity(account?: string) {
         console.log('forgetIdentity');
         // console.log('payload', payload);
-        const result = (await Message.signal<AccountPayload>(MessageTypes.FORGET_IDENTITY, { account }).request()) as Identity;
+        const result = (await this.signal<AccountPayload>(MessageTypes.FORGET_IDENTITY, { account }).request()) as Identity;
         // console.log(result);
-        this.identity = result;
+        this._identity = result;
         return this.identity;
     }
 
-    async getIdentityFromPermissions() : Promise<Identity | null> {
+    public async getIdentityFromPermissions() : Promise<Identity | null> {
         console.log('getIdentityFromPermissions');
         try {
-            const result = (await Message.signal<Payload>(MessageTypes.GET_IDENTITY_FROM_PERMISSIONS).request()) as Identity;
+            const result = (await this.signal<Payload>(MessageTypes.GET_IDENTITY_FROM_PERMISSIONS).request()) as Identity;
             return result;
         } catch (e: any) {
             if (e.code && e.code == ErrorCodes.EMPTY_DATA) {
@@ -144,39 +115,79 @@ class Dapp {
         }
     }
 
-    async suggestNetwork() {
+    public async suggestNetwork() {
         console.log('suggestNetwork');
-        console.log(arguments);
+        throw new Error('suggestNetwork doesn\'t support now');
     }
 
-    async authenticate(randomString: string) {
+    public async addToken() {
+        console.log('addToken');
+        throw new Error('addToken doesn\'t support now');
+    }
+
+    public async authenticate(randomString: string) {
         console.log('authenticate');
         console.log(randomString);
     }
 
-    async getArbitrarySignature(publicKey: string, data: string) : Promise<string> {
+    public async getArbitrarySignature(publicKey: string, data: string) : Promise<string> {
         console.log('arbitrarySignature');
         const params = { publicKey, data }
-        const result = (await Message.signal<ArbitrarySignaturePayload>(MessageTypes.REQUEST_ARBITRARY_SIGNATURE, params).request()) as SignatureResult;
+        const result = (await this.signal<ArbitrarySignaturePayload>(MessageTypes.REQUEST_ARBITRARY_SIGNATURE, params).request()) as SignatureResult;
         return result.signatures[0];
     }
 
-    async requestRawAbi(account: string, chainId: string) {
+    public async requestRawAbi(account: string, chainId: string) {
         const params = { account, chainId }
-        const result = await Message.signal<AccountPayload>(MessageTypes.REQUEST_RAW_ABI, params).request();
+        const result = await this.signal<AccountPayload>(MessageTypes.REQUEST_RAW_ABI, params).request();
         return result;
     }
 
-    async requestRequiredKeys(transaction: any, availableKeys: string[]) {
+    public async requestRequiredKeys(transaction: any, availableKeys: string[]) {
         console.log('requestRequiredKeys');
         const params = { transaction, availableKeys }
-        const result = await Message.signal<RequiredKeysPayload>(MessageTypes.REQUEST_REQUIRED_KEYS, params).request();
+        const result = await this.signal<RequiredKeysPayload>(MessageTypes.REQUEST_REQUIRED_KEYS, params).request();
         return result;
     }
 
-    eosHook(network: ChainNetwork) {
+    public eosHook(network: ChainNetwork) {
         console.log('call eosHook');
-        return signatureProvider(network.chainId);
+        return this.signatureProvider(network.chainId, this);
+    }
+
+    private signatureProvider(chainId: string, dapp: Dapp) {
+        return {
+            async getAvailableKeys() : Promise<string[]> {
+                // console.log('getAvailableKeys');
+                //console.log(payload);
+                const keys = (await dapp.signal<Payload>(MessageTypes.REQUEST_AVAILABLE_KEYS, { chainId }).request()) as string[];
+                // console.log(keys);
+                return keys;
+            },
+    
+            async sign(signatureArgs: SignaturePayloadArgs) {
+    
+                const params: Partial<SignaturePayload> = {
+                    chainId: signatureArgs.chainId,
+                    requiredKeys: [],
+                    serializedTransaction: [],
+                    serializedContextFreeData: [],
+                    abis: [],
+                };
+    
+                //Uint8Array to array
+                params.serializedTransaction = Array.from(signatureArgs.serializedTransaction);
+                if (signatureArgs.serializedContextFreeData) {
+                    params.serializedContextFreeData = Array.from(signatureArgs.serializedContextFreeData);
+                }
+                const result = (await dapp.signal<SignaturePayload>(MessageTypes.REQUEST_SIGNATURE, params).request()) as SignatureResult;
+                // console.log(result.signatures);
+                return {
+                    signatures: result.signatures,
+                    serializedTransaction: signatureArgs.serializedTransaction
+                }
+            }
+        }
     }
 
     // support for eos1 is no longer available
@@ -185,7 +196,7 @@ class Dapp {
         // const api = chain.getApi(network.chainId);
         const chainId = options.chainId ? options.chainId : network.chainId;
         options.chainId = chainId;
-        options.signatureProvider = signatureProvider(chainId);
+        options.signatureProvider = this.signatureProvider(chainId, this);
         options.abiProvider = {
             getRawAbi: async (accountName: string) => {
                 const abi: any = await this.requestRawAbi(accountName, chainId);
@@ -231,7 +242,7 @@ class Dapp {
                 expireSeconds = 30;
             }
 
-            const { info } = (await Message.signal<Payload>(MessageTypes.REQUEST_CHAIN_INFO, { chainId }).request()) as ChainInfoResult;
+            const { info } = (await this.signal<Payload>(MessageTypes.REQUEST_CHAIN_INFO, { chainId }).request()) as ChainInfoResult;
 
             // console.log(info);
             const ref_block_num = info.head_block_num;
@@ -262,7 +273,7 @@ class Dapp {
             };
 
             const account = transaction.actions[0].authorization[0].actor;
-            const smoothMode = await Message.signal<AccountPayload>(MessageTypes.GET_ACCOUNT_SMOOTH_MODE, { chainId, account }).request();
+            const smoothMode = await this.signal<AccountPayload>(MessageTypes.GET_ACCOUNT_SMOOTH_MODE, { chainId, account }).request();
             console.log('smoothMode', account, smoothMode); 
             if (!smoothMode || (typeof options.broadcast != 'undefined' && options.broadcast == false)) {
                 return await api.oTransact(transaction, options);
@@ -334,6 +345,20 @@ class Dapp {
     async createTransaction() {
         console.log('requestTransfer');
         console.log(arguments);
+    }
+
+    signal<T extends Payload>(type: string, data?: Partial<T>) {
+        const m = new Message<T>();
+        m.type = type; 
+        if (typeof data != 'undefined') {
+            if (data.chainId) {
+                this.chainId = data.chainId;
+            } else if (this.chainId) {
+                data.chainId = this.chainId;
+            }
+            Object.assign(m.payload, data);
+        }
+        return m;
     }
 }
 

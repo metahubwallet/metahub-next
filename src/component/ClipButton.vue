@@ -18,18 +18,19 @@ const clip = () => {
         .catch(() => {
             window.msg.warning(t('setting.copyFailure'));
         });
+    return false;
 };
 </script>
 
 <template>
     <div v-if="props.type === '1'">
         <span class="wrap-line">{{ props.value }}</span>
-        <img class="account-cell-key-copy" src="@/assets/images/account_copy2.png" @click="clip" />
+        <img class="account-cell-key-copy" src="@/assets/images/account_copy2.png" @click.stop="clip" />
     </div>
 
     <div v-else class="flex items-center">
         <div class="wrap-line text-[12px] text-[#848484] px-[8px]">{{ props.value }}</div>
-        <div class="copy-btn" @click="clip">{{ $t('setting.copy') }}</div>
+        <div class="copy-btn" @click.stop="clip">{{ $t('setting.copy') }}</div>
     </div>
 </template>
 

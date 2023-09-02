@@ -64,6 +64,7 @@ export interface NetworkPayload extends Payload {
 }
 
 export interface LoginPayload extends Payload {
+    appName?: string;
     newLogin?: boolean;
     accounts?: ChainNetwork[];
 }
@@ -128,7 +129,7 @@ export const sendMessageToBackground = (msg: any) => {
     });
 }
 
-export type Result = SignatureResult | Identity | ChainInfoResult;
+export type Result = SignatureResult | Identity | ChainInfoResult | string[];
 export class Message<T extends Payload> {
     public type: string;
     public payload: T;
@@ -148,15 +149,6 @@ export class Message<T extends Payload> {
     static fromJson(json: Object) {
         const m = new Message<Payload>();
         return Object.assign(m, json);
-    }
-
-    static signal<T extends Payload>(type: string, data?: Partial<T>) {
-        const m = new Message<T>();
-        m.type = type;
-        if (typeof data != 'undefined') {
-            Object.assign(m.payload, data);
-        }
-        return m;
     }
 
     async request(): Promise<Result> {

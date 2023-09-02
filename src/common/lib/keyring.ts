@@ -23,17 +23,13 @@ export function isValidPublic(publicKey: string) {
     return ecc.isValidPublic(publicKey);
 }
 
-export function signature(data: Buffer | string, privateKey: string, arbitrary: boolean = false) {
+export function signature(data: Buffer | string, privateKey: string, arbitrary: boolean = false, isHash: boolean = false) {
     if (!privateKey) {
         return '';
     }
-    let sig;
-    if (typeof data == 'string') {
-        if (arbitrary) {
-            sig = ecc.sign(Buffer.from(data, 'hex'), privateKey, 'utf8');
-        } else {
-            sig = ecc.signHash(data, privateKey).toString();
-        }
+    let sig: string;
+    if (isHash) {
+        sig = ecc.signHash(data, privateKey, 'utf8');
     } else {
         sig = ecc.sign(data, privateKey, 'utf8');
     }

@@ -8,10 +8,18 @@ interface Props {
     isShow: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {});
+const emit = defineEmits(['close', 'importKey']);
 
 // 获取初始当前网络
 const chain = store.chain();
+const wallet = store.wallet();
 const activeChainId = ref(chain.currentChainId);
+const selectedNetwork = ref(chain.currentNetwork);
+const searchName = ref('');
+const accounts = computed(() => {
+    return wallet.wallets.filter((x) => x.chainId == activeChainId.value && (searchName.value == '' || x.name.includes(searchName.value)));
+});
+
 watch(
     () => props.isShow,
     (v) => {
@@ -23,7 +31,6 @@ watch(
 );
 
 // 锁屏
-const emit = defineEmits(['close', 'importKey']);
 const handleLock = () => {
     emit('close');
     store.user().setLocked();
@@ -39,15 +46,6 @@ const handleImportKey = (chainId: string) => {
     emit('importKey', chainId);
 };
 
-// 搜索账号
-const searchName = ref('');
-const wallet = store.wallet();
-const accounts = computed(() => {
-    return wallet.wallets.filter(
-        (x) => x.chainId == activeChainId.value && (searchName.value == '' || x.name.includes(searchName.value))
-    );
-});
-
 // 账号模糊显示
 const showAccount = (account: string) => {
     if (account.length <= 12) return account;
@@ -55,7 +53,6 @@ const showAccount = (account: string) => {
 };
 
 // 选择网络
-const selectedNetwork = ref();
 const handleSelectNetwork = (item: Network) => {
     activeChainId.value = item.chainId;
     selectedNetwork.value = item;
@@ -63,7 +60,7 @@ const handleSelectNetwork = (item: Network) => {
 
 // 选择账号
 const handleSelectAccount = (account: Wallet) => {
-    let index = wallet.wallets.indexOf(account);
+    let index = wallet.wallets.findIndex((x) => x.chainId == account.chainId && x.name == account.name);
     wallet.setSelectedIndex(index);
     store.chain().setCurrentNetwork(selectedNetwork.value);
     emit('close');
@@ -76,14 +73,7 @@ const handleSelectAccount = (account: Wallet) => {
             <img @click="handleLock" class="lock-icon" src="@/assets/images/lock.png" />
         </template>
         <div class="list-container">
-            <n-tabs
-                placement="left"
-                v-model:value="activeChainId"
-                type="line"
-                animated
-                size="small"
-                style="height: 100%"
-            >
+            <n-tabs placement="left" v-model:value="activeChainId" type="line" animated size="small" style="height: 100%">
                 <n-tab-pane v-for="(item, index) in chain.networks" :key="item.chainId" :name="item.chainId">
                     <template #tab>
                         <div @click="handleSelectNetwork(item)">
@@ -110,31 +100,19 @@ const handleSelectAccount = (account: Wallet) => {
                             </div>
 
                             <div v-show="accounts.length == 0">
-                                <n-button @click="handleImportKey(item.chainId)" class="import-key-btn">
-                                    +{{ $t('public.importKey') }}
-                                </n-button>
+                                <n-button @click="handleImportKey(item.chainId)" class="import-key-btn">+{{ $t('public.importKey') }}</n-button>
                             </div>
-                            <div
-                                :key="'wallet-' + index"
-                                @click="handleSelectAccount(item)"
-                                class="account-cell"
-                                v-for="item in accounts"
-                            >
+                            <div :key="'wallet-' + index" @click="handleSelectAccount(account)" class="account-cell" v-for="(account, accIndex) in accounts">
                                 <div class="account-left">
-                                    <clip-button
-                                        class="account-left-name"
-                                        :value="showAccount(item.name)"
-                                    ></clip-button>
+                                    <clip-button class="account-left-name" :value="account.name"></clip-button>
                                     <div class="account-left-key">
-                                        {{ item.keys[0].publicKey.substring(0, 8) }}...{{
-                                            item.keys[0].publicKey.substring(-16, 16)
-                                        }}
+                                        {{ account.keys[0].publicKey.substring(0, 8) }}...{{ account.keys[0].publicKey.substring(-16, 16) }}
                                     </div>
                                 </div>
                                 <img
                                     class="close"
                                     src="@/assets/images/account_select.png"
-                                    v-show="wallet.selectedIndex == index && chain.currentChainId === item.chainId"
+                                    v-if="wallet.selectedIndex == accIndex && chain.currentChainId === item.chainId"
                                 />
                             </div>
                         </div>
@@ -302,5 +280,4 @@ const handleSelectAccount = (account: Wallet) => {
         }
     }
 }
-
 </style>

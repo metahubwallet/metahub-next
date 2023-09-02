@@ -56,23 +56,24 @@ onMounted(async () => {
         return;
     }
 
-    for (const act of payload.actions) {
-        tabs.push('property');
-        actionsJson.push(JSON.stringify(act.data, null, '    '));
-    }
-    // console.log(tabs);
-
-    // only one
-    if (payload.actions.length == 1) {
-        for (let key in payload.actions[0].data) {
-            actionsChecked.push(key);
-        }
-    }
-    console.log(windowParams.actions[0].data);
-
     if (payload.encryptText) {
         type.value = 'signature';
+    } else {
+        for (const act of payload.actions) {
+            tabs.push('property');
+            actionsJson.push(JSON.stringify(act.data, null, '    '));
+        }
+        // console.log(tabs);
+
+        // only one
+        if (payload.actions.length == 1) {
+            for (let key in payload.actions[0].data) {
+                actionsChecked.push(key);
+            }
+        }
     }
+
+
 });
 
 const onSubmit = async () => {
@@ -80,7 +81,7 @@ const onSubmit = async () => {
     // console.log(actions)
     // console.log(whitelist.value)
     const whitelist = [] as WhiteItem[];
-    if (checked.value) {
+    if (type.value == 'transcation' && checked.value) {
         for (const action of payload.actions) {
             console.log(actionsChecked);
             const properties = _.cloneDeep(payload.actions[0].data);
@@ -98,8 +99,9 @@ const onSubmit = async () => {
             item.hash = md5([item.domain, item.chainId, item.actor, item.permission, item.contract, item.action].join('-'));
             whitelist.push(item);
         }
+        // console.log(whitelist);
     }
-    console.log(whitelist);
+    
     // save result
     await chrome.storage.session.set({ windowResult: { approve: true, whitelist } });
 

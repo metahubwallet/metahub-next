@@ -247,7 +247,6 @@ async function getEndPoint(chainId: string) {
 }
 
 async function requestAvailableKeys(payload: Payload) {
-    // scatter好像直接返回了没有登录的账号，头疼。todo:针对同key也自动登录吗？
     if (!payload.chainId) {
         throw SdkError.noNetwork();
     }
@@ -301,6 +300,9 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
         const tooLongWord = payload.data.split(/\s+/).findIndex((x) => x.length > 12);
         if (tooLongWord >= 0) {
             throw SdkError.signatureError('signature_rejected', 'Each word cannot exceed 12 characters in length.');
+        }
+        if (payload.data.length == 0) {
+            throw SdkError.signatureError('signature_rejected', 'String cannot be empty.');
         }
         if (payload.data.length >= 1024) {
             throw SdkError.signatureError('signature_rejected', 'String length cannot greater than 1024.');
@@ -395,7 +397,7 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
 
     }
     const privateKey = await getPrivateKey(payload.chainId, account.publicKey);
-    const arbitrary = newPayload.actions.length == 0;
+    const arbitrary = newPayload.encryptText != '';
     const sig = signature(arbitrary ? newPayload.encryptText : newPayload.buffer, privateKey, arbitrary);
     return { signatures: [ sig ] };
             
@@ -403,23 +405,27 @@ async function requestSignature(payload: SignaturePayload | ArbitrarySignaturePa
 
 async function getPrivateKey(chainId: string, publicKey: string) {
     const wallets = (await localCache.get('wallets', [])) as Wallet[];
-    let privateKey = '';
+    let encryptPrivateKey = '';
     let seed = '';
     for (const wallet of wallets) {
         if (wallet.chainId == chainId) {
             const key = wallet.keys.find((x) => x.publicKey == publicKey);
             if (key) {
-                privateKey = key.privateKey;
+                encryptPrivateKey = key.privateKey;
                 seed = wallet.seed;
                 break;
             }
         }
     }
-    if (!privateKey) {
-        return '';
+    let privateKey = '';
+    if (encryptPrivateKey) {
+        const password = await getPassword();
+        privateKey = decrypt(encryptPrivateKey, md5(seed + password));
     }
-    const password = await getPassword();
-    return decrypt(privateKey, md5(seed + password));
+    if (!privateKey) {
+        throw SdkError.signatureError('signature_rejected', 'The private key was not found through the account provided');
+    }
+    return privateKey;
 }
 
 async function requestArbitrarySignature(payload: ArbitrarySignaturePayload) {
