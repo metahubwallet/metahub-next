@@ -59,7 +59,7 @@ const exportWallet = () => {
     link.download = 'Metahub-' + moment().format('YYYY-MM-DD') + '.backup';
     link.click();
 
-    window.msg.success(t('Export Success!'));
+    window.msg.success(t('wallet.backupSuccess'));
 };
 </script>
 

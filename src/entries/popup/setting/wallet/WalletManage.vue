@@ -24,6 +24,10 @@ const handleClearCache = async () => {
     await localCache.remove('cachedAbis');
     window.msg.success(t('public.executeSuccess'));
 };
+
+const handleLockWallets = async () => {
+    store.user().setLocked();
+}
 </script>
 
 <template>
@@ -83,6 +87,17 @@ const handleClearCache = async () => {
                                 <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
                             </div>
                         </div>
+
+                        <!-- clear cache -->
+                        <div @click="handleLockWallets" class="setting-item">
+                            <div class="setting-item-left">
+                                <div class="item-title">{{ $t('setting.lockWallets') }}</div>
+                            </div>
+                            <div class="setting-item-right">
+                                <img class="bg-img" src="@/assets/images/right_arrow@2x.png" />
+                            </div>
+                        </div>
+
                     </div>
                 </n-scrollbar>
             </div>

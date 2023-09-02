@@ -9,14 +9,23 @@ const props = withDefaults(defineProps<Props>(), {});
 const { t } = useI18n();
 
 const schema = {
-    encryptPassword: yup.string().required().label(t('setting.encryptPassword')),
-    password: yup.string().required().label(t('public.password')),
+    encryptPassword: yup
+        .string()
+        .required()
+        .label(t('setting.encryptPassword')),
+    password: yup
+        .string()
+        .required()
+        .label(t('public.password')),
     password_confirm: yup
         .string()
         .required()
         .oneOf([yup.ref('password')], t('public.passwordNoSame'))
         .label(t('public.repeatPassword')),
-    uploadName: yup.string().required().label(t('public.import')),
+    uploadName: yup
+        .string()
+        .required()
+        .label(t('public.import')),
 };
 const { values, errors, handleSubmit } = useForms(schema);
 let backUpFile: Blob | null = null;
@@ -99,11 +108,11 @@ const importWalletsFromData = async (content: string) => {
     store.chain().setCurrentNetwork(importData.currentNetwork);
     store.chain().setSelectedRpcs(importData.selectedRpc);
     store.chain().setCustomRpcs(importData.customRpcs);
-    
+
     store.wallet().setWallets(importData.wallets);
     store.wallet().setSelectedIndex(importData.selectedIndex);
     store.wallet().setUserTokens(importData.userTokens);
-    
+
     store.user().setPasswordHash(importData.passwordHash);
     store.user().setLocked();
 
@@ -126,52 +135,27 @@ const changeLang = async (value: any) => {
     <modal :is-show="props.isShow" :title="$t('public.importBackup')" @close="$emit('close')" @submit="onSubmit">
         <!-- 加密密码 -->
         <div class="mb-2">
-            <div class="dialog-title flex justify-between items-center">
-                <span>{{ $t('setting.encryptPassword') }}</span>
-                <span class="text-yellow-400 text-xs">
-                    {{ errors.encryptPassword }}
-                </span>
-            </div>
-            <n-input
-                v-model:value="values.encryptPassword"
-                type="password"
-                show-password-on="click"
-                :placeholder="$t('setting.encryptPassword')"
-            ></n-input>
+            <div class="mb-1">{{ $t('setting.encryptPassword') }}</div>
+            <n-input v-model:value="values.encryptPassword" type="password" show-password-on="click" :placeholder="$t('setting.encryptPassword')"></n-input>
+            <div class="text-yellow-400 text-xs">{{ errors.encryptPassword }}</div>
         </div>
 
         <!-- 新密码 -->
         <div class="mb-2">
-            <div class="dialog-title flex justify-between items-center">
-                <span>{{ $t('setting.newPassword1') }}</span>
-                <span class="text-yellow-400 text-xs">{{ errors.password }}</span>
-            </div>
-            <n-input
-                v-model:value="values.password"
-                type="password"
-                show-password-on="click"
-                :placeholder="$t('setting.newPassword1')"
-            ></n-input>
+            <div class="mb-1">{{ $t('setting.newPassword1') }}</div>
+            <n-input v-model:value="values.password" type="password" show-password-on="click" :placeholder="$t('setting.newPassword1')"></n-input>
+            <div class="text-yellow-400 text-xs">{{ errors.password }}</div>
         </div>
 
         <!-- 重复密码 -->
         <div class="mb-2">
-            <div class="dialog-title flex justify-between items-center">
-                <span>{{ $t('setting.newPassword2') }}</span>
-                <span class="text-yellow-400 text-xs">
-                    {{ errors.password_confirm }}
-                </span>
-            </div>
-            <n-input
-                v-model:value="values.password_confirm"
-                type="password"
-                show-password-on="click"
-                :placeholder="$t('setting.newPassword2')"
-            ></n-input>
+            <div class="mb-1">{{ $t('setting.newPassword2') }}</div>
+            <n-input v-model:value="values.password_confirm" type="password" show-password-on="click" :placeholder="$t('setting.newPassword2')"></n-input>
+            <div class="text-yellow-400 text-xs">{{ errors.password_confirm }}</div>
         </div>
 
         <!-- 选择备份文件 -->
-        <div class="dialog-title">
+        <div class="mb-1">
             <n-upload v-if="values.uploadName == ''" @before-upload="beforeUpload" :show-file-list="false">
                 <n-button text class="upload-button text-primary">
                     {{ $t('public.selectFileToImport') }}
