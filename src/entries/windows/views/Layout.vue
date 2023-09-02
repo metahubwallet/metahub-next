@@ -32,7 +32,7 @@ const handleSubmit = async () => {
             <div class="tip tip2">{{ $t('password.unlockTip') }}</div>
         </header>
         <n-form :model="formData">
-            <n-input :placeholder="$t('password.toUnlock')" type="password" v-model:value="formData.password" @keyup.enter="handleSubmit">
+            <n-input :placeholder="$t('password.toUnlock')" type="password" v-model:value="formData.password" :autofocus="true" @keyup.enter="handleSubmit">
                 <img class="prefix-img" slot="prefix" src="@/assets/images/initial_unlock@2x.png" />
             </n-input>
 

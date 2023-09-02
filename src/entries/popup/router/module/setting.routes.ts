@@ -10,7 +10,7 @@ import AccountChange from '@/entries/popup/setting/account/AccountChange.vue';
 import WhiteList from '@/entries/popup/setting/whitelist/WhiteList.vue';
 import WhiteListDetail from '@/entries/popup/setting/whitelist/WhiteListDetail.vue';
 import NetworkManage from '@/entries/popup/setting/network/NetworkManage.vue';
-import NetworkAdd from '@/entries/popup/setting/network/NetworkAdd.vue';
+import NetworkAdd from '@/entries/popup/setting/network/NetworkAddExists.vue';
 import NetworkAddCustom from '@/entries/popup/setting/network/NetworkAddCustom.vue';
 import NetworkSelect from '@/entries/popup/setting/network/NetworkSelect.vue';
 

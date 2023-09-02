@@ -112,7 +112,7 @@ const handleSelectAccount = (account: Wallet) => {
                                 <img
                                     class="close"
                                     src="@/assets/images/account_select.png"
-                                    v-if="wallet.selectedIndex == accIndex && chain.currentChainId === item.chainId"
+                                    v-show="wallet.selectedIndex == accIndex && chain.currentChainId === item.chainId"
                                 />
                             </div>
                         </div>

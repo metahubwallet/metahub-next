@@ -17,7 +17,7 @@ const chainId = ref(route.query.chainId ? (route.query.chainId as string) : eosC
 const activeIndex = ref(networks.findIndex((item) => item.chainId === chainId.value));
 const showPopover = ref(false);
 const getNetworkIcon = (chainId: string) => {
-    const chain = store.chain().findNetwork(chainId)?.chain;
+    const chain = store.chain().findNetwork(chainId).chain;
     return getNetworkLocalIcon(chain);
 };
 

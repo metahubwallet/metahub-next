@@ -11,12 +11,14 @@ const lang = ref([
     },
 ]);
 const setting = store.setting();
+const router = useRouter();
 
 // 切换语言
 const { locale } = useI18n();
 const handleChangeLang = async (value: any) => {
     locale.value = value;
     store.setting().setLang(value);
+    router.back();
 };
 </script>
 

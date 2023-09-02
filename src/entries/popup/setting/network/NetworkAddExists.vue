@@ -7,10 +7,10 @@ const { t } = useI18n();
 const router = useRouter();
 
 const eChainId = ref(eosChainId);
-const supportNets = ref(supportNetworks);
 
 // 添加网络前置操作
 const chainStore = store.chain();
+
 const handleAdd = (network: Network) => {
     window.dialog.warning({
         title: t('public.tip'),
@@ -24,6 +24,10 @@ const handleAdd = (network: Network) => {
         onNegativeClick: () => {},
     });
 };
+
+const networkExists = (chainId: string) => {
+    return  chainStore.networks.findIndex((x) => x.chainId == chainId) >= 0;
+}
 
 // 新增网络
 const addNetwork = (network: Network) => {
@@ -91,7 +95,7 @@ const removeNetwork = (network: Network) => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(network, index) of supportNets" :key="index">
+                            <tr v-for="(network, index) of supportNetworks" :key="index">
                                 <!-- name -->
                                 <td>{{ network.name }}</td>
                                 <!-- chainId -->
@@ -105,20 +109,17 @@ const removeNetwork = (network: Network) => {
                                         fill="#bf01fa"
                                         :strokeWidth="3"
                                         class="cursor-pointer"
-                                        v-show="!chainStore.findNetwork(network.chainId)"
+                                        v-show="!networkExists(network.chainId)"
                                         @click="handleAdd(network)"
                                     />
                                     <!-- remove  -->
                                     <icon-delete
                                         theme="outline"
-                                        size="24"
+                                        size="20"
                                         fill="#e53e30"
                                         :strokeWidth="3"
                                         class="cursor-pointer"
-                                        v-show="
-                                            chainStore.findNetwork(network.chainId) &&
-                                            network.chainId != eChainId
-                                        "
+                                        v-show="networkExists(network.chainId) && network.chainId != eChainId"
                                         @click="handleRemove(network)"
                                     />
                                 </td>

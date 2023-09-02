@@ -1,10 +1,9 @@
 <script setup lang="ts">
-const currentVersion = ref('v1.0.0');
 
-onBeforeMount(() => {
-    let manifestData = chrome.runtime.getManifest();
-    currentVersion.value = manifestData.version;
-});
+
+const manifestData = chrome.runtime.getManifest();
+console.log(manifestData);
+const currentVersion = ref(manifestData.version || '1.0.0');
 
 const aboutUs = () => {
     chrome.tabs.create({ url: 'https://metahub.cash/' }); // 新标签页跳转

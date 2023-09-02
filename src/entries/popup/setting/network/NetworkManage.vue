@@ -62,7 +62,7 @@ const removeNetwork = async (network: Network) => {
                             <!-- remove button -->
                             <icon-delete
                                 theme="outline"
-                                size="24"
+                                size="20"
                                 fill="#e53e30"
                                 :strokeWidth="3"
                                 v-show="item.chainId != eosChainId"

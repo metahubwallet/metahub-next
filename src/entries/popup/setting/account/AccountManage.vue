@@ -11,7 +11,7 @@ const wallets = computed(() => {
         .wallet()
         .wallets.filter((x) => x.chainId === chainId.value)
         .map((x) => {
-            const symbol = store.chain().findNetwork(x.chainId)?.token.symbol || '';
+            const symbol = store.chain().findNetwork(x.chainId).token.symbol || '';
             return Object.assign(x, { symbol }) as ShownWallet;
         });
 });

@@ -36,6 +36,7 @@ const submit = () => {
                 round
                 style="border-radius: 200px"
                 @keydown.enter="submit"
+                :autofocus="true"
             ></n-input>
 
             <n-button
