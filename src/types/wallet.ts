@@ -6,9 +6,10 @@ export interface Key {
 
 export interface Wallet {
     name: string;
+    // address: string; // to add address for eth
     chainId: string;
     keys: Key[];
     seed: string;
-    // address: string; // to delete ?
+    blockchain: string;
     smoothMode: boolean;
 }

@@ -66,15 +66,20 @@ const handleImportKey = async () => {
         isKey = true;
     }
     if (isKey) {
-        let network = store.chain().networks.find((x) => x.chainId == chainId.value);
-        let chainAccount: any = {};
-        chainAccount.chainId = network?.chainId;
-        chainAccount.seed = sha256('metahub' + Math.random(), new Date().toString() as any)
+        const network = store.chain().networks.find((x) => x.chainId == chainId.value)!;
+        const seed = sha256('metahub' + Math.random(), new Date().toString() as any)
             .toString()
             .substring(0, 16)
             .toUpperCase();
-        chainAccount.blockchain = 'eos'; // eth, tron ...
-        chainAccount.smoothMode = false; // 默认关闭顺畅模式
+        const chainAccount: Wallet = {
+            name: '',
+            chainId: network.chainId,
+            seed,
+            blockchain: 'eos',  // eth, eth ...
+            smoothMode: false,
+            keys: [],
+        };
+
 
         const publicKey = privateToPublic(privateKey.value);
         const privateValue = encrypt(privateKey.value, md5(chainAccount.seed + store.user().password));
@@ -97,7 +102,7 @@ const handleImportKey = async () => {
             for (let account of accounts) {
                 const newAccount = Object.assign({}, chainAccount);
                 newAccount.name = account; // real eos account
-                newAccount.account = ethAddress != '' ? ethAddress : account;
+                // newAccount.address = ethAddress != '' ? ethAddress : account;
 
                 let existed = false;
                 for (let i = 0; i < store.wallet().wallets.length; i++) {
@@ -142,7 +147,11 @@ const privateKey = ref('');
 const importWallet = async (wallets: Wallet[]) => {
     isLoad.value = true;
 
-    store.wallet().setWallets([...wallets.sort(sortAccounts), ...store.wallet().wallets]);
+
+    const newWallets = [...store.wallet().wallets, ...wallets].sort(sortAccounts);
+    store.wallet().setWallets(newWallets);
+
+    // fetch permissions
     for (const wallet of wallets) {
         await chain.fetchPermissions(wallet.name, wallet.chainId);
     }
@@ -152,10 +161,12 @@ const importWallet = async (wallets: Wallet[]) => {
     store.wallet().setSelectedIndex(index >= 0 ? index : 0);
     store.chain().setCurrentNetwork(networks[activeIndex.value]);
 
-    window.msg.success(t('wallet.importSuccess'));
     isLoad.value = false;
     privateKey.value = '';
+
     router.go(-1);
+
+    window.msg.success(t('wallet.importSuccess'));
 };
 
 // select wallet

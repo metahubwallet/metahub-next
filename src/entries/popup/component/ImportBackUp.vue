@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { metahubKey, encrypt, decrypt, password1, password2, md5 } from '@/common/util/crypto';
+import { Wallet } from '@/types/wallet';
 
 interface Props {
     isShow: boolean;
@@ -17,14 +18,14 @@ const schema = {
         .string()
         .required()
         .label(t('public.password')),
-    password_confirm: yup
+    passwordConfirm: yup
         .string()
         .required()
         .oneOf([yup.ref('password')], t('public.passwordNoSame'))
         .label(t('public.repeatPassword')),
     uploadName: yup
         .string()
-        .required()
+        .required(t('public.importErrorTip'))
         .label(t('public.import')),
 };
 const { values, errors, handleSubmit } = useForms(schema);
@@ -37,7 +38,7 @@ watch(
         if (oldValue === true && newValue === false) {
             values.encryptPassword = '';
             values.password = '';
-            values.password_confirm = '';
+            values.passwordConfirm = '';
             backUpFile = null;
         }
     }
@@ -48,6 +49,7 @@ const beforeUpload = (e: any) => {
     values.uploadName = e.file.name;
     backUpFile = e.file.file;
 };
+
 // 清空文件信息
 const removeUpload = () => {
     values.uploadName = '';
@@ -56,7 +58,9 @@ const removeUpload = () => {
 
 // 确认导入
 const onSubmit = handleSubmit(() => {
-    if (!backUpFile) return window.msg.warning(t('public.importErrorTip'));
+    if (!backUpFile) {
+        return window.msg.warning(t('public.importErrorTip'));
+    }
     const fileReader = new FileReader();
     fileReader.onload = (e: any) => {
         importWalletsFromData(e.target.result);
@@ -67,7 +71,9 @@ const onSubmit = handleSubmit(() => {
 // 导入数据
 const router = useRouter();
 const importWalletsFromData = async (content: string) => {
-    if (!/^[0-9A-F]+$/.test(content)) return window.msg.error(t('public.importErrorTip'));
+    if (!/^[0-9A-F]+$/.test(content)) {
+        return window.msg.error(t('public.importErrorTip'));
+    }
 
     let importData: any = {};
     try {
@@ -91,9 +97,10 @@ const importWalletsFromData = async (content: string) => {
     }
 
     // 检查格式是否正确
-    if (!importData.wallets) return window.msg.error(t('public.importErrorTip2'));
+    if (!importData.wallets) {
+        return window.msg.error(t('public.importErrorTip2'));
+    }
 
-    importData.isLock = true;
     importData.password = password1(values.password);
     importData.passwordHash = password2(values.password);
 
@@ -104,18 +111,43 @@ const importWalletsFromData = async (content: string) => {
         }
     }
 
+
+    // recentTransfers: old version no token field
+
     store.chain().setNetworks(importData.networks);
-    store.chain().setCurrentNetwork(importData.currentNetwork);
+    if (importData.currentNetwork) {
+        store.chain().setCurrentNetwork(importData.currentNetwork);
+    } else {
+        // old version
+        const network = (importData.networks as any[]).find((x) => x.chainId == importData.currentChainId);
+        store.chain().setCurrentNetwork(network || importData.networks[0]);
+    }   
+   
     store.chain().setSelectedRpcs(importData.selectedRpc);
     store.chain().setCustomRpcs(importData.customRpcs);
 
-    store.wallet().setWallets(importData.wallets);
+    
+    const wallets: Wallet[] = [];
+    for (const w of importData.wallets) {
+        wallets.push({
+            name: w.name,
+            chainId: w.chainId,
+            seed: w.seed,
+            blockchain: w.blockchain || 'eos',  // eth, eth ...
+            smoothMode: w.smoothMode,
+            keys: w.keys,
+        });
+    }
+    store.wallet().setWallets(wallets);
+
     store.wallet().setSelectedIndex(importData.selectedIndex);
     store.wallet().setUserTokens(importData.userTokens);
 
+    store.setting().setWhitelist(importData.whitelist);
+
     store.user().setPasswordHash(importData.passwordHash);
     store.user().setLocked();
-
+    
     changeLang(importData.language);
 
     router.push({ name: 'index' });
@@ -126,6 +158,9 @@ const importWalletsFromData = async (content: string) => {
 // 切换语言
 const { locale } = useI18n();
 const changeLang = async (value: any) => {
+    if (!value) {
+        value = 'en';
+    }
     locale.value = value;
     store.setting().setLang(value);
 };
@@ -150,8 +185,8 @@ const changeLang = async (value: any) => {
         <!-- 重复密码 -->
         <div class="mb-2">
             <div class="mb-1">{{ $t('setting.newPassword2') }}</div>
-            <n-input v-model:value="values.password_confirm" type="password" show-password-on="click" :placeholder="$t('setting.newPassword2')"></n-input>
-            <div class="text-yellow-400 text-xs">{{ errors.password_confirm }}</div>
+            <n-input v-model:value="values.passwordConfirm" type="password" show-password-on="click" :placeholder="$t('setting.newPassword2')"></n-input>
+            <div class="text-yellow-400 text-xs">{{ errors.passwordConfirm }}</div>
         </div>
 
         <!-- 选择备份文件 -->
@@ -160,6 +195,7 @@ const changeLang = async (value: any) => {
                 <n-button text class="upload-button text-primary">
                     {{ $t('public.selectFileToImport') }}
                 </n-button>
+                <div class="text-yellow-400 text-xs">{{ errors.uploadName }}</div>
             </n-upload>
 
             <div class="upload-file-name flex items-center justify-between" v-else>

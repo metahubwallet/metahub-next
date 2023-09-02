@@ -37,11 +37,16 @@ const handleSubmit = () => {
 
 // 导出钱包
 const exportWallet = () => {
-    const exportData = {
+    const exportData: any = {
         ...store.wallet().$state,
         ...store.chain().$state,
+        whitelist: store.setting().whitelist,
         language: store.setting().language,
     };
+
+    delete exportData.allTokens;
+    delete exportData.password;
+    delete exportData.passwordHash;
 
     for (const wallet of exportData.wallets) {
         for (const key of wallet.keys) {

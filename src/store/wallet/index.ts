@@ -53,6 +53,15 @@ const store = defineStore('wallet', {
             this.wallets = wallets;
             await localCache.set('wallets', wallets);
         },
+        async setWallet(wallet: Wallet) {
+            const idx = this.wallets.findIndex(x => x.chainId == wallet.chainId && x.name == wallet.name);
+            if (idx >= 0) {
+                this.wallets[idx] = wallet;
+            } else {
+                this.wallets.push(wallet);
+            }
+            await localCache.set('wallets', this.wallets);
+        },
         async setSelectedIndex(index: number) {
             this.selectedIndex = index;
             await localCache.set('selectedIndex', index);

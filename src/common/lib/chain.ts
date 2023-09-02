@@ -218,7 +218,7 @@ export default class Chain {
         const index = store.wallet().wallets.findIndex((item) => {
             return item.name === account && item.chainId === chainId;
         });
-        let wallet = store.wallet().wallets[index];
+        const wallet = store.wallet().wallets[index];
 
         try {
             const accinfo = await Chain.getApi(chainId).getAccount(account);
@@ -234,8 +234,7 @@ export default class Chain {
                 key.permissions = Array.from(permissions) as any;
             }
 
-            store.wallet().wallets[index] = wallet;
-            store.wallet().setWallets(store.wallet().wallets);
+            store.wallet().setWallet(wallet);
         } catch (e) {
             result.code = ErrorCode.HTTP_END_POINT_ERROR;
             result.msg = i18n.global.t('public.requestHttpEndpointTimeout');
