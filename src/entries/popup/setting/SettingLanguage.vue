@@ -10,14 +10,14 @@ const lang = ref([
         value: 'en',
     },
 ]);
-const setting = store.setting();
+const settingStore = useSettingStore();
 const router = useRouter();
 
 // 切换语言
 const { locale } = useI18n();
 const handleChangeLang = async (value: any) => {
     locale.value = value;
-    store.setting().setLang(value);
+    settingStore.setLang(value);
     router.back();
 };
 </script>
@@ -36,7 +36,7 @@ const handleChangeLang = async (value: any) => {
                         v-for="item in lang"
                     >
                         <div class="title">{{ item.name }}</div>
-                        <icon-check v-show="item.value == setting.language" :fill="theme.primaryColor" />
+                        <icon-check v-show="item.value == settingStore.language" :fill="theme.primaryColor" />
                     </div>
                 </div>
             </div>

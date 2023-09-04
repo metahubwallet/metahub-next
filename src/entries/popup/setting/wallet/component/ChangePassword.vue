@@ -12,7 +12,7 @@ const passwordConfirm = ref('');
 
 const { t } = useI18n();
 const handleChangePassword = async () => {
-    if (password2(passwordOld.value) != store.user().passwordHash)
+    if (password2(passwordOld.value) != useUserStore().passwordHash)
         return window.msg.warning(t('password.error'));
 
     if (!passwordNew.value || !passwordConfirm.value)
@@ -22,15 +22,15 @@ const handleChangePassword = async () => {
         return window.msg.warning(t('public.passwordNoSame'));
 
     // 密码存储
-    store.user().setPasswordHash(password2(passwordNew.value));
+    useUserStore().setPasswordHash(password2(passwordNew.value));
     // 秘钥重新加密。。。
-    for (const wallet of store.wallet().wallets) {
+    for (const wallet of useWalletStore().wallets) {
         for (const key of wallet.keys) {
             let pk = decrypt(key.privateKey, md5(wallet.seed + password1(passwordOld.value)));
             key.privateKey = encrypt(pk, md5(wallet.seed + password1(passwordNew.value)));
         }
     }
-    store.user().setLocked();
+    useUserStore().setLocked();
 };
 </script>
 

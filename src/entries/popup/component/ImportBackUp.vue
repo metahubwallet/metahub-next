@@ -111,17 +111,17 @@ const importWalletsFromData = async (content: string) => {
         }
     }
 
-    store.chain().setNetworks(importData.networks);
-    if (importData.currentNetwork) {
-        store.chain().setCurrentNetwork(importData.currentNetwork);
-    } else {
-        // old version
-        const network = (importData.networks as any[]).find((x) => x.chainId == importData.currentChainId);
-        store.chain().setCurrentNetwork(network || importData.networks[0]);
-    }   
+    useChainStore().setNetworks(importData.networks);
+    // if (importData.currentNetwork) {
+    //     useChainStore().setCurrentNetwork(importData.currentNetwork);
+    // } else {
+    //     // old version
+    //     const network = (importData.networks as any[]).find((x) => x.chainId == importData.currentChainId);
+    //     useChainStore().setCurrentNetwork(network || importData.networks[0]);
+    // }   
    
-    store.chain().setSelectedRpcs(importData.selectedRpc);
-    store.chain().setCustomRpcs(importData.customRpcs);
+    useChainStore().setSelectedRpcs(importData.selectedRpc);
+    useChainStore().setCustomRpcs(importData.customRpcs);
 
     
     const wallets: Wallet[] = [];
@@ -135,19 +135,19 @@ const importWalletsFromData = async (content: string) => {
             keys: w.keys,
         });
     }
-    store.wallet().setWallets(wallets);
+    useWalletStore().setWallets(wallets);
 
     if (importData.recentTransfers) {
-        store.wallet().setRecentTransfers(importData.recentTransfers);
+        useWalletStore().setRecentTransfers(importData.recentTransfers);
     }
 
-    store.wallet().setSelectedIndex(importData.selectedIndex);
-    store.wallet().setUserTokens(importData.userTokens);
+    useWalletStore().setSelectedIndex(importData.selectedIndex);
+    useWalletStore().setUserTokens(importData.userTokens);
 
-    store.setting().setWhitelist(importData.whitelist);
+    useSettingStore().setWhitelist(importData.whitelist);
 
-    store.user().setPasswordHash(importData.passwordHash);
-    store.user().setLocked();
+    useUserStore().setPasswordHash(importData.passwordHash);
+    useUserStore().setLocked();
     
     changeLang(importData.language);
 
@@ -163,7 +163,7 @@ const changeLang = async (value: any) => {
         value = 'en';
     }
     locale.value = value;
-    store.setting().setLang(value);
+    useSettingStore().setLang(value);
 };
 </script>
 

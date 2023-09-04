@@ -4,7 +4,7 @@ import { supportNetworks } from '@/common/util/network';
 import { Network, RPC } from '@/types/settings';
 
 
-export default defineStore('chain', {
+export const useChainStore = defineStore('chain', {
     state: (): ChainState => {
         return {
             networks: [],
@@ -41,15 +41,7 @@ export default defineStore('chain', {
     actions: {
         async init() {
             this.networks = (await localCache.get('networks', supportNetworks.slice(0, 3))) as Network[];
-            let currentNetwork = await localCache.get('currentNetwork', null);
-            if (!currentNetwork) {
-                // compatible with old data
-                const chainId = await localCache.get('currentChainId', '');
-                if (chainId) {
-                    currentNetwork = this.networks.find((x) => x.chainId == chainId);
-                }
-            } 
-            this.currentNetwork = currentNetwork || this.networks[0];
+            this.currentNetwork = this.networks[0];
             this.selectedRpcs = (await localCache.get('selectedRpcs', {}));
             this.customRpcs = (await localCache.get('customRpcs', {}));
         },
@@ -57,9 +49,11 @@ export default defineStore('chain', {
             this.networks = networks;
             await localCache.set('networks', networks);
         },
-        async setCurrentNetwork(network: Network) {
-            this.currentNetwork = network;
-            await localCache.set('currentNetwork', network);
+        async setCurrentNetworkByChainId(chainId: string) {
+            const network = this.networks.find(x => x.chainId == chainId);
+            if (network) {
+                this.currentNetwork = network;
+            }
         },
         async setSelectedRpc(chainId: string, endpoint: string) {
             this.selectedRpcs[chainId] = endpoint;

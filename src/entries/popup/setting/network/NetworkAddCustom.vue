@@ -84,7 +84,7 @@ const rules: FormRules = {
 
 // 添加前处理
 const formRef = ref<any>(null);
-const { networks } = store.chain();
+const { networks } = useChainStore();
 const handleAdd = (e: any) => {
     formRef.value.validate((errors: any) => {
         if (errors) return;
@@ -110,12 +110,12 @@ const handleAdd = (e: any) => {
 
 // 添加自定义网络
 const addNetwork = async (network: Network) => {
-    store.chain().setNetworks([...store.chain().networks, network]);
+    useChainStore().setNetworks([...useChainStore().networks, network]);
 
-    store.chain().setSelectedRpc(network.chainId, network.endpoint);
+    useChainStore().setSelectedRpc(network.chainId, network.endpoint);
 
     const customRpcs = {
-        ...store.chain().customRpcs,
+        ...useChainStore().customRpcs,
         [network.chainId]: [
             {
                 name: network.name,
@@ -123,7 +123,7 @@ const addNetwork = async (network: Network) => {
             },
         ],
     };
-    store.chain().setCustomRpcs(customRpcs);
+    useChainStore().setCustomRpcs(customRpcs);
 };
 </script>
 

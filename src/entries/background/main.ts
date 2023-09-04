@@ -575,3 +575,6 @@ async function createWindow(type: string, width: number, height: number, params:
 //         }
 //     });
 // });
+
+// upgrade from v1
+localCache.upgrade();

@@ -43,14 +43,14 @@ const submit = async (item: any) => {
 };
 
 // 获取详情
-const { currentWallet } = store.wallet();
+const walletStore = useWalletStore();
 const loadOtherDetailData = async () => {
     otherCPU.value = [];
     otherNET.value = [];
-    let stakeList = await chain.getApi().getDelegatebwList(currentWallet.name);
+    let stakeList = await chain.getApi().getDelegatebwList(walletStore.currentWallet.name);
     for (let index = 0; index < stakeList.length; index++) {
         const stakeRow = stakeList[index];
-        if (stakeRow.to != currentWallet.name) {
+        if (stakeRow.to != walletStore.currentWallet.name) {
             if (stakeRow.cpu_weight != '0.0000 EOS') {
                 otherCPU.value.push({
                     from: stakeRow.from,

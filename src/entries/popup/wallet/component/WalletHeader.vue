@@ -15,10 +15,9 @@ const totalValue = computed(() => {
 });
 
 // 跳转至转账页
-const wallet = store.wallet();
 const router = useRouter();
 const handleViewTransfer = () => {
-    const eosToken = wallet.currentUserTokens.find(
+    const eosToken = useWalletStore().currentUserTokens.find(
         (i) => i.contract === 'eosio.token' && i.symbol === 'EOS'
     );
     router.push({

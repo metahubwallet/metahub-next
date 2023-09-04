@@ -16,13 +16,13 @@ const route = useRoute();
 const account = ref(JSON.parse(route.query.account + '') as Wallet);
 
 // 初始化
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 const permissions = ref([] as string[]);
 
-const currentKey = computed(() => wallet.currentWallet.keys[0].publicKey );
+const currentKey = computed(() => walletStore.currentWallet.keys[0].publicKey );
 onBeforeMount(() => {
     let perms = new Set();
-    for (const key of wallet.currentWallet.keys) {
+    for (const key of walletStore.currentWallet.keys) {
         for (const perm of key.permissions) {
             perms.add(perm);
         }
@@ -31,7 +31,7 @@ onBeforeMount(() => {
 });
 
 onMounted(async () => {
-    let result = await chain.fetchPermissions(wallet.currentWallet.name, wallet.currentWallet.chainId);
+    let result = await chain.fetchPermissions(walletStore.currentWallet.name, walletStore.currentWallet.chainId);
 
     if (result.code != 200) return window.msg.error(result.msg);
 
@@ -144,27 +144,29 @@ const handleActiveRemove = (oldOperateKey: string) => {
 // 移除账号
 const showPasswordConfirm = ref(false);
 const removeAccountClicked = () => {
-    const index = store.wallet().wallets.findIndex((item) => {
+    const index = useWalletStore().wallets.findIndex((item) => {
         return item.name === account.value.name && item.chainId === chainId.value;
     });
-    wallet.wallets.splice(index, 1);
-    wallet.setWallets(wallet.wallets);
+    walletStore.wallets.splice(index, 1);
+    walletStore.setWallets(walletStore.wallets);
 
     // 无账号
-    if (wallet.wallets.length === 0) {
-        wallet.setSelectedIndex(0);
+    if (walletStore.wallets.length === 0) {
+        walletStore.setSelectedIndex(0);
         window.msg.success(t('password.deleteSuccess'));
         router.push({ name: 'index' });
         return;
     }
 
     // 存在其它账号
-    let firstIndex = wallet.wallets.indexOf(wallet.wallets[0]);
-    wallet.setSelectedIndex(firstIndex >= 0 ? firstIndex : 0);
-    const network = store.chain().networks.find((item) => {
-        return item.chainId === wallet.currentWallet.chainId;
-    });
-    if (network) store.chain().setCurrentNetwork(network);
+    let firstIndex = walletStore.wallets.indexOf(walletStore.wallets[0]);
+    walletStore.setSelectedIndex(firstIndex >= 0 ? firstIndex : 0);
+    // const network = useChainStore().networks.find((item) => {
+    //     return item.chainId === walletStore.currentWallet.chainId;
+    // });
+    // if (network) {
+    //     useChainStore().setCurrentNetwork(network);
+    // }
     window.msg.success(t('password.deleteSuccess'));
     router.go(-1);
 };

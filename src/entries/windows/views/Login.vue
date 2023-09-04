@@ -19,7 +19,7 @@ const payload = reactive({
 
 
 const allAccounts = computed(() => {
-  const accounts = store.wallet().wallets.filter( x => x.chainId == payload.chainId );
+  const accounts = useWalletStore().wallets.filter( x => x.chainId == payload.chainId );
   return accounts.map(x => {
     const permissions = x.keys.flatMap(y => y.permissions);
     return {
@@ -61,7 +61,7 @@ const changePermision = ({ account, permission } : { account: LoginAccount, perm
 const login = async (account: LoginAccount) => {
     let publicKey = '';
     const permission = account.selectedPermission;
-    const wallet = store.wallet().wallets.find(x => x.chainId == payload.chainId && x.name == account.name)!;
+    const wallet = useWalletStore().wallets.find(x => x.chainId == payload.chainId && x.name == account.name)!;
     for (const key of wallet.keys) {
         if (key.permissions.indexOf(permission) >= 0) {
             publicKey = key.publicKey;

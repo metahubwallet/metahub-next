@@ -12,12 +12,12 @@ const { t } = useI18n();
 const route = useRoute();
 
 // get network
-const { networks } = store.chain();
+const { networks } = useChainStore();
 const chainId = ref(route.query.chainId ? (route.query.chainId as string) : eosChainId);
 const activeIndex = ref(networks.findIndex((item) => item.chainId === chainId.value));
 const showPopover = ref(false);
 const getNetworkIcon = (chainId: string) => {
-    const chain = store.chain().findNetwork(chainId).chain;
+    const chain = useChainStore().findNetwork(chainId).chain;
     return getNetworkLocalIcon(chain);
 };
 
@@ -66,7 +66,7 @@ const handleImportKey = async () => {
         isKey = true;
     }
     if (isKey) {
-        const network = store.chain().networks.find((x) => x.chainId == chainId.value)!;
+        const network = useChainStore().networks.find((x) => x.chainId == chainId.value)!;
         const seed = sha256('metahub' + Math.random(), new Date().toString() as any)
             .toString()
             .substring(0, 16)
@@ -82,7 +82,7 @@ const handleImportKey = async () => {
 
 
         const publicKey = privateToPublic(privateKey.value);
-        const privateValue = encrypt(privateKey.value, md5(chainAccount.seed + store.user().password));
+        const privateValue = encrypt(privateKey.value, md5(chainAccount.seed + useUserStore().password));
         const key = { publicKey, privateKey: privateValue, permissions: [] };
         chainAccount.keys = [key];
         try {
@@ -105,8 +105,8 @@ const handleImportKey = async () => {
                 // newAccount.address = ethAddress != '' ? ethAddress : account;
 
                 let existed = false;
-                for (let i = 0; i < store.wallet().wallets.length; i++) {
-                    const element = store.wallet().wallets[i];
+                for (let i = 0; i < useWalletStore().wallets.length; i++) {
+                    const element = useWalletStore().wallets[i];
                     if (element.name === newAccount.name && element.chainId === newAccount.chainId) {
                         existed = true;
                         break;
@@ -148,8 +148,8 @@ const importWallet = async (wallets: Wallet[]) => {
     isLoad.value = true;
 
 
-    const newWallets = [...store.wallet().wallets, ...wallets].sort(sortAccounts);
-    store.wallet().setWallets(newWallets);
+    const newWallets = [...useWalletStore().wallets, ...wallets].sort(sortAccounts);
+    useWalletStore().setWallets(newWallets);
 
     // fetch permissions
     for (const wallet of wallets) {
@@ -157,9 +157,9 @@ const importWallet = async (wallets: Wallet[]) => {
     }
 
     const firstWallet = wallets[0];
-    let index = store.wallet().wallets.indexOf(firstWallet);
-    store.wallet().setSelectedIndex(index >= 0 ? index : 0);
-    store.chain().setCurrentNetwork(networks[activeIndex.value]);
+    let index = useWalletStore().wallets.indexOf(firstWallet);
+    useWalletStore().setSelectedIndex(index >= 0 ? index : 0);
+    // useChainStore().setCurrentNetwork(networks[activeIndex.value]);
 
     isLoad.value = false;
     privateKey.value = '';

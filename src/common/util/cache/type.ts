@@ -1,5 +1,5 @@
 export type CacheKey =
-    | 'lang'
+    | 'language'
     | 'passwordHash'
     | 'powupState'
     | 'cachedAbis'
@@ -13,8 +13,5 @@ export type CacheKey =
     | 'selectedIndex'
     | 'allTokens'
     | 'userTokens'
-    | 'updateAt'
     | 'recentTransfers'
-    
-    | 'currentChainId' // old key
     ;

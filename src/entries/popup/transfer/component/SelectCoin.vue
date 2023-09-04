@@ -6,7 +6,7 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {});
 
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 </script>
 
 <template>
@@ -18,7 +18,7 @@ const wallet = store.wallet();
                 <span class="col-span-3 text-right pr-[12px]">{{ $t('wallet.balance') }}</span>
             </div>
             <div
-                v-for="(coin, index) of wallet.currentUserTokens"
+                v-for="(coin, index) of walletStore.currentUserTokens"
                 :key="index"
                 class="grid grid-cols-12 items-center border-gray-200 py-[10px] cursor-pointer"
                 :class="index ? 'border-t pt-0' : ''"

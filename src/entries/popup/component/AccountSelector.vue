@@ -11,20 +11,20 @@ const props = withDefaults(defineProps<Props>(), {});
 const emit = defineEmits(['close', 'importKey']);
 
 // 获取初始当前网络
-const chain = store.chain();
-const wallet = store.wallet();
-const activeChainId = ref(chain.currentChainId);
-const selectedNetwork = ref(chain.currentNetwork);
+const chainStore = useChainStore();
+const walletStore = useWalletStore();
+const activeChainId = ref(chainStore.currentChainId);
+const selectedNetwork = ref(chainStore.currentNetwork);
 const searchName = ref('');
 const accounts = computed(() => {
-    return wallet.wallets.filter((x) => x.chainId == activeChainId.value && (searchName.value == '' || x.name.includes(searchName.value)));
+    return walletStore.wallets.filter((x) => x.chainId == activeChainId.value && (searchName.value == '' || x.name.includes(searchName.value)));
 });
 
 watch(
     () => props.isShow,
     (v) => {
         if (v) {
-            activeChainId.value = chain.currentChainId;
+            activeChainId.value = chainStore.currentChainId;
         }
     },
     { immediate: true }
@@ -33,7 +33,7 @@ watch(
 // 锁屏
 const handleLock = () => {
     emit('close');
-    store.user().setLocked();
+    useUserStore().setLocked();
 };
 
 // 获取网络图标
@@ -60,9 +60,9 @@ const handleSelectNetwork = (item: Network) => {
 
 // 选择账号
 const handleSelectAccount = (account: Wallet) => {
-    let index = wallet.wallets.findIndex((x) => x.chainId == account.chainId && x.name == account.name);
-    wallet.setSelectedIndex(index);
-    store.chain().setCurrentNetwork(selectedNetwork.value);
+    let index = walletStore.wallets.findIndex((x) => x.chainId == account.chainId && x.name == account.name);
+    walletStore.setSelectedIndex(index);
+    // useChainStore().setCurrentNetwork(selectedNetwork.value);
     emit('close');
 };
 </script>
@@ -74,7 +74,7 @@ const handleSelectAccount = (account: Wallet) => {
         </template>
         <div class="list-container">
             <n-tabs placement="left" v-model:value="activeChainId" type="line" animated size="small" style="height: 100%">
-                <n-tab-pane v-for="(item, index) in chain.networks" :key="item.chainId" :name="item.chainId">
+                <n-tab-pane v-for="(item, index) in chainStore.networks" :key="item.chainId" :name="item.chainId">
                     <template #tab>
                         <div @click="handleSelectNetwork(item)">
                             <img :src="getNetworkIcon(item)" class="icon-img m-[7px]" />
@@ -112,7 +112,7 @@ const handleSelectAccount = (account: Wallet) => {
                                 <img
                                     class="close"
                                     src="@/assets/images/account_select.png"
-                                    v-show="wallet.selectedIndex == accIndex && chain.currentChainId === item.chainId"
+                                    v-show="walletStore.selectedIndex == accIndex && chainStore.currentChainId === item.chainId"
                                 />
                             </div>
                         </div>

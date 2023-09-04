@@ -5,7 +5,7 @@ import { Transfer, TransferRecord } from '@/types/transcation';
 
 const { t } = useI18n();
 
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 const recentVisible = ref(false);
 const selectTokenVisible = ref(false);
 
@@ -27,7 +27,7 @@ const targeMaxAmount = ref(0);
 // 初始化数据
 const route = useRoute();
 onBeforeMount(() => {
-    const currentSystemToken = store.chain().currentNetwork.token;
+    const currentSystemToken = useChainStore().currentNetwork.token;
     transfer.token = {
         symbol: (route.query.symbol as string) || currentSystemToken.symbol,
         contract: (route.query.contract as string) || currentSystemToken.contract,
@@ -35,14 +35,14 @@ onBeforeMount(() => {
     }
     transfer.amount = Number(route.query.amount) || 0;
 
-    wallet.currentUserTokens.forEach((row) => {
+    walletStore.currentUserTokens.forEach((row) => {
         if (row.contract == transfer.token.contract && row.symbol == transfer.token.symbol) {
             targeMaxAmount.value = row.amount;
             transfer.token.precision = row.precision;
         }
     });
 
-    transfer.sender = tool.briefAccount(wallet.currentWallet.name, 14, 8);
+    transfer.sender = tool.briefAccount(walletStore.currentWallet.name, 14, 8);
 
     getBalance();
 });
@@ -52,7 +52,7 @@ const isShowMemo = ref(true);
 const receiverError = ref('');
 const checkReceiver = async () => {
     if (!transfer.receiver) return (receiverError.value = t('wallet.emptyReceiver'));
-    if (transfer.receiver == wallet.currentWallet.name) return (receiverError.value = t('wallet.transferSelf'));
+    if (transfer.receiver == walletStore.currentWallet.name) return (receiverError.value = t('wallet.transferSelf'));
 
     // 账号不存在
     if (transfer.receiver.length == 42) isShowMemo.value = false;
@@ -104,7 +104,7 @@ const handleChangeToken = (coin: Balance) => {
 
 // 获取余额
 const getBalance = async () => {
-    const balance = await chain.getApi().getCurrencyBalance(transfer.token.contract, wallet.currentWallet.name, transfer.token.symbol);
+    const balance = await chain.getApi().getCurrencyBalance(transfer.token.contract, walletStore.currentWallet.name, transfer.token.symbol);
     if (balance) {
         targeMaxAmount.value = Number(balance.split(' ')[0]);
     }

@@ -10,7 +10,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {});
 const { t } = useI18n();
 const router = useRouter();
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 
 const submiting = ref(false);
 
@@ -48,14 +48,13 @@ const handleSubmit = async () => {
             token: props.transfer.token,
         };
 
-        wallet.addRecentTransfer(recent);
+        walletStore.addRecentTransfer(recent);
 
         // console.log(recent);
-        // console.log(wallet.recentTransfers);
 
         const params: [ string, string, string, string, string ] = [
             props.transfer.token.contract,
-            wallet.currentWallet.name,
+            walletStore.currentWallet.name,
             receiver,
             props.transfer.amount.toFixed(props.transfer.token.precision) + ' ' + props.transfer.token.symbol,
             memo,

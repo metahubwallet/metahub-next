@@ -7,11 +7,10 @@ interface ShownWallet extends Wallet {
 
 const chainId = ref(useRoute().query.chainId);
 const wallets = computed(() => {
-    return store
-        .wallet()
+    return useWalletStore()
         .wallets.filter((x) => x.chainId === chainId.value)
         .map((x) => {
-            const symbol = store.chain().findNetwork(x.chainId).token.symbol || '';
+            const symbol = useChainStore().findNetwork(x.chainId).token.symbol || '';
             return Object.assign(x, { symbol }) as ShownWallet;
         });
 });

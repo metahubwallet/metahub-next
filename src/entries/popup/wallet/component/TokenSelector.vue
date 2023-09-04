@@ -33,11 +33,11 @@ watch(
 );
 
 // 初始化token列表
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 const initTokens = () => {
     let tokens: Balance[] = [];
     chainTokens = [];
-    for (const chainToken of wallet.chainTokens) {
+    for (const chainToken of walletStore.chainTokens) {
         console.log(chainToken);
         if (chainToken.contract == 'eosio.token') {
             continue;
@@ -45,13 +45,13 @@ const initTokens = () => {
         let coin = {} as Balance;
         Object.assign(coin, chainToken);
         coin.isShow =
-            wallet.currentUserTokens.findIndex(
+            walletStore.currentUserTokens.findIndex(
                 (x: Coin) => x.contract == coin.contract && x.symbol == coin.symbol
             ) >= 0;
         coin.amount = 0;
         tokens.push(coin);
     }
-    for (const ut of wallet.currentUserTokens) {
+    for (const ut of walletStore.currentUserTokens) {
         if (ut.contract == 'eosio.token') continue;
         if (tokens.findIndex((x) => x.contract == ut.contract && x.symbol == ut.symbol) >= 0) continue;
 
@@ -91,10 +91,10 @@ const searchTokens = () => {
 // 新增token
 const handleAddToken = async (token: Balance) => {
     if (token.isShow) {
-        const index = wallet.currentUserTokens.findIndex(
+        const index = walletStore.currentUserTokens.findIndex(
             (x: Coin) => x.contract == token.contract && x.symbol == token.symbol
         );
-        wallet.currentUserTokens.splice(index, 1);
+        walletStore.currentUserTokens.splice(index, 1);
         token.isShow = false;
     } else {
         const newToken = {
@@ -105,10 +105,10 @@ const handleAddToken = async (token: Balance) => {
             precision: token.precision,
             logo: '',
         };
-        wallet.setCurrentUserTokens([...wallet.currentUserTokens, newToken]);
+        walletStore.setCurrentUserTokens([...walletStore.currentUserTokens, newToken]);
         token.isShow = true;
     }
-    wallet.setUserTokens(wallet.userTokens);
+    walletStore.setUserTokens(walletStore.userTokens);
 };
 </script>
 

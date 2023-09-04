@@ -1,7 +1,7 @@
 import { WhiteItem } from '@/types/settings';
 import { SettingState } from './type';
 
-export default defineStore('setting', {
+export const useSettingStore = defineStore('setting', {
     state: (): SettingState => ({
         language: 'zh-CN',
         whitelist: [],
@@ -11,7 +11,7 @@ export default defineStore('setting', {
         },
         async setLang(lang: 'zh-CN' | 'en') {
             this.language = lang;
-            await localCache.set('lang', lang);
+            await localCache.set('language', lang);
         },
         async setWhitelist(list: WhiteItem[]) {
             this.whitelist = list;

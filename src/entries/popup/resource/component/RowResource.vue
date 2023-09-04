@@ -22,9 +22,9 @@ const resourePercentage = computed(() => {
 
 
 const { t } = useI18n();
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 
-const { currentSymbol } = store.chain();
+const { currentSymbol } = useChainStore();
 const showStakedDetail = ref(false);
 const showStakedOtherDetail = ref(false);
 
@@ -33,7 +33,7 @@ const optionAction = ref('');
 
 const refundNow = async () => {
     try {
-        await chain.getApi().refund(wallet.currentWallet.name, chain.getAuth());
+        await chain.getApi().refund(walletStore.currentWallet.name, chain.getAuth());
 
         window.msg.success(t('resource.stakeSuccess'));
         emit('loadData');

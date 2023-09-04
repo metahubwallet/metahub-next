@@ -2,17 +2,19 @@
 
 // 初始化钱包情况
 
-const chain = store.chain();
-const wallet = store.wallet();
-const user = store.user();
-const setting = store.setting();
+const chainStore = useChainStore();
+const walletStore = useWalletStore();
+const userStore = useUserStore();
+const settingStore = useSettingStore();
 
 onBeforeMount(async () => {
 
-    await chain.init();
-    await wallet.init();
-    await user.init();
-    await setting.init();
+    await localCache.upgrade();
+    
+    await chainStore.init();
+    await walletStore.init();
+    await userStore.init();
+    await settingStore.init();
 
 });
 
@@ -43,7 +45,7 @@ watch(
 
 <template>
     <!-- 已解锁钱包 -->
-    <div v-if="!user.isLock" class="bg">
+    <div v-if="!userStore.isLock" class="bg">
         <top-nav @change-account="showAccountSelector = true"></top-nav>
 
         <div class="app-content">
@@ -61,7 +63,7 @@ watch(
     </div>
 
     <!-- 未解锁钱包但已初始化 -->
-    <div class="bg" v-else-if="user.isInited">
+    <div class="bg" v-else-if="userStore.isInited">
         <password-unlock></password-unlock>
     </div>
 

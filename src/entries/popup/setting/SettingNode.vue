@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 const route = useRoute();
 const chainId = ref(route.query.chainId + '');
-const network = ref(store.chain().findNetwork(chainId.value));
+const network = ref(useChainStore().findNetwork(chainId.value));
 
 // 初始化
 const selectedHttpApi = ref('');
@@ -15,10 +15,10 @@ const selectedHttpApi = ref('');
 const recommendEndpoints = ref<RPC[]>([]);
 
 onMounted(async () => {
-    const customRpcs = store.chain().customRpcs[chainId.value];
+    const customRpcs = useChainStore().customRpcs[chainId.value];
 
     customEndpoints.value = Array.isArray(customRpcs) ? customRpcs : [];
-    selectedHttpApi.value = store.chain().selectedRpc(chainId.value);
+    selectedHttpApi.value = useChainStore().selectedRpc(chainId.value);
 
     await loadRecommendEndpoints();
     pingEndpoints(customEndpoints.value);
@@ -56,8 +56,8 @@ const pingEndpoints = async (endpoints: RPC[]) => {
 
 
 const handleSelectNode = (item: RPC) => {
-    // store.chain().selectedRpc[chainId.value] = item.endpoint;
-    store.chain().setSelectedRpc(chainId.value, item.endpoint);
+    // useChainStore().selectedRpc[chainId.value] = item.endpoint;
+    useChainStore().setSelectedRpc(chainId.value, item.endpoint);
     selectedHttpApi.value = item.endpoint;
 
     // 更新URL
@@ -94,12 +94,12 @@ const saveNode = () => {
     const endpoints = _.cloneDeep(customEndpoints.value);
     for (const api of endpoints) delete api.delay;
 
-    let allCustomRpcs = store.chain().customRpcs;
+    let allCustomRpcs = useChainStore().customRpcs;
     if (!allCustomRpcs) {
         allCustomRpcs = {};
     }
     allCustomRpcs[chainId.value] = endpoints;
-    store.chain().setCustomRpcs(allCustomRpcs);
+    useChainStore().setCustomRpcs(allCustomRpcs);
 };
 
 // 新增节点

@@ -9,7 +9,7 @@ const symbol = ref();
 const contract = ref('eosio.token');
 const route = useRoute();
 onMounted(() => {
-    symbol.value = route.query.symbol ? route.query.symbol : store.chain().currentSymbol;
+    symbol.value = route.query.symbol ? route.query.symbol : useChainStore().currentSymbol;
     contract.value = route.query.contract ? route.query.contract + '' : 'eosio.token';
     draw();
 });
@@ -17,15 +17,15 @@ onMounted(() => {
 // 生成二维码
 let canvas: any = '';
 const amount = ref('');
-const wallet = store.wallet();
-let network = reactive(store.chain().findNetwork(store.chain().currentChainId) as Network);
+const walletStore = useWalletStore();
+let network = reactive(useChainStore().findNetwork(useChainStore().currentChainId) as Network);
 const draw = () => {
     canvas = document.getElementById('qrccode-canvas');
-    let to = wallet.currentWallet.name;
+    let to = walletStore.currentWallet.name;
     let memo = '';
-    if (wallet.currentWallet.name.length > 12) {
+    if (walletStore.currentWallet.name.length > 12) {
         to = 'etheraccount';
-        memo = wallet.currentWallet.name;
+        memo = walletStore.currentWallet.name;
     }
 
     let data = {
@@ -64,7 +64,7 @@ const draw = () => {
                         </div>
                         <clip-button
                             class="coin-other2"
-                            :value="briefAccount(wallet.currentWallet.name, 10, 8)"
+                            :value="briefAccount(walletStore.currentWallet.name, 10, 8)"
                         ></clip-button>
                         <div class="coin-other3">
                             <canvas class="qrcode_box" id="qrccode-canvas"></canvas>

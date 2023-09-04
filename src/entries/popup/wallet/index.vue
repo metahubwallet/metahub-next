@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 const assetUnit = ref('usd'); // 资产单位
 const assetAmount = ref(0); // 资产数量
 const isLoad = ref(false);
@@ -9,7 +9,7 @@ const isSelectToken = ref(false);
 
 <template>
     <div class="full">
-        <n-scrollbar class="full" v-if="wallet.wallets.length > 0">
+        <n-scrollbar class="full" v-if="walletStore.wallets.length > 0">
             <wallet-header :type="assetUnit" :amount="assetAmount" :isLoad="isLoad"></wallet-header>
 
             <coin-list

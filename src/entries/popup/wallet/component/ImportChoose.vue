@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {});
 // 初始化wallets(用onMount取不到值)
 const wallets = computed(() => {
     return props.accountList.map((item, index) => {
-        const network = store.chain().findNetwork(item.chainId);
+        const network = useChainStore().findNetwork(item.chainId);
         return Object.assign(item, {
             index,
             chainName: network ? network.name : 'Unknown',

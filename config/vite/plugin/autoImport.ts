@@ -10,7 +10,6 @@ export const autoImport = () => {
             // 自定义api
             {
                 'vue-i18n': ['useI18n'],
-                '@/store': ['store'],
                 '@/api': ['api'],
                 '@/common/util/env': ['env'],
                 '@/common/plugin/axios': ['http'],
@@ -21,5 +20,8 @@ export const autoImport = () => {
         ],
         // 声明文件位置
         dts: 'config/declare/auto-import.d.ts',
+        dirs: [
+            'src/store/**'
+        ],
     });
 };

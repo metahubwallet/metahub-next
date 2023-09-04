@@ -11,10 +11,10 @@ const submit = () => {
     if (!password.value) return window.msg.warning(t('password.empty'));
 
     let passwordHash = password2(password.value);
-    if (passwordHash != store.user().passwordHash) return window.msg.error(t('password.error'));
+    if (passwordHash != useUserStore().passwordHash) return window.msg.error(t('password.error'));
 
     // 持久化存储锁屏状态，有效1d
-    store.user().setPassword(password1(password.value));
+    useUserStore().setPassword(password1(password.value));
     router.push({ name: 'index' });
 };
 </script>

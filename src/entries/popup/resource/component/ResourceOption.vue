@@ -26,12 +26,12 @@ const props = withDefaults(defineProps<Props>(), {});
 const emit = defineEmits(['loadData', 'close']);
 
 const { t } = useI18n();
-const wallet = store.wallet();
-const { currentSymbol } = store.chain();
+const walletStore = useWalletStore();
+const { currentSymbol } = useChainStore();
 
 const modalTitle = ref('');
 const formData: FromData = reactive({
-    receiver: ref(wallet.currentWallet.name),
+    receiver: ref(walletStore.currentWallet.name),
     cpuValue: 0,
     netValue: 0,
     transfer: false,
@@ -115,7 +115,7 @@ const formatValue = (value: number | null) => {
     if (value == null) {
         value = 0; 
     }
-    const precision = store.chain().currentNetwork?.token?.precision;
+    const precision = useChainStore().currentNetwork?.token?.precision;
     return value.toFixed(precision) + ' ' + currentSymbol;
 };
 
@@ -132,7 +132,7 @@ const handleSubmit = async () => {
             await chain
                 .getApi()
                 .delegatebw(
-                    wallet.currentWallet.name,
+                    walletStore.currentWallet.name,
                     formData.receiver,
                     netQuantity,
                     cpuQuantity,
@@ -142,10 +142,10 @@ const handleSubmit = async () => {
         } else if (props.action == 'refund') {
             await chain
                 .getApi()
-                .undelegatebw(wallet.currentWallet.name, formData.receiver, netQuantity, cpuQuantity, chain.getAuth());
+                .undelegatebw(walletStore.currentWallet.name, formData.receiver, netQuantity, cpuQuantity, chain.getAuth());
         } else if (props.action == 'rent') {
             let parms = powerup(
-                wallet.currentWallet.name,
+                walletStore.currentWallet.name,
                 formData.receiver,
                 cpuQuantity,
                 netQuantity,

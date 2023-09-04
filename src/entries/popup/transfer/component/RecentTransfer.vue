@@ -6,8 +6,8 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {});
 
-const wallet = store.wallet();
-const { timeFormat } = tool;
+const walletStore = useWalletStore();
+
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const { timeFormat } = tool;
 
         <n-scrollbar>
             <div
-                v-for="(item, index) of wallet.recentTransfers"
+                v-for="(item, index) of walletStore.recentTransfers"
                 :key="index"
                 class="grid grid-cols-12 items-center border-gray-200 py-[10px] cursor-pointer"
                 :class="index ? 'border-t' : ''"
@@ -37,7 +37,7 @@ const { timeFormat } = tool;
                 </div>
             </div>
 
-            <div class="text-center py-[10px] text-gray-400" v-if="wallet.recentTransfers.length === 0">
+            <div class="text-center py-[10px] text-gray-400" v-if="walletStore.recentTransfers.length === 0">
                 {{ $t('public.noData') }}
             </div>
         </n-scrollbar>

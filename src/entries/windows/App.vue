@@ -3,17 +3,14 @@ import { themeOverrides } from '@/common/util/theme';
 import Global from '@/component/Global';
 import Layout from '@/entries/windows/views/Layout.vue';
 
-const chain = store.chain();
-const wallet = store.wallet();
-const user = store.user();
-const setting = store.setting();
-
 onBeforeMount(async () => {
 
-    await chain.init();
-    await wallet.init();
-    await user.init();
-    await setting.init();
+    await localCache.upgrade();
+
+    await useChainStore().init();
+    await useWalletStore().init();
+    await useWalletStore().init();
+    await useSettingStore().init();
 
 });
 

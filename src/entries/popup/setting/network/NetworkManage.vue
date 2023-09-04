@@ -19,19 +19,19 @@ const handleRemove = (item: Network) => {
 };
 
 // 移除网络
-const { networks } = store.chain();
+const { networks } = useChainStore();
 const removeNetwork = async (network: Network) => {
-    const widx = store.wallet().wallets.findIndex((x) => x.chainId == network.chainId);
+    const widx = useWalletStore().wallets.findIndex((x) => x.chainId == network.chainId);
     if (widx >= 0) return alert(t('setting.alreadyExistAccount'));
 
     const idx = networks.findIndex((x) => x.chainId == network.chainId);
     if (idx >= 0) {
         networks.splice(idx, 1);
-        store.chain().networks = [...networks];
+        useChainStore().networks = [...networks];
         await localCache.set('networks', [...networks]);
-        if (store.chain().customRpcs[network.chainId]) {
-            delete store.chain().customRpcs[network.chainId];
-            store.chain().setCustomRpcs(store.chain().customRpcs);
+        if (useChainStore().customRpcs[network.chainId]) {
+            delete useChainStore().customRpcs[network.chainId];
+            useChainStore().setCustomRpcs(useChainStore().customRpcs);
         }
     }
 };

@@ -1,6 +1,6 @@
 import { UserState } from './type';
 
-export default defineStore('user', {
+export const useUserStore =  defineStore('user', {
     state: (): UserState => ({
         password: '',
         passwordHash: '',

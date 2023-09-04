@@ -60,9 +60,9 @@ export const isSupportChain = (chain: string) => {
     return hyperionApis[chain as hyperionKey] ? true : false;
 };
 
-export const getEndpoints = async (chainId = store.chain().currentChainId) => {
+export const getEndpoints = async (chainId = useChainStore().currentChainId) => {
     try {
-        const chain = store.chain().findNetwork(chainId).chain;
+        const chain = useChainStore().findNetwork(chainId).chain;
         let res = await axios.get(
             `https://cdn.jsdelivr.net/gh/metahubwallet/chain-rpcs@master/${chain}-rpcs.json`
         );

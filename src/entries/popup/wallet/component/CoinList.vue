@@ -8,19 +8,19 @@ import { Balance, Coin } from '@/types/tokens';
 import chain from '@/common/lib/chain';
 
 
-const chainStore = store.chain();
+const chainStore = useChainStore();
 const showAddToken = ref(false);
 
 // 初始化Tokens
 let isLoad = ref(false);
 const tokens = ref<Balance[]>([]);
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 const emit = defineEmits(['isLoad', 'setUnit', 'setAmount']);
 onMounted(async () => {
     await loadTokens();
 });
 watch(
-    () => wallet.currentWallet.name,
+    () => walletStore.currentWallet.name,
     async (v) => {
         await loadTokens();
     }
@@ -34,8 +34,8 @@ const loadTokens = async () => {
     if (isLoad.value) return;
     isLoad.value = true;
 
-    if (wallet.currentUserTokens.length == 0) {
-        wallet.setCurrentUserTokens([
+    if (walletStore.currentUserTokens.length == 0) {
+        walletStore.setCurrentUserTokens([
             {
                 amount: 0,
                 ...chainStore.currentNetwork.token,
@@ -43,7 +43,7 @@ const loadTokens = async () => {
             },
         ]);
     }
-    tokens.value = wallet.currentUserTokens;
+    tokens.value = walletStore.currentUserTokens;
 
     getCoinsLogo(tokens.value);
     await getUserBalance();
@@ -55,7 +55,7 @@ const loadTokens = async () => {
 // 获取Coin图标
 const getCoinsLogo = (coins: Coin[]) => {
     for (const coin of coins) {
-        const t = wallet.getToken(coin);
+        const t = walletStore.getToken(coin);
         if (t.logo) {
             coin.logo = t.logo;
         }
@@ -68,13 +68,13 @@ const getUserBalance = async () => {
         return { contract: x.contract, symbol: x.symbol };
     }) as Coin[];
 
-    await getBalanceList(store.wallet().currentWallet.name, userCoins, (coin: Balance) => {
+    await getBalanceList(useWalletStore().currentWallet.name, userCoins, (coin: Balance) => {
         // console.log(coin);
         const selectedToken = tokens.value.find((x) => x.contract === coin.contract && x.symbol == coin.symbol);
 
         if (selectedToken) {
             selectedToken.amount = coin.amount;
-            wallet.setUserTokens(wallet.userTokens);
+            walletStore.setUserTokens(walletStore.userTokens);
         }
     });
 };
@@ -109,12 +109,12 @@ const getWalletCache = async () => {
     let rexEOS = 0.0;
     let rexCount = 0.0;
     if (chainStore.currentChainId === eosChainId) {
-        let response: any = await chain.getApi().getREXInfo(wallet.currentWallet.name);
+        let response: any = await chain.getApi().getREXInfo(walletStore.currentWallet.name);
         rexEOS = response['rows'][0]['vote_stake'];
         rexCount = response['rows'][0]['rex_balance'];
     }
-    const walletCaches = wallet.walletCaches;
-    let currentWalletCaches = walletCaches[wallet.currentWallet?.name + '@' + wallet.currentWallet?.chainId];
+    const walletCaches = walletStore.walletCaches;
+    let currentWalletCaches = walletCaches[walletStore.currentWallet?.name + '@' + walletStore.currentWallet?.chainId];
     if (!currentWalletCaches) return;
     currentWalletCaches['rexEOS'] = rexEOS;
     currentWalletCaches['rexCount'] = rexCount;

@@ -3,7 +3,7 @@ import { WhiteItem } from '@/types/settings';
 
 const domains: string[] = reactive([]);
 onMounted(() => {
-    store.setting().whitelist.forEach((item: WhiteItem) => {
+    useSettingStore().whitelist.forEach((item: WhiteItem) => {
         if (domains.indexOf(item.domain) == -1) {
             domains.push(item.domain);
         }

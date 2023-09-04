@@ -10,10 +10,10 @@ export default class Chain {
     static apis: { [key: string]: EosApi } = {};
 
     static getPrivateKeyByPublicKey(publicKey: string) {
-        for (const wallet of store.wallet().wallets) {
+        for (const wallet of useWalletStore().wallets) {
             for (const key of wallet.keys) {
                 if (key.publicKey === publicKey) {
-                    return decrypt(key.privateKey, md5(wallet.seed + store.user().password));
+                    return decrypt(key.privateKey, md5(wallet.seed + useUserStore().password));
                 }
             }
         }
@@ -30,12 +30,12 @@ export default class Chain {
             };
         }
 
-        const wallet = store.wallet().wallets.find((x) => x.chainId === chainId && x.name === authorization.actor);
+        const wallet = useWalletStore().wallets.find((x) => x.chainId === chainId && x.name === authorization.actor);
 
         if (wallet) {
             for (const key of wallet.keys) {
                 if (key.permissions.indexOf(authorization.permission) >= 0) {
-                    return decrypt(key.privateKey, md5(wallet.seed + store.user().password));
+                    return decrypt(key.privateKey, md5(wallet.seed + useUserStore().password));
                 }
             }
         }
@@ -43,7 +43,7 @@ export default class Chain {
     }
 
     static getPublicKeyByPermission(chainId: string, actor: string, permission: string) {
-        const wallet = store.wallet().wallets.find((x) => x.chainId === chainId && x.name === actor);
+        const wallet = useWalletStore().wallets.find((x) => x.chainId === chainId && x.name === actor);
 
         if (wallet) {
             for (const key of wallet.keys) {
@@ -56,13 +56,13 @@ export default class Chain {
     }
 
     static currentAccount() {
-        return store.wallet().currentWallet;
+        return useWalletStore().currentWallet;
     }
 
     static getApi(chainId: string = '') {
-        if (chainId == '') chainId = store.chain().currentChainId;
+        if (chainId == '') chainId = useChainStore().currentChainId;
         if (typeof this.apis[chainId] == 'undefined') {
-            this.apis[chainId] = new EosApi(chainId, store.chain().selectedRpc(chainId) as string, this);
+            this.apis[chainId] = new EosApi(chainId, useChainStore().selectedRpc(chainId) as string, this);
         }
         return this.apis[chainId];
     }
@@ -198,7 +198,7 @@ export default class Chain {
      *
      */
     static findLocalAccount(account: string, chainId: string) {
-        let wallets = store.wallet().wallets;
+        let wallets = useWalletStore().wallets;
         for (let index = 0; index < wallets.length; index++) {
             let wallet = wallets[index];
             if (wallet.name === account && wallet.chainId === chainId) {
@@ -215,10 +215,10 @@ export default class Chain {
     static async fetchPermissions(account: string, chainId: string) {
         let result = { code: ErrorCode.OK, permissions: [] as Permission[], msg: '' };
 
-        const index = store.wallet().wallets.findIndex((item) => {
+        const index = useWalletStore().wallets.findIndex((item) => {
             return item.name === account && item.chainId === chainId;
         });
-        const wallet = store.wallet().wallets[index];
+        const wallet = useWalletStore().wallets[index];
 
         try {
             const accinfo = await Chain.getApi(chainId).getAccount(account);
@@ -234,7 +234,7 @@ export default class Chain {
                 key.permissions = Array.from(permissions) as any;
             }
 
-            store.wallet().setWallet(wallet);
+            useWalletStore().setWallet(wallet);
         } catch (e) {
             result.code = ErrorCode.HTTP_END_POINT_ERROR;
             result.msg = i18n.global.t('public.requestHttpEndpointTimeout');

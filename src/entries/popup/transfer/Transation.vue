@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 const { timeFormat } = tool;
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 
 const trx = ref<any>(useRoute().query.trx);
 const token = ref<any>(useRoute().query.token);
@@ -32,13 +32,13 @@ const handleQuery = (url: string) => {
                                 <div
                                     :class="[
                                         'transation-count',
-                                        trx.receiver == wallet.currentWallet.name
+                                        trx.receiver == walletStore.currentWallet.name
                                             ? 'transation-count-blue'
                                             : 'transation-count-red',
                                     ]"
                                 >
                                     {{
-                                        trx.receiver == wallet.currentWallet.name
+                                        trx.receiver == walletStore.currentWallet.name
                                             ? '+' + trx.quantity
                                             : '-' + trx.quantity
                                     }}

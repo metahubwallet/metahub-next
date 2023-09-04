@@ -2,7 +2,6 @@
 import chain from '@/common/lib/chain';
 import { Balance } from '@/types/tokens';
 
-
 const code = ref('');
 const contract = ref('');
 
@@ -19,23 +18,19 @@ const handleAddToken = async () => {
             const precision = amount.split('.').length > 1 ? amount.split('.')[1].length : 0;
             const coin: Balance = {
                 amount: 0,
-                chain: store.chain().currentChain,
+                chain: useChainStore().currentChain,
                 contract: newContract,
                 symbol: symbol,
                 precision: precision,
                 logo: '',
             };
             const tokenExists =
-                store
-                    .wallet()
-                    .currentUserTokens.findIndex(
-                        (x: Balance) => x.chain == coin.chain && x.contract == coin.contract && x.symbol == coin.symbol
-                    ) >= 0;
+                useWalletStore().currentUserTokens.findIndex((x: Balance) => x.chain == coin.chain && x.contract == coin.contract && x.symbol == coin.symbol) >= 0;
             if (tokenExists) {
                 window.msg.error(t('wallet.addTokenExist'));
                 return;
             }
-            store.wallet().setCurrentUserTokens([...store.wallet().currentUserTokens, coin]);
+            useWalletStore().setCurrentUserTokens([...useWalletStore().currentUserTokens, coin]);
             window.msg.success(t('wallet.addTokenSuccessfully'));
             router.go(-1);
         } else {

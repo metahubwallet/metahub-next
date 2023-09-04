@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { networks, selectedRpc } = store.chain();
+const { networks, selectedRpc } = useChainStore();
 const router = useRouter();
 
 // 选择网络

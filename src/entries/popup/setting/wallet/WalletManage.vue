@@ -9,7 +9,7 @@ const showChangePassword = ref(false);
 const router = useRouter();
 const handleAccountManage = () => {
     // 直接跳转当前账号公链的账号列表
-    let currentChainId = store.chain().currentChainId;
+    let currentChainId = useChainStore().currentChainId;
     if (!currentChainId) currentChainId = eosChainId;
 
     router.push({
@@ -26,7 +26,7 @@ const handleClearCache = async () => {
 };
 
 const handleLockWallets = async () => {
-    store.user().setLocked();
+    useUserStore().setLocked();
 }
 </script>
 

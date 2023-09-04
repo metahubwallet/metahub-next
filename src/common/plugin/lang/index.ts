@@ -16,7 +16,7 @@ export const i18n = createI18n({
     messages,
     legacy: false,
     globalInjection: true, // 全局生效$t
-    locale: (await localCache.get('lang', defaultLang)) + '',
+    locale: (await localCache.get('language', defaultLang)) + '',
 });
 
 export const setupI18n = async (app: App) => {

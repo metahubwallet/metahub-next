@@ -1,14 +1,14 @@
 import { WalletState } from './type';
 import localTokens from '@/assets/json/tokens.json';
 import axios from 'axios';
-import chain from '../chain';
 import { Balance, Coin } from '@/types/tokens';
 import { Wallet } from '@/types/wallet';
 import { TransferRecord } from '@/types/transcation';
 
+
 type AllTokens = { [key: string]: Coin[] };
 
-const store = defineStore('wallet', {
+export const useWalletStore = defineStore('wallet', {
     state: (): WalletState => ({
         wallets: [],
         selectedIndex: 0,
@@ -20,7 +20,7 @@ const store = defineStore('wallet', {
 
     getters: {
         getToken: (state) => (token: Coin) : Coin => {
-            const _chain = token.chain ?? chain().currentChain;
+            const _chain = token.chain ?? useChainStore().currentChain;
             const chainTokens = state.allTokens[_chain] ?? [];
             const result = chainTokens.find(t => t.contract == token.contract && t.symbol == token.symbol);
             return result ? result : {} as Coin;
@@ -29,7 +29,7 @@ const store = defineStore('wallet', {
             return state.wallets[state.selectedIndex];
         },
         chainTokens(state): Coin[] {
-            const currentChain = chain().currentChain;
+            const currentChain = useChainStore().currentChain;
             return state.allTokens[currentChain] ? state.allTokens[currentChain] : [];
         },
         currentWalletKey(): string {
@@ -44,11 +44,11 @@ const store = defineStore('wallet', {
 
     actions: {
         async init() {
-            // to delete wallet.account && wallet.symbol
             this.wallets = (await localCache.get('wallets', [])) as Wallet[];
             this.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
             this.recentTransfers = (await localCache.get('recentTransfers', [])) as TransferRecord[];
             this.allTokens = await initTokens();
+            
         },
         async setWallets(wallets: Wallet[]) {
             this.wallets = wallets;
@@ -64,8 +64,13 @@ const store = defineStore('wallet', {
             await localCache.set('wallets', this.wallets);
         },
         async setSelectedIndex(index: number) {
-            this.selectedIndex = index;
-            await localCache.set('selectedIndex', index);
+            if (index >=0 && index <= this.wallets.length) {
+                this.selectedIndex = index;
+                const wallet = this.wallets[index];
+                useChainStore().setCurrentNetworkByChainId(wallet.chainId);
+                await localCache.set('selectedIndex', index);
+            }
+            
         },
         async setAllTokens(tokens: AllTokens) {
             this.allTokens = tokens;
@@ -100,7 +105,6 @@ const store = defineStore('wallet', {
     },
 });
 
-export default store;
 
 
 const getLocalTokens = () => {
@@ -158,7 +162,7 @@ const updateTokens = () => {
         const tokenMap = getTokensFromJson(tokenArray);
 
         //store.dispatch('setAllTokens', tokenMap);
-        store().setAllTokens(tokenMap);
+        useWalletStore().setAllTokens(tokenMap);
 
         console.log('--- tokens updated');
         })

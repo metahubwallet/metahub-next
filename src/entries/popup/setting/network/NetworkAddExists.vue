@@ -9,7 +9,7 @@ const router = useRouter();
 const eChainId = ref(eosChainId);
 
 // 添加网络前置操作
-const chainStore = store.chain();
+const chainStore = useChainStore();
 
 const handleAdd = (network: Network) => {
     window.dialog.warning({
@@ -61,7 +61,7 @@ const handleRemove = (item: Network) => {
 
 // 移除网络
 const removeNetwork = (network: Network) => {
-    const widx = store.wallet().wallets.findIndex((x) => x.chainId == network.chainId);
+    const widx = useWalletStore().wallets.findIndex((x) => x.chainId == network.chainId);
     if (widx >= 0) return window.msg.error(t('setting.alreadyExistAccount'));
 
     const index = chainStore.networks.findIndex((x) => x.chainId == network.chainId);

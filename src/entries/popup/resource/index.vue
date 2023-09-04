@@ -6,15 +6,15 @@ import { toInteger } from 'lodash';
 
 // 初始化
 const showResBox = ref(true);
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 onBeforeMount(async () => {
-    showResBox.value = store.chain().currentChainId == eosChainId;
+    showResBox.value = useChainStore().currentChainId == eosChainId;
     loadData();
-    if (wallet.currentWallet.smoothMode) {
+    if (walletStore.currentWallet.smoothMode) {
         smoothMode.value = true;
     }
 
-    await api.resource.getTime(wallet.currentWallet.name).then((res: any) => {
+    await api.resource.getTime(walletStore.currentWallet.name).then((res: any) => {
         if (res.code == 200) {
             smoothModeCPU.value = Math.floor(res.result / 1000) + ' ms';
         }
@@ -25,8 +25,8 @@ onBeforeMount(async () => {
 const smoothMode = ref(false);
 const smoothModeCPU = ref('~');
 const changeSmoothMode = async () => {
-    wallet.wallets[wallet.selectedIndex].smoothMode = smoothMode.value;
-    await localCache.set('wallets', [...wallet.wallets]);
+    walletStore.wallets[walletStore.selectedIndex].smoothMode = smoothMode.value;
+    await localCache.set('wallets', [...walletStore.wallets]);
     smoothMode.value = smoothMode.value;
 };
 
@@ -48,7 +48,7 @@ const memory: ResourceBase= reactive({
     },
 });
 
-const emptyCoin = '0.0000 ' + store.chain().currentSymbol;
+const emptyCoin = '0.0000 ' + useChainStore().currentSymbol;
 const empayRefund = { amount: 0, request_time: 0, left_time: '' };
 const emptyResourceData: ResourceData = {
     core_liquid_balance: emptyCoin,
@@ -74,15 +74,15 @@ const loadData = async () => {
         let stakeForOthersCPU = 0;
         let stakeForOthersNET = 0;
 
-        stakeList.value = await chain.getApi().getDelegatebwList(wallet.currentWallet.name);
+        stakeList.value = await chain.getApi().getDelegatebwList(walletStore.currentWallet.name);
         stakeList.value.forEach((item: any) => {
-            if (item.to != wallet.currentWallet.name) {
+            if (item.to != walletStore.currentWallet.name) {
                 stakeForOthersNET += parseFloat(item.net_weight);
                 stakeForOthersCPU += parseFloat(item.cpu_weight);
             }
         });
 
-        const account = (await chain.getApi().getAccount(wallet.currentWallet.name))!;
+        const account = (await chain.getApi().getAccount(walletStore.currentWallet.name))!;
         const core_liquid_balance = account.core_liquid_balance ?? emptyCoin;
         resources.cpu = {
             core_liquid_balance,

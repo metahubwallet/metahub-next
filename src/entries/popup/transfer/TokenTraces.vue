@@ -8,10 +8,10 @@ import { Coin } from '@/types/tokens';
 
 const { timeFormat } = tool;
 
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 
 const [contract, symbol] = (useRoute().params.token as any).split('-');
-const token = ref(wallet.currentUserTokens.find(
+const token = ref(walletStore.currentUserTokens.find(
     (x: Coin) => x.contract == contract && x.symbol == symbol
 )!);
 
@@ -27,7 +27,7 @@ onMounted(() => {
 const getBalance = async () => {
     const balance = await chain
         .getApi()
-        .getCurrencyBalance(token.value.contract, wallet.currentWallet.name, token.value.symbol);
+        .getCurrencyBalance(token.value.contract, walletStore.currentWallet.name, token.value.symbol);
     if (balance) {
         token.value.amount = Number(balance.split(' ')[0]);
     }
@@ -36,9 +36,9 @@ const getBalance = async () => {
 // 获取远程数据
 const traceList = ref([] as any);
 const getTraceList = async () => {
-    const chain = store.chain().currentChain;
+    const chain = useChainStore().currentChain;
     const params = {
-        account: wallet.currentWallet.name,
+        account: walletStore.currentWallet.name,
         filter: `${token.value.contract}:*`,
         sort: 'desc',
     };
@@ -118,7 +118,7 @@ const viewTransation = (item: any) => {
                                     <div class="content-info-left">
                                         <img
                                             :src="
-                                                item.receiver == wallet.currentWallet.name
+                                                item.receiver == walletStore.currentWallet.name
                                                     ? CoinGet
                                                     : CoinOut
                                             "
@@ -126,7 +126,7 @@ const viewTransation = (item: any) => {
                                         <div>
                                             <div class="content-info-up">
                                                 {{
-                                                    item.receiver != wallet.currentWallet.name
+                                                    item.receiver != walletStore.currentWallet.name
                                                         ? item.receiver
                                                         : item.sender
                                                 }}
@@ -138,13 +138,13 @@ const viewTransation = (item: any) => {
                                     </div>
                                     <div
                                         :class="
-                                            item.receiver == wallet.currentWallet.name
+                                            item.receiver == walletStore.currentWallet.name
                                                 ? 'content-info-right-blue'
                                                 : 'content-info-right-red'
                                         "
                                     >
                                         {{
-                                            item.receiver == wallet.currentWallet.name
+                                            item.receiver == walletStore.currentWallet.name
                                                 ? '+' + item.quantity
                                                 : '-' + item.quantity
                                         }}

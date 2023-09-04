@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 // 初始化
-const wallet = store.wallet();
+const walletStore = useWalletStore();
 onMounted(async () => {
-    await api.resource.getTime(wallet.currentWallet.name).then((res) => {
+    await api.resource.getTime(walletStore.currentWallet.name).then((res) => {
         if (res && res.data && res.data.code == 200) {
             smoothModeCPU.value = res.data.result / 1000 + ' ms';
         }
@@ -10,11 +10,11 @@ onMounted(async () => {
 });
 
 // 切换顺畅模式
-const smoothMode = ref(wallet.currentWallet.smoothMode);
+const smoothMode = ref(walletStore.currentWallet.smoothMode);
 const smoothModeCPU = ref('~');
 const changeSmoothMode = async () => {
-    wallet.wallets[wallet.selectedIndex].smoothMode = smoothMode.value;
-    wallet.setWallets(wallet.wallets);
+    walletStore.wallets[walletStore.selectedIndex].smoothMode = smoothMode.value;
+    walletStore.setWallets(walletStore.wallets);
 };
 
 // 选择充值数量
@@ -27,13 +27,13 @@ const changeAmount = (value: number) => {
 const radioFor = ref('self');
 const rechargeTo = ref('');
 const radioChange = () => {
-    if (radioFor.value == 'self') rechargeTo.value = wallet.currentWallet.name;
+    if (radioFor.value == 'self') rechargeTo.value = walletStore.currentWallet.name;
     else rechargeTo.value = '';
 };
 
 // 提交前操作
 const form = reactive({
-    sender: wallet.currentWallet.name,
+    sender: walletStore.currentWallet.name,
     receiver: 'metahubpower',
     amount: 0,
     memo: '',
@@ -45,7 +45,7 @@ const form = reactive({
 });
 const showConfirm = ref(false);
 const beforeSubmit = () => {
-    if (!rechargeTo.value) rechargeTo.value = wallet.currentWallet.name;
+    if (!rechargeTo.value) rechargeTo.value = walletStore.currentWallet.name;
     form.memo = rechargeTo.value;
     form.amount = amount.value;
     showConfirm.value = true;

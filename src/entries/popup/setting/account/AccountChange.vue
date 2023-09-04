@@ -6,7 +6,7 @@ import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 const permissions = ref<Permission[]>([]);
 onBeforeMount(() => {
     let perms = new Set();
-    for (const key of store.wallet().currentWallet.keys) {
+    for (const key of useWalletStore().currentWallet.keys) {
         for (const perm of key.permissions) {
             perms.add(perm);
         }

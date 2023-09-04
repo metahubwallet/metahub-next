@@ -16,7 +16,7 @@ const encryptPassword = ref('');
 
 // 确认提交
 const handleSubmit = () => {
-    if (password2(walletPassowrd.value) != store.user().passwordHash)
+    if (password2(walletPassowrd.value) != useUserStore().passwordHash)
         return window.msg.error(t('password.error'));
 
     let invaildPassword = false;
@@ -38,10 +38,10 @@ const handleSubmit = () => {
 // 导出钱包
 const exportWallet = () => {
     const exportData: any = {
-        ...store.wallet().$state,
-        ...store.chain().$state,
-        whitelist: store.setting().whitelist,
-        language: store.setting().language,
+        ...useUserStore().$state,
+        ...useChainStore().$state,
+        whitelist: useSettingStore().whitelist,
+        language: useSettingStore().language,
     };
 
     delete exportData.allTokens;
@@ -50,7 +50,7 @@ const exportWallet = () => {
 
     for (const wallet of exportData.wallets) {
         for (const key of wallet.keys) {
-            key.privateKey = decrypt(key.privateKey, md5(wallet.seed + store.user().password));
+            key.privateKey = decrypt(key.privateKey, md5(wallet.seed + useUserStore().password));
         }
     }
 

@@ -15,7 +15,7 @@ const langOptions = [
 const { locale, t } = useI18n();
 const handleSwitchLang = (lang: any) => {
     locale.value = lang;
-    store.setting().setLang(lang);
+    useSettingStore().setLang(lang);
 };
 
 // 表单
@@ -31,8 +31,8 @@ const { values, errors, handleSubmit } = useForms(schema);
 
 // 设置密码
 const onSubmit = handleSubmit(() => {
-    store.user().setPassword(password1(values.password));
-    store.user().setPasswordHash(password2(values.password));
+    useUserStore().setPassword(password1(values.password));
+    useUserStore().setPasswordHash(password2(values.password));
     router.push({ name: 'index' });
 });
 

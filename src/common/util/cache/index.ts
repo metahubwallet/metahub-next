@@ -1,7 +1,7 @@
 import { CacheKey } from './type';
 
 interface CacheData {
-    value: any;
+    value: string;
     expire?: number;
 }
 
@@ -18,7 +18,7 @@ export const localCache = {
     async get(key: CacheKey, defaultValue: any = null): Promise<any> {
         const items = await chrome.storage.local.get(key);
         const data = items[key];
-        if (typeof data == 'object') {
+        if (typeof data == 'object' && data.value) {
             // 超时清空
             if (typeof data.value === 'undefined' || (data.expire && data.expire < new Date().getTime())) {
                 await localCache.remove(key);
@@ -27,11 +27,55 @@ export const localCache = {
                 return JSON.parse(data.value);
             }
         } else {
+            await localCache.remove(key);
             return defaultValue;
         }
     },
 
     async remove(key: CacheKey) {
         await chrome.storage.local.remove(key);
+    },
+
+    async upgrade() {
+        // update data from version 1 to version 2
+        const data = await chrome.storage.local.get('selectedRpc');
+        if (data && data.selectedRpc) {
+            console.log('upgrade...');
+            // old data
+            const keys = [
+                'networks',
+                'wallets',
+                'selectedRpc',
+                'customRpcs',
+                'selectedIndex',
+                'passwordHash',
+                'language',
+                'whitelist',
+                'recentTransfers',
+                // 'allTokens', // don't need
+                'userTokens',
+            ];
+            const states = await chrome.storage.local.get(keys);
+            keys.forEach(k => {
+                const nk = k =='selectedRpc' ? 'selectedRpcs' : k;
+                if (typeof states[k] == 'undefined' || states[k] === null) {
+                    return;
+                }
+                let v = k == 'language' || k == 'passwordHash' ? states[k] : JSON.parse(states[k]);
+                if (k == 'wallets') {
+                    v = (v as any[]).map(x => {
+                        if (x.account) {
+                            delete x.account;
+                        }
+                        if (x.symbol) {
+                            delete x.symbol;
+                        }
+                        return x;
+                    });
+                }
+                localCache.set(nk as CacheKey, v);
+            });
+            await chrome.storage.local.remove('selectedRpc');
+        }
     },
 };

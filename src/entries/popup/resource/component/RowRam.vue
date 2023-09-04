@@ -27,13 +27,13 @@ const beforeSubmit = async (value: string) => {
     modalVisible.value = true;
 };
 
-const wallet = store.wallet();
-const receiver = ref(wallet.currentWallet.name);
+const walletStore = useWalletStore();
+const receiver = ref(walletStore.currentWallet.name);
 
 // 提交表单
 const inputValue = ref(0);
 const submitLoading = ref(false);
-const { currentSymbol } = store.chain();
+const { currentSymbol } = useChainStore();
 const emit = defineEmits(['loadData']);
 const onSubmit = async () => {
     if (!receiver.value) return window.msg.warning(t('wallet.emptyReceiver'));
@@ -47,9 +47,9 @@ const onSubmit = async () => {
         let result = {};
         // 购买
         if (action.value == 'buyRam') {
-            const precision = store.chain().currentNetwork.token.precision;
+            const precision = useChainStore().currentNetwork.token.precision;
             let value = inputValue.value.toFixed(precision) + ' ' + currentSymbol;
-            result = await chain.getApi().buyRam(wallet.currentWallet.name, receiver.value, value, chain.getAuth());
+            result = await chain.getApi().buyRam(walletStore.currentWallet.name, receiver.value, value, chain.getAuth());
         }
         // 出售
         else if (action.value == 'sellRam') {
@@ -59,7 +59,7 @@ const onSubmit = async () => {
                 submitLoading.value = false;
                 return window.msg.warning(t('resource.valueSizeError'));
             }
-            result = await chain.getApi().sellRam(wallet.currentWallet.name, value, chain.getAuth());
+            result = await chain.getApi().sellRam(walletStore.currentWallet.name, value, chain.getAuth());
         }
         window.msg.success(t('resource.stakeSuccess'));
 

@@ -7,7 +7,7 @@ const formData = reactive({
     password: '',
 });
 
-const user = store.user();
+const user = useUserStore();
 
 const handleSubmit = async () => {
     if (!formData.password) {
