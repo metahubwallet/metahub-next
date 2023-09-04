@@ -288,7 +288,7 @@ export default {
         cancel: '取消',
         verifyPassword: '密码确认',
         toUnlock: '请输入密码以解锁',
-        inputPasswrod: '请输入钱包密码',
+        inputPasswrod: '请输入钱包解锁密码',
         deleteSuccess: '删除成功',
         thisTime: '本次有效',
         one: '1小时内免密',

@@ -295,8 +295,8 @@ export default {
         submit: 'Submit',
         cancel: 'Cancel',
         verifyPassword: 'Verify Password',
-        toUnlock: 'Wallet Password',
-        inputPasswrod: 'Please enter the password',
+        toUnlock: 'Wallet Unlock Password',
+        inputPasswrod: 'Please enter the unlock password',
         deleteSuccess: 'Delete success',
         thisTime: 'This time',
         one: 'No password before hour',
@@ -306,7 +306,7 @@ export default {
         error: 'Password Error',
         unlock: 'Unlock',
         welcome: 'Welcome back!',
-        unlockTip:'Please enter the unlock password and take care to recognize the correct unlock window.',
+        unlockTip:'Make sure you enter the unlock password in the correct window.',
     },
 
     // 授权
