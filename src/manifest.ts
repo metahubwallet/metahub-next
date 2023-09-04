@@ -37,7 +37,7 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
     //       matches: [ '*://*/*' ],
     //     },
     // ],
-    permissions: ['storage', 'unlimitedStorage', 'alarms', 'tabs' ],
+    permissions: ['storage', 'unlimitedStorage', 'tabs'],
 };
 
 export function getManifest(): chrome.runtime.ManifestV3 {
