@@ -6211,6 +6211,11 @@ vite-plugin-node-stdlib-browser@^0.2.1:
   dependencies:
     "@rollup/plugin-inject" "^5.0.3"
 
+vite-plugin-remove-console@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.npmjs.org/vite-plugin-remove-console/-/vite-plugin-remove-console-2.1.1.tgz"
+  integrity sha512-AQOsKl9+1YO82otwSchf+P8SRo4RhMvPjOvjm9DXOnkff0SBwBPAzazEn06IUjhsm/zX4miMgicCQH1hPdktrw==
+
 vite-plugin-web-extension-support-inject@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmjs.org/vite-plugin-web-extension-support-inject/-/vite-plugin-web-extension-support-inject-5.0.0.tgz"
