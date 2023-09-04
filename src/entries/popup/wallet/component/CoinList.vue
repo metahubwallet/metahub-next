@@ -12,27 +12,31 @@ const chainStore = useChainStore();
 const showAddToken = ref(false);
 
 // 初始化Tokens
-let isLoad = ref(false);
+const isLoading = ref(false);
 const tokens = ref<Balance[]>([]);
 const walletStore = useWalletStore();
-const emit = defineEmits(['isLoad', 'setUnit', 'setAmount']);
+const emit = defineEmits(['isLoading', 'setUnit', 'setAmount']);
+
 onMounted(async () => {
     await loadTokens();
 });
+
 watch(
-    () => walletStore.currentWallet.name,
+    () => walletStore.selectedIndex,
     async (v) => {
+        console.log('change wallet index');
         await loadTokens();
     }
 );
-watch(isLoad, () => {
-    emit('isLoad', isLoad.value);
+
+watch(isLoading, () => {
+    emit('isLoading', isLoading.value);
 });
 
 // 加载tokens
 const loadTokens = async () => {
-    if (isLoad.value) return;
-    isLoad.value = true;
+    if (isLoading.value) return;
+    isLoading.value = true;
 
     if (walletStore.currentUserTokens.length == 0) {
         walletStore.setCurrentUserTokens([
@@ -49,7 +53,7 @@ const loadTokens = async () => {
     await getUserBalance();
     await handleGetEosPrice();
     await getWalletCache();
-    isLoad.value = false;
+    isLoading.value = false;
 };
 
 // 获取Coin图标

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 // 初始化钱包情况
 
 const chainStore = useChainStore();
@@ -8,16 +7,13 @@ const userStore = useUserStore();
 const settingStore = useSettingStore();
 
 onBeforeMount(async () => {
-
     await localCache.upgrade();
-    
+
     await chainStore.init();
     await walletStore.init();
     await userStore.init();
     await settingStore.init();
-
 });
-
 
 // 钱包选择
 const showAccountSelector = ref(false);
@@ -36,9 +32,13 @@ const transitionName = ref('');
 watch(
     () => route.meta.index,
     (toIndex, fromIndex) => {
-        if (toIndex < fromIndex) transitionName.value = 'slideInLeft';
-        else if (toIndex > fromIndex) transitionName.value = 'slideInRight';
-        else transitionName.value = '';
+        if (toIndex < fromIndex) {
+            transitionName.value = 'slideInLeft';
+        } else if (toIndex > fromIndex) {
+            transitionName.value = 'slideInRight';
+        } else {
+            transitionName.value = '';
+        }
     }
 );
 </script>
@@ -49,9 +49,12 @@ watch(
         <top-nav @change-account="showAccountSelector = true"></top-nav>
 
         <div class="app-content">
-            <keep-alive include="wallet">
-                <router-view class="animate__animated" :class="`animate__${transitionName}`"></router-view>
-            </keep-alive>
+            <router-view  class="animate__animated" :class="`animate__${transitionName}`" v-slot="{ Component }">
+                <keep-alive :include="['wallet']">
+                    <component :is="Component" />
+                </keep-alive>
+            </router-view>
+           
         </div>
 
         <account-selector
@@ -71,7 +74,6 @@ watch(
     <div class="bg" v-else>
         <password-setting></password-setting>
     </div>
-
 </template>
 
 <style lang="scss" scoped>

@@ -32,15 +32,15 @@ watch(
 
 // import wallet
 const checked = ref(true);
-const isLoad = ref(false);
+const isLoading = ref(false);
 const accountList = ref([] as Wallet[]);
 const handleImportKey = async () => {
-    if (isLoad.value) return;
-    isLoad.value = true;
+    if (isLoading.value) return;
+    isLoading.value = true;
 
     /** 判断协议勾选 */
     if (!checked.value) {
-        isLoad.value = false;
+        isLoading.value = false;
         return window.msg.warning('请仔细阅读协议,并勾选');
     }
 
@@ -123,7 +123,7 @@ const handleImportKey = async () => {
 
             console.log(e);
             window.msg.error(e);
-            isLoad.value = false;
+            isLoading.value = false;
         }
     } else {
         tipMessage = t('public.invaildPrivateKey');
@@ -137,7 +137,7 @@ const handleImportKey = async () => {
         await importWallet(importAccounts);
     } else {
         window.msg.error(tipMessage);
-        isLoad.value = false;
+        isLoading.value = false;
     }
 };
 
@@ -145,7 +145,7 @@ const handleImportKey = async () => {
 const router = useRouter();
 const privateKey = ref('');
 const importWallet = async (wallets: Wallet[]) => {
-    isLoad.value = true;
+    isLoading.value = true;
 
 
     const newWallets = [...useWalletStore().wallets, ...wallets].sort(sortAccounts);
@@ -161,7 +161,7 @@ const importWallet = async (wallets: Wallet[]) => {
     useWalletStore().setSelectedIndex(index >= 0 ? index : 0);
     // useChainStore().setCurrentNetwork(networks[activeIndex.value]);
 
-    isLoad.value = false;
+    isLoading.value = false;
     privateKey.value = '';
 
     router.go(-1);
@@ -239,7 +239,7 @@ const sortAccounts = (first: any, second: any) => {
                             {{ $t('public.readAndAgreeProtocols') }}
                         </span>
                     </span>
-                    <n-button @click="handleImportKey" :loading="isLoad" class="import-key-btn">
+                    <n-button @click="handleImportKey" :loading="isLoading" class="import-key-btn">
                         {{ $t('public.importKey') }}
                     </n-button>
                 </div>
@@ -250,7 +250,7 @@ const sortAccounts = (first: any, second: any) => {
                 :accountList="accountList"
                 @close="
                     isShowChoose = false;
-                    isLoad = false;
+                    isLoading = false;
                 "
                 @import="handleSelectWallet"
             ></import-choose>

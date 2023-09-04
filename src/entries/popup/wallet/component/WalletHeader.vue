@@ -2,7 +2,7 @@
 export interface Props {
     type: string;
     amount: number;
-    isLoad: boolean;
+    isLoading: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {});
 
@@ -35,7 +35,7 @@ const handleViewTransfer = () => {
         <div class="wallet-header-div">
             <div class="my-asset-tip">{{ $t('wallet.assets') }}</div>
             <div class="my-asset-number">
-                <span v-if="!props.isLoad" class="asset-number-left">{{ totalValue }}</span>
+                <span v-if="!props.isLoading" class="asset-number-left">{{ totalValue }}</span>
                 <n-spin v-else :size="18" stroke="#fff" class="ml-[10px] mb-[3px]" />
             </div>
         </div>

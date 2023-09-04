@@ -6,28 +6,29 @@ import { RPC } from '@/types/settings';
 import _ from 'lodash';
 
 const route = useRoute();
+const chainStore = useChainStore();
 const chainId = ref(route.query.chainId + '');
-const network = ref(useChainStore().findNetwork(chainId.value));
+const network = ref(chainStore.findNetwork(chainId.value));
 
-// 初始化
-const selectedHttpApi = ref('');
+
 // 选择节点
 const recommendEndpoints = ref<RPC[]>([]);
 
+const selectedRpc = computed(() => chainStore.selectedRpc(chainId.value));
+
 onMounted(async () => {
-    const customRpcs = useChainStore().customRpcs[chainId.value];
+    const customRpcs = chainStore.customRpcs[chainId.value];
 
     customEndpoints.value = Array.isArray(customRpcs) ? customRpcs : [];
-    selectedHttpApi.value = useChainStore().selectedRpc(chainId.value);
 
     await loadRecommendEndpoints();
     pingEndpoints(customEndpoints.value);
 });
 
 // 加载默认节点
-const isLoad = ref(false);
+const isLoading = ref(false);
 const loadRecommendEndpoints = async () => {
-    isLoad.value = true;
+    isLoading.value = true;
     const endpoints = await getEndpoints(chainId.value);
     if (endpoints && endpoints.length) {
         for (const endpoint of endpoints) {
@@ -36,7 +37,7 @@ const loadRecommendEndpoints = async () => {
         recommendEndpoints.value = endpoints;
         pingEndpoints(recommendEndpoints.value);
     }
-    isLoad.value = false;
+    isLoading.value = false;
 };
 
 // ping节点
@@ -57,8 +58,7 @@ const pingEndpoints = async (endpoints: RPC[]) => {
 
 const handleSelectNode = (item: RPC) => {
     // useChainStore().selectedRpc[chainId.value] = item.endpoint;
-    useChainStore().setSelectedRpc(chainId.value, item.endpoint);
-    selectedHttpApi.value = item.endpoint;
+    chainStore.setSelectedRpc(chainId.value, item.endpoint);
 
     // 更新URL
     try {
@@ -73,12 +73,16 @@ const handleSelectNode = (item: RPC) => {
 const { t } = useI18n();
 const customEndpoints = ref<RPC[]>([]);
 const handleDeleteClick = (item: RPC) => {
+    if (item.endpoint == chainStore.selectedRpc(chainId.value)) {
+        window.msg.warning('can not delete default rpc');
+    }
     window.dialog.warning({
         title: t('public.tip'),
         content: t('setting.confirmDelete'),
         positiveText: t('public.ok'),
         negativeText: t('public.cancel'),
         onPositiveClick: () => {
+           
             const index = customEndpoints.value.findIndex((obj) => {
                 return item.endpoint === obj.endpoint;
             });
@@ -115,7 +119,9 @@ const addCustomEndpoint = async () => {
     }
     let isHttp = completeUrl.startsWith('http://');
     let isHttps = completeUrl.startsWith('https://');
-    if (!isHttp && !isHttps) return window.msg.error('Endpoint must start with http:// or https://');
+    if (!isHttp && !isHttps) {
+        return window.msg.error('Endpoint must start with http:// or https://');
+    }
 
     const startTimestamp = new Date().getTime();
     try {
@@ -145,8 +151,8 @@ const addCustomEndpoint = async () => {
             <div class="cover-content _effect pb-[47px]">
                 <n-scrollbar class="full">
                     <!-- select default node -->
-                    <div class="title">{{ $t('setting.defaultNodes') }}</div>
-                    <div class="setting-group default-rpcs">
+                    <div class="title"  v-if="recommendEndpoints.length">{{ $t('setting.defaultNodes') }}</div>
+                    <div class="setting-group default-rpcs"  v-if="recommendEndpoints.length">
                         <div
                             @click="handleSelectNode(item)"
                             class="setting-item cursor-pointer"
@@ -159,15 +165,11 @@ const addCustomEndpoint = async () => {
                                 <img
                                     src="@/assets/images/account_select@2x.png"
                                     class="!w-[20px]"
-                                    v-show="selectedHttpApi === item.endpoint"
+                                    v-show="selectedRpc === item.endpoint"
                                 />
                             </div>
                         </div>
 
-                        <div v-show="recommendEndpoints.length == 0">
-                            <n-spin v-if="isLoad" :size="24" :stroke="theme.primaryColor" class="flex mt-[10%]" />
-                            <n-empty v-else class="m-auto mt-[10%]" />
-                        </div>
                     </div>
 
                     <!-- select custom node -->
@@ -183,22 +185,20 @@ const addCustomEndpoint = async () => {
                             <div @click="handleSelectNode(item)" class="setting-title">
                                 {{ item.endpoint }}
                             </div>
-                            <div class="setting-delete">
-                                <icon-delete
-                                    theme="outline"
-                                    size="16"
-                                    fill="#e53e30"
-                                    :strokeWidth="3"
-                                    class="cursor-pointer"
-                                    @click="handleDeleteClick(item)"
-                                />
-                            </div>
                             <div class="setting-right flex items-center">
                                 <div class="right-text">{{ item.delay }}</div>
                                 <img
                                     src="@/assets/images/account_select@2x.png"
                                     class="!w-[20px]"
-                                    v-show="selectedHttpApi === item.endpoint"
+                                    v-show="selectedRpc == item.endpoint"
+                                />
+                                <icon-delete  v-if="selectedRpc !== item.endpoint"
+                                    theme="outline"
+                                    size="20"
+                                    fill="#e53e30"
+                                    :strokeWidth="3"
+                                    class="cursor-pointer"
+                                    @click="handleDeleteClick(item)"
                                 />
                             </div>
                         </div>
@@ -263,7 +263,7 @@ const addCustomEndpoint = async () => {
         word-break: keep-all;
         text-overflow: ellipsis;
         overflow: hidden;
-        width: 80%;
+        flex: 1;
     }
 
     .setting-right {
@@ -271,7 +271,6 @@ const addCustomEndpoint = async () => {
         flex-direction: row;
         justify-content: flex-end;
         align-items: center;
-        width: 20%;
         img {
             width: 7.5px;
             height: auto;
@@ -284,26 +283,9 @@ const addCustomEndpoint = async () => {
         margin-right: 10px;
     }
 
-    .right-icon {
-        color: $color-primary;
-        width: 22px;
-        height: 44px;
-        line-height: 44px;
-        text-align: center;
-    }
+
 }
 
-.custom-rpcs {
-    .setting-title {
-        width: calc(80% - 40px);
-    }
-    .setting-delete {
-        width: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-}
 
 .bottom-btn {
     position: fixed;
