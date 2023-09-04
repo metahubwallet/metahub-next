@@ -35,6 +35,7 @@ const getBalance = async () => {
 
 // 获取远程数据
 const traceList = ref([] as any);
+const loading = ref(true);
 const getTraceList = async () => {
     const chain = useChainStore().currentChain;
     const params = {
@@ -43,6 +44,7 @@ const getTraceList = async () => {
         sort: 'desc',
     };
     traceList.value = await getTransactionList(chain, params);
+    loading.value = false;
 };
 
 // 跳转至转账页面
@@ -113,6 +115,7 @@ const viewTransation = (item: any) => {
                                 class="content-item"
                                 v-for="(item, index) of traceList"
                                 :key="index"
+                                v-if="traceList.length"
                             >
                                 <div class="content-info-big">
                                     <div class="content-info-left">
@@ -152,7 +155,20 @@ const viewTransation = (item: any) => {
                                 </div>
                                 <div class="separate-line"></div>
                             </div>
-                            <div class="footer">{{ $t('wallet.noData') }}</div>
+
+                            <div v-else-if="loading">
+                                <div class="flex flex-row px-4 py-3 justify-between items-center" v-for="i in [0, 1]">
+                                    <div class="flex flex-row items-center">
+                                        <n-skeleton height="24px" circle />
+                                        <div class="flex flex-col ml-2">
+                                            <n-skeleton text  class="w-[80px]" />
+                                            <n-skeleton text  class="w-[120px] mt-2" />
+                                        </div>
+                                    </div>
+                                    <n-skeleton text class="w-[40px]" />
+                                </div>
+                            </div>
+                            <div class="footer" v-else>{{ $t('public.noData') }}</div>
                         </div>
                     </div>
                 </n-scrollbar>

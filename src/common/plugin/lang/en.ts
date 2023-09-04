@@ -254,7 +254,7 @@ export default {
         transferSuccess: 'Transfer success',
         transferSelf: 'Can’t transfer to yourself',
         accountNotExist: 'Account does not exist',
-        noData: 'No Data',
+        noMoreData: 'No More Data',
         addNewTokens: 'Add New Tokens',
         searchKeyWord: 'Search by the Symbol or Contract',
         voted: 'Voted',

@@ -245,7 +245,7 @@ export default {
         transferSuccess: '转账成功',
         transferSelf: '不能给自己转账',
         accountNotExist: '收款方账号不存在',
-        noData: '没有更多数据',
+        noMoreData: '没有更多数据',
         addNewTokens: '添加新Token',
         searchKeyWord: '搜索代币或者合约',
         contract: '合约',
