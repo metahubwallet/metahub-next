@@ -30,16 +30,11 @@ const changeSmoothMode = async () => {
     smoothMode.value = smoothMode.value;
 };
 
-// 新标签页跳转
-const toLink = (url: string) => {
-    chrome.tabs.create({ url: url });
-};
-
 // 获取数据
 const stakeList = ref([] as any);
 const ramprice = ref(0);
 
-const memory: ResourceBase= reactive({
+const memory: ResourceBase = reactive({
     core_liquid_balance: '0.0000 EOS',
     use_percentage: 0,
     use_limit: {
@@ -63,7 +58,7 @@ const emptyResourceData: ResourceData = {
     self_delegated_bandwidth_weight: emptyCoin,
     staked_for_others: 0,
     staked_for_user: 0,
-}
+};
 const resources: { [key: string]: ResourceData } = reactive({
     cpu: emptyResourceData,
     net: emptyResourceData,
@@ -89,27 +84,30 @@ const loadData = async () => {
             use_percentage: account.cpu_limit.max > 0 ? parseInt((account.cpu_limit.used / account.cpu_limit.max) * 100 + '') : 100,
             use_limit: account.cpu_limit,
             stake_max: parseFloat(core_liquid_balance),
-            refund_request: account.refund_request ? {
-                amount: parseFloat(account.refund_request.cpu_amount),
-                request_time: new Date(account.refund_request.request_time).getTime(),
-                left_time: '',
-            } : empayRefund,
+            refund_request: account.refund_request
+                ? {
+                      amount: parseFloat(account.refund_request.cpu_amount),
+                      request_time: new Date(account.refund_request.request_time).getTime(),
+                      left_time: '',
+                  }
+                : empayRefund,
             total_resources_weight: account.total_resources ? account.total_resources.cpu_weight : emptyCoin,
             self_delegated_bandwidth_weight: account.self_delegated_bandwidth ? account.self_delegated_bandwidth.cpu_weight : emptyCoin,
             staked_for_others: Number(stakeForOthersCPU.toFixed(4)),
             staked_for_user: 0,
-            
-        }
+        };
         resources.net = {
             core_liquid_balance,
             use_percentage: account.net_limit.max > 0 ? parseInt((account.net_limit.used / account.net_limit.max) * 100 + '') : 100,
             use_limit: account.net_limit,
             stake_max: parseFloat(core_liquid_balance),
-            refund_request: account.refund_request ? {
-                amount: parseFloat(account.refund_request.net_amount),
-                request_time: new Date(account.refund_request.request_time).getTime(),
-                left_time: '',
-            } : empayRefund,
+            refund_request: account.refund_request
+                ? {
+                      amount: parseFloat(account.refund_request.net_amount),
+                      request_time: new Date(account.refund_request.request_time).getTime(),
+                      left_time: '',
+                  }
+                : empayRefund,
             total_resources_weight: account.total_resources ? account.total_resources.net_weight : emptyCoin,
             self_delegated_bandwidth_weight: account.self_delegated_bandwidth ? account.self_delegated_bandwidth.net_weight : emptyCoin,
             staked_for_others: Number(stakeForOthersNET.toFixed(4)),
@@ -119,21 +117,20 @@ const loadData = async () => {
         memory.use_limit.max = account.ram_quota;
         memory.use_percentage = parseInt((account.ram_usage / account.ram_quota) * 100 + '');
 
-        ['cpu', 'net'].forEach(x => {
+        ['cpu', 'net'].forEach((x) => {
             if (resources[x].use_percentage > 100) {
                 resources[x].use_percentage = 100;
             }
             if (resources[x].refund_request.amount) {
                 const leftTime = new Date().getTime() - resources[x].refund_request.request_time;
                 const minutes = 4320 - (leftTime / 60000 - 479); //赎回剩余分钟数
-                resources[x].refund_request.left_time = minutes > 0 ? toInteger(minutes / 1440) + 'd ' + (toInteger(minutes / 60) % 24) + 'h ' + (minutes % 60) + 'm' : '-';
+                resources[x].refund_request.left_time =
+                    minutes > 0 ? toInteger(minutes / 1440) + 'd ' + (toInteger(minutes / 60) % 24) + 'h ' + (minutes % 60) + 'm' : '-';
             }
             resources[x].stake_max += Number(resources[x].refund_request.amount.toFixed(4));
             resources[x].staked_for_user = parseFloat(resources[x].total_resources_weight) - parseFloat(resources[x].self_delegated_bandwidth_weight);
             resources[x].staked_for_user = Number(resources[x].staked_for_user.toFixed(4));
         });
-
-
     } catch (e) {
         console.log(e);
         window.msg.error(e);
@@ -164,68 +161,39 @@ const loadData = async () => {
                                 <!-- smoothMode switch -->
                                 <div class="line1">
                                     <div>{{ $t('resource.smoothMode') }}</div>
-                                    <n-switch
-                                        style="display: block"
-                                        v-model:value="smoothMode"
-                                        active-color="#C02BFC"
-                                        @change="changeSmoothMode"
-                                    ></n-switch>
+                                    <n-switch style="display: block" v-model:value="smoothMode" active-color="#C02BFC" @change="changeSmoothMode"></n-switch>
                                 </div>
 
                                 <!-- recharge -->
                                 <div class="line2">
                                     <div>{{ $t('resource.remainingNET') }} {{ smoothModeCPU }}</div>
                                     <div>
-                                        <span @click="$router.push({ name: 'recharge' })">
-                                            {{ $t('resource.recharge') }} >
-                                        </span>
+                                        <span @click="$router.push({ name: 'recharge' })">{{ $t('resource.recharge') }} ></span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- links -->
                             <div class="links">
-                                <div
-                                    class="link flex justify-between items-center"
-                                    @click="toLink('https://eospowerup.io/')"
-                                >
-                                    {{ $t('resource.freeCPU') }}
+                                <a class="link" target="_blank" href="https://eospowerup.io/">
+                                    <span>{{ $t('resource.freeCPU') }}</span>
                                     <icon-right theme="filled" size="14" fill="#4a4a4a" />
-                                </div>
-                                <div
-                                    class="link flex justify-between items-center"
-                                    @click="toLink('https://rex.tokenpocket.pro/#/')"
-                                    style="margin-top: 8px"
-                                >
-                                    {{ $t('resource.tradeREX') }}
+                                </a>
+                                <a class="link" target="_blank" href="https://rex.tokenpocket.pro/#/" style="margin-top: 8px">
+                                    <span>{{ $t('resource.tradeREX') }}</span>
                                     <icon-right theme="filled" size="14" fill="#4a4a4a" />
-                                </div>
+                                </a>
                             </div>
                         </div>
 
                         <!-- cpu -->
-                        <row-resource
-                            @loadData="loadData"
-                            class="res-item"
-                            type="cpu"
-                            :resources="resources"
-                        ></row-resource>
+                        <row-resource @loadData="loadData" class="res-item" type="cpu" :resources="resources"></row-resource>
 
                         <!-- net -->
-                        <row-resource
-                            @loadData="loadData"
-                            class="res-item"
-                            type="net"
-                            :resources="resources"
-                        ></row-resource>
+                        <row-resource @loadData="loadData" class="res-item" type="net" :resources="resources"></row-resource>
 
                         <!-- ram -->
-                        <row-ram
-                            @loadData="loadData"
-                            class="res-item"
-                            :ramprice="ramprice"
-                            :memory="memory"
-                        ></row-ram>
+                        <row-ram @loadData="loadData" class="res-item" :ramprice="ramprice" :memory="memory"></row-ram>
                     </div>
                 </n-scrollbar>
             </div>
@@ -267,6 +235,10 @@ const loadData = async () => {
                 height: 100px;
                 font-size: 12px;
                 .link {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
                     padding: 12px;
                     width: 115px;
                     height: 46px;

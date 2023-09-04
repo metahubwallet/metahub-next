@@ -2,11 +2,12 @@
 
 
 const manifestData = chrome.runtime.getManifest();
-console.log(manifestData);
 const currentVersion = ref(manifestData.version || '1.0.0');
 
-const aboutUs = () => {
-    chrome.tabs.create({ url: 'https://metahub.cash/' }); // 新标签页跳转
+const link = ref<HTMLLinkElement | null>(null);
+
+const aboutUsClick = () => {
+    link.value?.click();
 };
 </script>
 
@@ -96,7 +97,8 @@ const aboutUs = () => {
                     </div>
 
                     <!-- about us -->
-                    <div @click="aboutUs" class="setting-item">
+                    <div @click="aboutUsClick" class="setting-item">
+                        <a ref="link" href="https://metahub.cash/" target="_blank"></a>
                         <div class="setting-icon">
                             <img class="img-icon" src="@/assets/images/setting_about_me@2x.png" />
                         </div>

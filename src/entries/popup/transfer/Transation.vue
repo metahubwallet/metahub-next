@@ -5,10 +5,7 @@ const walletStore = useWalletStore();
 const trx = ref<any>(useRoute().query.trx);
 const token = ref<any>(useRoute().query.token);
 
-const handleQuery = (url: string) => {
-    url = url + trx.value.trx_id;
-    chrome.tabs.create({ url });
-};
+
 </script>
 
 <template>
@@ -22,26 +19,17 @@ const handleQuery = (url: string) => {
                         <div class="transation-root">
                             <!-- 头部 -->
                             <div class="transation-success">
-                                <img
-                                    class="transation-img"
-                                    src="@/assets/images/transaction_successful@2x.png"
-                                />
+                                <img class="transation-img" src="@/assets/images/transaction_successful@2x.png" />
                                 <div class="transation-type">
                                     {{ $t('wallet.transferSuccess') }}
                                 </div>
                                 <div
                                     :class="[
                                         'transation-count',
-                                        trx.receiver == walletStore.currentWallet.name
-                                            ? 'transation-count-blue'
-                                            : 'transation-count-red',
+                                        trx.receiver == walletStore.currentWallet.name ? 'transation-count-blue' : 'transation-count-red',
                                     ]"
                                 >
-                                    {{
-                                        trx.receiver == walletStore.currentWallet.name
-                                            ? '+' + trx.quantity
-                                            : '-' + trx.quantity
-                                    }}
+                                    {{ trx.receiver == walletStore.currentWallet.name ? '+' + trx.quantity : '-' + trx.quantity }}
                                 </div>
                             </div>
 
@@ -85,28 +73,24 @@ const handleQuery = (url: string) => {
                                 <div class="item">
                                     <div class="item-title">{{ $t('wallet.moreDetail') }}</div>
                                     <div class="item-search">
-                                        <div @click="handleQuery('https://bloks.io/transaction/')">
+                                        <a class="block" target="_blank" :href="'https://bloks.io/transaction/' + trx.trx_id">
                                             <img src="@/assets/images/bloks.png" />
                                             <span>bloks</span>
-                                        </div>
-                                        <div @click="handleQuery('https://eosflare.io/tx/')">
+                                        </a>
+                                        <a class="block" target="_blank" :href="'https://eosflare.io/tx/' + trx.trx_id">
                                             <img src="@/assets/images/eosflare.png" />
                                             <span>eosflare</span>
-                                        </div>
+                                        </a>
                                     </div>
                                     <div class="item-search">
-                                        <div @click="handleQuery('https://www.eosx.io/tx/')">
+                                        <a class="block" target="_blank" :href="'https://www.eosx.io/tx/' + trx.trx_id">
                                             <img src="@/assets/images/eosx.png" />
                                             <span>eosx</span>
-                                        </div>
-                                        <div
-                                            @click="
-                                                handleQuery('https://eos.eosq.eosnation.io/tx/')
-                                            "
-                                        >
+                                        </a>
+                                        <a class="block" target="_blank" :href="'https://eos.eosq.eosnation.io/tx/' + trx.trx_id">
                                             <img src="@/assets/images/eosq.png" />
                                             <span>eosq</span>
-                                        </div>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
