@@ -102,7 +102,7 @@ const importWalletsFromData = async (content: string) => {
     }
 
     importData.password = password1(values.password);
-    importData.passwordHash = password2(values.password);
+    importData.passhash = password2(values.password);
 
     // 重新加密
     for (const wallet of importData.wallets) {
@@ -146,7 +146,7 @@ const importWalletsFromData = async (content: string) => {
 
     useSettingStore().setWhitelist(importData.whitelist);
 
-    useUserStore().setPasswordHash(importData.passwordHash);
+    useUserStore().setPasshash(importData.passhash);
     useUserStore().setLocked();
     
     changeLang(importData.language);

@@ -32,7 +32,7 @@ const { values, errors, handleSubmit } = useForms(schema);
 // 设置密码
 const onSubmit = handleSubmit(() => {
     useUserStore().setPassword(password1(values.password));
-    useUserStore().setPasswordHash(password2(values.password));
+    useUserStore().setPasshash(password2(values.password));
     router.push({ name: 'index' });
 });
 

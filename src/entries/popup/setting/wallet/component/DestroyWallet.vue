@@ -14,7 +14,7 @@ const handleConfirm = async () => {
     useWalletStore().setUserTokens({});
 
     useUserStore().setLocked();
-    useUserStore().setPasswordHash('');
+    useUserStore().setPasshash('');
 
     router.push('/');
     window.msg.success(t('password.deleteSuccess'));

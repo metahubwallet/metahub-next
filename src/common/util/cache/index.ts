@@ -41,10 +41,9 @@ export const localCache = {
     },
 
     async upgrade() {
-      
         // update data from version 1 to version 2
-        const data = await chrome.storage.local.get('selectedRpc');
-        if (data && data.selectedRpc) {
+        const data = await chrome.storage.local.get('passwordHash');
+        if (data && data.passwordHash) {
             console.log('start upgrade...');
             // old data
             const keys = [
@@ -62,7 +61,12 @@ export const localCache = {
             ];
             const states = await chrome.storage.local.get(keys);
             keys.forEach(k => {
-                const nk = k =='selectedRpc' ? 'selectedRpcs' : k;
+                let nk = k;
+                if (nk == 'selectedRpc') {
+                    nk = 'selectedRpcs';
+                } else if (nk == 'passwordHash') {
+                    nk = 'passhash';
+                }
                 if (typeof states[k] == 'undefined' || states[k] === null) {
                     return;
                 }
@@ -80,7 +84,7 @@ export const localCache = {
                 }
                 localCache.set(nk as CacheKey, v);
             });
-            await chrome.storage.local.remove('selectedRpc');
+            await chrome.storage.local.remove('passwordHash');
             console.log('upgrade finished.');
         }
         

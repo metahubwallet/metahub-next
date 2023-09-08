@@ -13,7 +13,7 @@ const { t } = useI18n();
 const password = ref('');
 const emit = defineEmits(['close', 'confirm']);
 const handleSubmit = () => {
-    if (password2(password.value) != useUserStore().passwordHash)
+    if (password2(password.value) != useUserStore().passhash)
         return window.msg.error(t('password.error'));
 
     emit('close');

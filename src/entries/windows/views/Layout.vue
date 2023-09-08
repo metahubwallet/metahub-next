@@ -14,9 +14,9 @@ const handleSubmit = async () => {
         return window.msg.warning(t('password.empty'));
     }
 
-    let password = password1(formData.password);
-    let passwordHash = password2(formData.password);
-    if (passwordHash != user.passwordHash) {
+    const password = password1(formData.password);
+    const passhash = password2(formData.password);
+    if (passhash != user.passhash) {
         return window.msg.warning(t('password.error'));
     }
 

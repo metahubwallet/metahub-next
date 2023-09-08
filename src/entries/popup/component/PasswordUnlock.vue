@@ -10,8 +10,10 @@ const password = ref('');
 const submit = () => {
     if (!password.value) return window.msg.warning(t('password.empty'));
 
-    let passwordHash = password2(password.value);
-    if (passwordHash != useUserStore().passwordHash) return window.msg.error(t('password.error'));
+    const passhash = password2(password.value);
+    if (passhash != useUserStore().passhash) {
+        return window.msg.error(t('password.error'));
+    }
 
     // 持久化存储锁屏状态，有效1d
     useUserStore().setPassword(password1(password.value));

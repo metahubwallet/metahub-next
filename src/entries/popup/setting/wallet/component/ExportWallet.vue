@@ -16,7 +16,7 @@ const encryptPassword = ref('');
 
 // 确认提交
 const handleSubmit = () => {
-    if (password2(walletPassowrd.value) != useUserStore().passwordHash)
+    if (password2(walletPassowrd.value) != useUserStore().passhash)
         return window.msg.error(t('password.error'));
 
     let invaildPassword = false;
@@ -46,7 +46,7 @@ const exportWallet = () => {
 
     delete exportData.allTokens;
     delete exportData.password;
-    delete exportData.passwordHash;
+    delete exportData.passhash;
 
     for (const wallet of exportData.wallets) {
         for (const key of wallet.keys) {

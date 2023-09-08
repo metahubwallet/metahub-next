@@ -1,6 +1,6 @@
 export type CacheKey =
     | 'language'
-    | 'passwordHash'
+    | 'passhash'
     | 'powupState'
     | 'cachedAbis'
     | 'wallets'
