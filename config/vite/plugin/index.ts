@@ -14,7 +14,10 @@ export const setupPlugins = () => {
     plugins.push(autoImport());
     plugins.push(setupComponent());
     plugins.push(nodePolyfills());
-    plugins.push(removeConsole());
+    console.log(process.env.npm_lifecycle_event);
+    if (process.env.npm_lifecycle_event == 'build') {
+        plugins.push(removeConsole());
+    }
 
     return plugins;
 };

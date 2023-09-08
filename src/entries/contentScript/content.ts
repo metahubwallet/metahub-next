@@ -115,6 +115,10 @@ class Dapp {
         }
     }
 
+    public async isMetahub() {
+        return true;
+    }
+
     public async suggestNetwork() {
         console.log('suggestNetwork');
         throw new Error('suggestNetwork doesn\'t support now');

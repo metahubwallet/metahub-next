@@ -2,6 +2,15 @@
 import Global from '@/component/Global';
 import { themeOverrides } from '@/common/util/theme';
 import Index from './index.vue';
+
+onBeforeMount(async () => {
+    await useChainStore().init();
+    await useUserStore().init();
+    await useWalletStore().init();
+    await useSettingStore().init();
+});
+
+
 </script>
 
 <template>

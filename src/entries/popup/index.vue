@@ -1,19 +1,6 @@
 <script setup lang="ts">
 // 初始化钱包情况
-
-const chainStore = useChainStore();
-const walletStore = useWalletStore();
 const userStore = useUserStore();
-const settingStore = useSettingStore();
-
-onBeforeMount(async () => {
-    await localCache.upgrade();
-
-    await chainStore.init();
-    await walletStore.init();
-    await userStore.init();
-    await settingStore.init();
-});
 
 // 钱包选择
 const showAccountSelector = ref(false);

@@ -8,15 +8,18 @@ export const useUserStore =  defineStore('user', {
 
     getters: {
         isLock: (state) => {
+            console.log('call isLock');
             return state.password == '';
         },
         isInited: (state) => {
+            console.log('call isInited');
             return state.passwordHash != '';
         }
     },
 
     actions: {
         async init() {
+            console.log('call init');
             const result: any = (await chrome.storage.session.get(['password'])) ?? {};
             this.password = result.password as string || '';
             this.passwordHash = (await localCache.get('passwordHash', '')) as string;

@@ -4,16 +4,11 @@ import Global from '@/component/Global';
 import Layout from '@/entries/windows/views/Layout.vue';
 
 onBeforeMount(async () => {
-
-    await localCache.upgrade();
-
     await useChainStore().init();
-    await useWalletStore().init();
+    await useUserStore().init();
     await useWalletStore().init();
     await useSettingStore().init();
-
 });
-
 
 </script>
 

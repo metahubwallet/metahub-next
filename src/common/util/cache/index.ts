@@ -33,14 +33,19 @@ export const localCache = {
     },
 
     async remove(key: CacheKey) {
+        if (key == 'wallets') {
+            // do not remove wallets
+            return;
+        }
         await chrome.storage.local.remove(key);
     },
 
     async upgrade() {
+      
         // update data from version 1 to version 2
         const data = await chrome.storage.local.get('selectedRpc');
         if (data && data.selectedRpc) {
-            console.log('upgrade...');
+            console.log('start upgrade...');
             // old data
             const keys = [
                 'networks',
@@ -76,6 +81,8 @@ export const localCache = {
                 localCache.set(nk as CacheKey, v);
             });
             await chrome.storage.local.remove('selectedRpc');
+            console.log('upgrade finished.');
         }
+        
     },
 };
