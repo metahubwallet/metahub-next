@@ -3,12 +3,6 @@ import { themeOverrides } from '@/common/util/theme';
 import Global from '@/component/Global';
 import Layout from '@/entries/windows/views/Layout.vue';
 
-onBeforeMount(async () => {
-    await useChainStore().init();
-    await useUserStore().init();
-    await useWalletStore().init();
-    await useSettingStore().init();
-});
 
 </script>
 

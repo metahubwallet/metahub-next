@@ -12,7 +12,7 @@ import {
 } from '@/common/lib/messages/message';
 import * as MessageTypes from '@/common/lib/messages/types';
 import SdkError from '@/common/lib/sdkError';
-import { Network, RPC, WhiteItem } from '@/types/settings';
+import { Network, WhiteItem } from '@/types/settings';
 import { signature } from '@/common/lib/keyring';
 import { decrypt, md5 } from '@/common/util/crypto';
 import { Api, JsonRpc } from 'eosjs';
@@ -21,25 +21,29 @@ import { Wallet } from '@/types/wallet';
 import { eosChainId } from '@/common/util/network';
 import { getContractAbi } from '@/common/util/abi';
 
-console.log('run...');
+console.log('add listeners', (new Date().toLocaleString()));
 
-function setupMessageListener() {
-    chrome.windows.onRemoved.addListener((windowId) => {
-        closeWindow(windowId);
-    });
-    chrome.runtime.onMessage.addListener((request: any, sender, sendResponse: Function) => {
-        if (sender.id !== chrome.runtime.id) return true;
-        if (typeof request == 'string') {
-            request = JSON.parse(request);
-        }
-        const message = Message.fromJson(request);
-        if (message.payload && !message.payload.domain) {
-            message.payload.domain = 'localhost';
-        }
-        dispenseMessage(sendResponse, message);
-        return true;
-    });
-}
+chrome.windows.onRemoved.addListener((windowId) => {
+    closeWindow(windowId);
+});
+chrome.runtime.onMessage.addListener((request: any, sender, sendResponse: Function) => {
+    console.log('add listeners');
+    if (sender.id !== chrome.runtime.id) return true;
+    if (typeof request == 'string') {
+        request = JSON.parse(request);
+    }
+    const message = Message.fromJson(request);
+    if (message.payload && !message.payload.domain) {
+        message.payload.domain = 'localhost';
+    }
+    dispenseMessage(sendResponse, message);
+    return true;
+});
+
+// Initialize the demo on install
+// chrome.runtime.onInstalled.addListener(({ reason }) => {
+//     // do something
+// });
 
 async function dispenseMessage(sendResponse: Function, message: Message<any>) {
     let response;
@@ -525,11 +529,7 @@ async function getPassword() {
 // todo: 这个变量可能会被置空
 const closeCallbacks: { [key: number]: Function } = {};
 
-// Initialize the demo on install
-// setupMessageListener();
-chrome.runtime.onInstalled.addListener(({ reason }) => {
-    setupMessageListener();
-});
+
 
 async function closeWindow(windowId: number, forceClose = false) {
     // console.log('close window', windowId);

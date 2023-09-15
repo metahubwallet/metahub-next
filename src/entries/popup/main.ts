@@ -12,8 +12,8 @@ const bootstrap = async () => {
     await localCache.upgrade();
 
     const app = createApp(App);
-    setupPlugins(app);
-    setupRouter(app);
+    await setupPlugins(app);
+    await setupRouter(app);
     app.mount('#app');
 };
 

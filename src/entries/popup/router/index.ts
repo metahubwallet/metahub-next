@@ -8,7 +8,7 @@ export const router = createRouter({
     routes: baseRoutes,
 });
 
-export const setupRouter = (app: App) => {
+export const setupRouter = async (app: App) => {
     setupModuleRoutes(router); // 加载模块路由
     app.use(router); // 注册路由
 };

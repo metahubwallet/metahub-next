@@ -3,8 +3,8 @@ import { setupPinia } from './pinia';
 import { setupTailwindcss } from './tailwindcss';
 import { setupI18n } from './lang';
 
-export const setupPlugins = (app: App) => {
+export const setupPlugins = async (app: App) => {
+    await setupPinia(app);
     setupTailwindcss();
-    setupPinia(app);
     setupI18n(app);
 };
