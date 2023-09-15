@@ -526,10 +526,10 @@ async function getPassword() {
 const closeCallbacks: { [key: number]: Function } = {};
 
 // Initialize the demo on install
-setupMessageListener();
-// chrome.runtime.onInstalled.addListener(({ reason }) => {
-//     setupMessageListener();
-// });
+// setupMessageListener();
+chrome.runtime.onInstalled.addListener(({ reason }) => {
+    setupMessageListener();
+});
 
 async function closeWindow(windowId: number, forceClose = false) {
     // console.log('close window', windowId);
