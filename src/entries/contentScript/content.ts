@@ -49,6 +49,10 @@ class Dapp {
         return this._identity;
     }
 
+    public set identity(_id: any) {
+        // do nothing, just compatibility with scatterjs
+    }
+
     public async getVersion() {
         return await this.signal<Payload>(MessageTypes.REQUEST_GET_VERSION).request();
     }
