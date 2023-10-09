@@ -8,3 +8,8 @@ declare interface Window {
 }
 
 declare module 'vite-plugin-node-stdlib-browser';
+
+declare module 'eosjs-ecc' {
+    import { ecc } from 'eosjs/dist/eosjs-ecc-migration';
+    export default ecc;
+}  

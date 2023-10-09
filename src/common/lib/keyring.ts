@@ -1,4 +1,5 @@
 import { ecc } from 'eosjs/dist/eosjs-ecc-migration';
+import ecc_old from 'eosjs-ecc';
 
 // 查询私钥是否正确
 export function isValidPrivate(privateKey: string) {
@@ -31,7 +32,11 @@ export function signature(data: Buffer | string, privateKey: string, arbitrary: 
     if (isHash) {
         sig = ecc.signHash(data, privateKey, 'utf8');
     } else {
-        sig = ecc.sign(data, privateKey, 'utf8');
+        if (arbitrary) {
+            sig = ecc_old.sign(data, privateKey, 'utf8');
+        } else {
+            sig = ecc.sign(data, privateKey, 'utf8');
+        }
     }
     return sig;
 }
