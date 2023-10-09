@@ -57,6 +57,7 @@
         "crypto-js": "^4.1.1",
         "dayjs": "^1.11.9",
         "eosjs": "^22.1.0",
+        "eosjs-ecc": "^4.0.7",
         "ethereumjs-util": "^7.1.5",
         "lodash": "^4.17.21",
         "node-stdlib-browser": "^1.2.0",

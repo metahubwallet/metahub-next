@@ -321,7 +321,7 @@ export default {
         chooseAccount: 'Choose Account',
         back: 'Back',
         loginTip: '{0} request login',
-        executionContract: 'Execution Contract',
+        executionContract: 'Contract Execution',
         requestSignature: 'Request Signature',
         property: 'Property',
         joinWhitelist: 'Add to Whitelist',

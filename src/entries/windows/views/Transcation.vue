@@ -202,6 +202,7 @@ const onClose = async () => {
         flex-direction: column;
         padding: 30px 20px 10px 20px;
         background-image: linear-gradient(rgba(246, 221, 255, 0.8), rgba(225, 225, 250, 0.05));
+        flex-basis: 110px;
         .title {
             flex-grow: 1;
             color: #222;
@@ -228,9 +229,10 @@ const onClose = async () => {
     }
 
     .content-transcation {
-        flex: 1;
+        flex-basis: 0;
+        flex-grow: 1;
         font-family: Helvetica, Arial;
-        height: auto!important;
+        overflow: hidden;
         .content-action {
             padding: 0 20px;
             width: 100%;
@@ -390,12 +392,13 @@ const onClose = async () => {
             text-align: left;
         }
     }
+
     .btns {
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        height: 100px;
+        flex-basis: 100px;
         .trx-btn {
             border: 1px solid $color-primary;
             border-radius: 4px;

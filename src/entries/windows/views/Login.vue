@@ -248,15 +248,6 @@ const login = async (account: LoginAccount) => {
     }
 }
 
-// /deep/ .n-scrollbar {
-//   height: 100%;
-//   .n-scrollbar__wrap {
-//     overflow-x: hidden;
-//   }
-//   .n-scrollbar__bar.is-horizontal {
-//     display: none;
-//   }
-// }
 .n-icon-arrow-down {
     font-size: 12px;
 }

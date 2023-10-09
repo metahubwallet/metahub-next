@@ -45,6 +45,13 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
+"@babel/runtime@7.6.0":
+  version "7.6.0"
+  resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.6.0.tgz"
+  integrity sha512-89eSBLJsxNxOERC0Op4vd+0Bqm6wRMqMbFtV3i0/fbaWw/mJ8Q3eBvgX0G4SyrOOLCtbu98HspF8o09MRT+KzQ==
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@commitlint/cli@^17.5.0":
   version "17.5.0"
   resolved "https://registry.npmmirror.com/@commitlint/cli/-/cli-17.5.0.tgz"
@@ -1056,7 +1063,7 @@ balanced-match@^1.0.0:
 
 base-x@^3.0.2:
   version "3.0.9"
-  resolved "https://registry.npmmirror.com/base-x/-/base-x-3.0.9.tgz"
+  resolved "https://registry.npmjs.org/base-x/-/base-x-3.0.9.tgz"
   integrity sha512-H7JU6iBHTal1gp56aKoaa//YUxEaAOUiydvrV/pILqIHXTtqxSkATOnDA2u+jZ/61sD+L/412+7kzXRtWukhpQ==
   dependencies:
     safe-buffer "^5.0.1"
@@ -1077,6 +1084,11 @@ bcrypt-pbkdf@^1.0.0:
   integrity sha512-qeFIXtP4MSoi6NLqO12WfqARWWuCKi2Rn/9hJLEmtB5yTNr9DqFWkJRCf2qShWzPeAMRnOgCrq0sg/KLv5ES9w==
   dependencies:
     tweetnacl "^0.14.3"
+
+bigi@^1.1.0, bigi@1.4.2:
+  version "1.4.2"
+  resolved "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz"
+  integrity sha512-ddkU+dFIuEIW8lE7ZwdIAf2UPoM90eaprg5m3YXAVVTmKlqV/9BX4A2M8BOK2yOq6/VgZFVhK6QAxJebhlbhzw==
 
 bignumber.js@^9.1.1:
   version "9.1.1"
@@ -1180,7 +1192,7 @@ browser-resolve@^2.0.0:
   dependencies:
     resolve "^1.17.0"
 
-browserify-aes@^1.0.0, browserify-aes@^1.0.4:
+browserify-aes@^1.0.0, browserify-aes@^1.0.4, browserify-aes@1.0.6:
   version "1.0.6"
   resolved "https://registry.npmmirror.com/browserify-aes/-/browserify-aes-1.0.6.tgz"
   integrity sha512-MMvWM6jpfsiuzY2Y+pRJvHRac3x3rHWQisWoz1dJaF9qDFsD8HdVxB7MyZKeLKeEt0fEjrXXZ0mxgTHSoJusug==
@@ -1276,6 +1288,13 @@ bs58@^5.0.0:
   dependencies:
     base-x "^4.0.0"
 
+bs58@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/bs58/-/bs58-4.0.1.tgz"
+  integrity sha512-Ok3Wdf5vOIlBrgCvTq96gBkJw+JUEzdBgyaza5HLtPm7yTHkjRy8+JzNyHF7BHa0bNWOQIp3m5YF0nnFcOIKLw==
+  dependencies:
+    base-x "^3.0.2"
+
 bs58check@^2.1.2:
   version "2.1.2"
   resolved "https://registry.npmmirror.com/bs58check/-/bs58check-2.1.2.tgz"
@@ -1343,6 +1362,13 @@ bunyan@1.8.15:
     moment "^2.19.3"
     mv "~2"
     safe-json-stringify "~1"
+
+bytebuffer@5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/bytebuffer/-/bytebuffer-5.0.1.tgz"
+  integrity sha512-IuzSdmADppkZ6DlpycMkm8l9zeEq16fWtLvunEwFiYciR/BHo4E8/xs5piFquG+Za8OWmMqHF8zuRviz2LHvRQ==
+  dependencies:
+    long "~3"
 
 cacheable-lookup@^7.0.0:
   version "7.0.0"
@@ -1791,7 +1817,7 @@ create-ecdh@^4.0.0:
     bn.js "^4.1.0"
     elliptic "^6.5.3"
 
-create-hash@^1.1.0, create-hash@^1.1.2:
+create-hash@^1.1.0, create-hash@^1.1.2, create-hash@1.1.3:
   version "1.1.3"
   resolved "https://registry.npmmirror.com/create-hash/-/create-hash-1.1.3.tgz"
   integrity sha512-snRpch/kwQhcdlnZKYanNF1m0RDlrCdSKQaH87w1FCFPVPNCQ/Il9QJKAX2jVBZddRdaHBMC+zXa9Gw9tmkNUA==
@@ -1812,7 +1838,7 @@ create-hash@^1.2.0:
     ripemd160 "^2.0.1"
     sha.js "^2.4.0"
 
-create-hmac@^1.1.0, create-hmac@^1.1.4:
+create-hmac@^1.1.0, create-hmac@^1.1.4, create-hmac@1.1.6:
   version "1.1.6"
   resolved "https://registry.npmmirror.com/create-hmac/-/create-hmac-1.1.6.tgz"
   integrity sha512-23osI7H2SH6Zm4g7A7BTM9+3XicGZkemw00eEhrFViR3EdGru+azj2fMKf9J2zWMGO7AfPgYRdIRL96kkdy8QA==
@@ -2210,6 +2236,13 @@ ecdsa-sig-formatter@1.0.11:
   dependencies:
     safe-buffer "^5.0.1"
 
+ecurve@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.npmjs.org/ecurve/-/ecurve-1.0.5.tgz"
+  integrity sha512-1Z3Zu5Nh5LSVGnwEnie1LDoHZByZxG2tk3wftkqeVHrfujmR8O+dOh96HVPxRPh4BjRWX0Z9mpwCYv/O/njgDw==
+  dependencies:
+    bigi "^1.1.0"
+
 electron-to-chromium@^1.4.284:
   version "1.4.338"
   resolved "https://registry.npmmirror.com/electron-to-chromium/-/electron-to-chromium-1.4.338.tgz"
@@ -2254,6 +2287,21 @@ entities@^4.2.0, entities@^4.3.0, entities@^4.4.0:
   version "4.4.0"
   resolved "https://registry.npmmirror.com/entities/-/entities-4.4.0.tgz"
   integrity sha512-oYp7156SP8LkeGD0GF85ad1X9Ai79WtRsZ2gxJqtBuzH+98YUV6jkHEKlZkMbcrjJjIVJNIDP/3WL9wQkoPbWA==
+
+eosjs-ecc@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.npmjs.org/eosjs-ecc/-/eosjs-ecc-4.0.7.tgz"
+  integrity sha512-uuqhqnrDy9XTpKfkhiZqRDUTCCI9oWBalVK5IosL7kpYwA9I3lm68INYFLyWsHpF2xwHqPql8MrMYJ3zfOn5Qg==
+  dependencies:
+    "@babel/runtime" "7.6.0"
+    bigi "1.4.2"
+    browserify-aes "1.0.6"
+    bs58 "4.0.1"
+    bytebuffer "5.0.1"
+    create-hash "1.1.3"
+    create-hmac "1.1.6"
+    ecurve "1.0.5"
+    randombytes "2.0.5"
 
 eosjs@^22.1.0:
   version "22.1.0"
@@ -3885,6 +3933,11 @@ log-symbols@^4.1.0:
     chalk "^4.1.0"
     is-unicode-supported "^0.1.0"
 
+long@~3:
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/long/-/long-3.2.0.tgz"
+  integrity sha512-ZYvPPOMqUwPoDsbJaR10iQJYnMuZhRTvHYl62ErLIEX7RgFlziSBUUvrt3OVfc47QlHHpzPZYP17g3Fv7oeJkg==
+
 longest@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmmirror.com/longest/-/longest-2.0.1.tgz"
@@ -4965,7 +5018,7 @@ quick-lru@^5.1.1:
   resolved "https://registry.npmmirror.com/quick-lru/-/quick-lru-5.1.1.tgz"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
-randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5:
+randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5, randombytes@2.0.5:
   version "2.0.5"
   resolved "https://registry.npmmirror.com/randombytes/-/randombytes-2.0.5.tgz"
   integrity sha512-8T7Zn1AhMsQ/HI1SjcCfT/t4ii3eAqco3yOcSzS4mozsOz69lHLsoMXmF9nZgnFanYscnSlUSgs8uZyKzpE6kg==
@@ -5124,7 +5177,7 @@ redent@^3.0.0:
     indent-string "^4.0.0"
     strip-indent "^3.0.0"
 
-regenerator-runtime@^0.13.11:
+regenerator-runtime@^0.13.11, regenerator-runtime@^0.13.2:
   version "0.13.11"
   resolved "https://registry.npmmirror.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz"
   integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
