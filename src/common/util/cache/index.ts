@@ -60,7 +60,7 @@ export const localCache = {
                 'userTokens',
             ];
             const states = await chrome.storage.local.get(keys);
-            keys.forEach(k => {
+            for (const k of keys) {
                 let nk = k;
                 if (nk == 'selectedRpc') {
                     nk = 'selectedRpcs';
@@ -68,7 +68,10 @@ export const localCache = {
                     nk = 'passhash';
                 }
                 if (typeof states[k] == 'undefined' || states[k] === null) {
-                    return;
+                    continue;
+                }
+                if (typeof states[k] == 'object' && states[k].value) {
+                    continue;
                 }
                 let v = k == 'language' || k == 'passwordHash' ? states[k] : JSON.parse(states[k]);
                 if (k == 'wallets') {
@@ -82,8 +85,8 @@ export const localCache = {
                         return x;
                     });
                 }
-                localCache.set(nk as CacheKey, v);
-            });
+                await localCache.set(nk as CacheKey, v);
+            };
             await chrome.storage.local.remove('passwordHash');
             console.log('upgrade finished.');
         }
