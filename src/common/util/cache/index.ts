@@ -74,7 +74,7 @@ export const localCache = {
                     continue;
                 }
                 let v = states[k];
-                if (typeof v == 'string' && [v.startsWith('[') || v.startsWith('{')]) {
+                if (typeof v == 'string' && (v.startsWith('[') || v.startsWith('{'))) {
                     v = JSON.parse(v);
                 }
                 if (k == 'wallets') {
