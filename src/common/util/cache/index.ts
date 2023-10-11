@@ -73,7 +73,10 @@ export const localCache = {
                 if (typeof states[k] == 'object' && states[k].value) {
                     continue;
                 }
-                let v = k == 'language' || k == 'passwordHash' ? states[k] : JSON.parse(states[k]);
+                let v = states[k];
+                if (typeof v == 'string' && [v.startsWith('[') || v.startsWith('{')]) {
+                    v = JSON.parse(v);
+                }
                 if (k == 'wallets') {
                     v = (v as any[]).map(x => {
                         if (x.account) {
