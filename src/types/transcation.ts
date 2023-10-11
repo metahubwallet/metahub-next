@@ -3,7 +3,7 @@ import { Token } from "./tokens";
 export interface Transfer {
     receiver: string;
     sender: string;
-    amount: number;
+    amount?: number;
     memo: string;
     token: Token;
 }

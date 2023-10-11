@@ -64,7 +64,7 @@ const viewTransation = (item: any) => {
     router.push({
         name: 'transation',
         query: {
-            token: JSON.stringify(token),
+            token: JSON.stringify(token.value),
             trx: JSON.stringify(item),
         },
     });

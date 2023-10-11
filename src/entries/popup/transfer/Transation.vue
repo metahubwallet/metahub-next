@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 const { timeFormat } = tool;
 const walletStore = useWalletStore();
+const route = useRoute()
 
-const trx = ref<any>(useRoute().query.trx);
-const token = ref<any>(useRoute().query.token);
+const trx = ref<any>(JSON.parse(route.query.trx as string));
+const token = ref<any>(JSON.parse(route.query.token as string));
+
+
 
 
 </script>
@@ -12,91 +15,88 @@ const token = ref<any>(useRoute().query.token);
     <div class="full-router">
         <div class="full-inner">
             <page-header :title="$t('wallet.transation')"></page-header>
-
             <div class="cover-content _effect">
-                <div>
-                    <n-scrollbar>
-                        <div class="transation-root">
-                            <!-- 头部 -->
-                            <div class="transation-success">
-                                <img class="transation-img" src="@/assets/images/transaction_successful@2x.png" />
-                                <div class="transation-type">
-                                    {{ $t('wallet.transferSuccess') }}
-                                </div>
-                                <div
-                                    :class="[
-                                        'transation-count',
-                                        trx.receiver == walletStore.currentWallet.name ? 'transation-count-blue' : 'transation-count-red',
-                                    ]"
-                                >
-                                    {{ trx.receiver == walletStore.currentWallet.name ? '+' + trx.quantity : '-' + trx.quantity }}
+                <n-scrollbar>
+                    <div class="transation-root">
+                        <!-- 头部 -->
+                        <div class="transation-success">
+                            <img class="transation-img" src="@/assets/images/transaction_successful@2x.png" />
+                            <div class="transation-type">
+                                {{ $t('wallet.transferSuccess') }}
+                            </div>
+                            <div
+                                :class="[
+                                    'transation-count',
+                                    trx.receiver == walletStore.currentWallet.name ? 'transation-count-blue' : 'transation-count-red',
+                                ]"
+                            >
+                                {{ trx.receiver == walletStore.currentWallet.name ? '+' + trx.quantity : '-' + trx.quantity }}
+                            </div>
+                        </div>
+
+                        <div class="item-group">
+                            <div class="item">
+                                <div class="item-title">{{ $t('wallet.receiverAccount') }}</div>
+                                <div class="item-value">{{ trx.receiver }}</div>
+                            </div>
+                            <div class="item">
+                                <div class="item-title">{{ $t('wallet.paymentAccount') }}</div>
+                                <div class="item-value">{{ trx.sender }}</div>
+                            </div>
+                            <div class="item">
+                                <div class="item-title">{{ $t('wallet.memo') }}</div>
+                                <div class="item-value">{{ trx.memo }}</div>
+                            </div>
+                        </div>
+
+                        <div class="item-group">
+                            <div class="item">
+                                <div class="item-title">{{ $t('wallet.transationHASH') }}</div>
+                                <div class="item-value transation-number-value">
+                                    {{ trx.trx_id }}
                                 </div>
                             </div>
-
-                            <div class="item-group">
-                                <div class="item">
-                                    <div class="item-title">{{ $t('wallet.receiverAccount') }}</div>
-                                    <div class="item-value">{{ trx.receiver }}</div>
-                                </div>
-                                <div class="item">
-                                    <div class="item-title">{{ $t('wallet.paymentAccount') }}</div>
-                                    <div class="item-value">{{ trx.sender }}</div>
-                                </div>
-                                <div class="item">
-                                    <div class="item-title">{{ $t('wallet.memo') }}</div>
-                                    <div class="item-value">{{ trx.memo }}</div>
-                                </div>
+                            <div class="item">
+                                <div class="item-title">{{ $t('wallet.blockNumber') }}</div>
+                                <div class="item-value">{{ trx.block_num }}</div>
                             </div>
-
-                            <div class="item-group">
-                                <div class="item">
-                                    <div class="item-title">{{ $t('wallet.transationHASH') }}</div>
-                                    <div class="item-value transation-number-value">
-                                        {{ trx.trx_id }}
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <div class="item-title">{{ $t('wallet.blockNumber') }}</div>
-                                    <div class="item-value">{{ trx.block_num }}</div>
-                                </div>
-                                <div class="item">
-                                    <div class="item-title">{{ $t('wallet.contract') }}</div>
-                                    <div class="item-value">{{ token.contract }}</div>
-                                </div>
-                                <div class="item">
-                                    <div class="item-title">{{ $t('wallet.transationTime') }}</div>
-                                    <div class="item-value">{{ timeFormat(trx.timestamp) }}</div>
-                                </div>
+                            <div class="item">
+                                <div class="item-title">{{ $t('wallet.contract') }}</div>
+                                <div class="item-value">{{ token.contract }}</div>
                             </div>
+                            <div class="item">
+                                <div class="item-title">{{ $t('wallet.transationTime') }}</div>
+                                <div class="item-value">{{ timeFormat(trx.timestamp) }}</div>
+                            </div>
+                        </div>
 
-                            <div class="item-group">
-                                <div class="item">
-                                    <div class="item-title">{{ $t('wallet.moreDetail') }}</div>
-                                    <div class="item-search">
-                                        <a class="block" target="_blank" :href="'https://bloks.io/transaction/' + trx.trx_id">
-                                            <img src="@/assets/images/bloks.png" />
-                                            <span>bloks</span>
-                                        </a>
-                                        <a class="block" target="_blank" :href="'https://eosflare.io/tx/' + trx.trx_id">
-                                            <img src="@/assets/images/eosflare.png" />
-                                            <span>eosflare</span>
-                                        </a>
-                                    </div>
-                                    <div class="item-search">
-                                        <a class="block" target="_blank" :href="'https://www.eosx.io/tx/' + trx.trx_id">
-                                            <img src="@/assets/images/eosx.png" />
-                                            <span>eosx</span>
-                                        </a>
-                                        <a class="block" target="_blank" :href="'https://eos.eosq.eosnation.io/tx/' + trx.trx_id">
-                                            <img src="@/assets/images/eosq.png" />
-                                            <span>eosq</span>
-                                        </a>
-                                    </div>
+                        <div class="item-group">
+                            <div class="item">
+                                <div class="item-title">{{ $t('wallet.moreDetail') }}</div>
+                                <div class="item-search">
+                                    <a class="block" target="_blank" :href="'https://bloks.io/transaction/' + trx.trx_id">
+                                        <img src="@/assets/images/bloks.png" />
+                                        <span>bloks</span>
+                                    </a>
+                                    <a class="block" target="_blank" :href="'https://eosflare.io/tx/' + trx.trx_id">
+                                        <img src="@/assets/images/eosflare.png" />
+                                        <span>eosflare</span>
+                                    </a>
+                                </div>
+                                <div class="item-search">
+                                    <a class="block" target="_blank" :href="'https://www.eosx.io/tx/' + trx.trx_id">
+                                        <img src="@/assets/images/eosx.png" />
+                                        <span>eosx</span>
+                                    </a>
+                                    <a class="block" target="_blank" :href="'https://eos.eosq.eosnation.io/tx/' + trx.trx_id">
+                                        <img src="@/assets/images/eosq.png" />
+                                        <span>eosq</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    </n-scrollbar>
-                </div>
+                    </div>
+                </n-scrollbar>
             </div>
         </div>
     </div>

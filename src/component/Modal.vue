@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <n-modal class="import-modal" v-model:show="props.isShow" @mask-click="$emit('close')">
+    <n-modal v-model:show="props.isShow" @mask-click="$emit('close')">
         <n-card class="w-5/6" :title="props.title" :bordered="false">
             <template #header-extra>
                 <icon-close
@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
             <slot></slot>
 
             <template #footer>
-                <div class="dialog-foot flex justify-end" v-if="!props.cusFooter">
+                <div class="flex justify-end" v-if="!props.cusFooter">
                     <n-button @click="$emit('close')" class="mr-2">
                         {{ $t('public.cancel') }}
                     </n-button>

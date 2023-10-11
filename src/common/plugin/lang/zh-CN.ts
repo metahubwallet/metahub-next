@@ -233,6 +233,8 @@ export default {
         copied: '已将账号复制到剪贴板',
         paymentAccount: '付款方账号',
         receiverAccount: '收款方账号',
+        sender: '付款方',
+        receiver: '收款方',
         amount: '付款金额',
         remark: '备注',
         memo: '备注(Memo)',

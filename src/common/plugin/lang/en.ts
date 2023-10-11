@@ -242,6 +242,8 @@ export default {
         copied: 'Copy account name success',
         paymentAccount: 'Payment Account',
         receiverAccount: 'Receiver Account',
+        sender: 'Sender',
+        receiver: 'Receiver',
         amount: 'Amount',
         remark: 'Remark',
         memo: 'Memo',

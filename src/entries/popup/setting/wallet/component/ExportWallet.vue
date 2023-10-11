@@ -117,8 +117,5 @@ const exportWallet = () => {
     word-break: keep-all;
 }
 
-.dialog-foot {
-    padding: 20px 0px 5px 0px;
-    text-align: right;
-}
+
 </style>

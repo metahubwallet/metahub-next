@@ -12,7 +12,7 @@ const selectTokenVisible = ref(false);
 const transfer = reactive({
     sender: '',
     receiver: '',
-    amount: 0,
+    amount: undefined,
     memo: '',
     token: {
         symbol: '',
@@ -33,7 +33,7 @@ onBeforeMount(() => {
         contract: (route.query.contract as string) || currentSystemToken.contract,
         precision: Number(route.query.precision) || currentSystemToken.precision,
     }
-    transfer.amount = Number(route.query.amount) || 0;
+    transfer.amount = Number(route.query.amount) || undefined;
 
     walletStore.currentUserTokens.forEach((row) => {
         if (row.contract == transfer.token.contract && row.symbol == transfer.token.symbol) {
@@ -81,7 +81,7 @@ const handleSelectTransfer = (tr: TransferRecord) => {
 // 验证quantity值
 const quantityError = ref('');
 const checkQuantity = () => {
-    const quantity = isNaN(transfer.amount) ? 0 : transfer.amount;
+    const quantity = transfer.amount == null || isNaN(transfer.amount) ? 0 : transfer.amount;
     if (quantity == 0) return (quantityError.value = t('wallet.emptyAmount'));
     if (quantity < 0) return (quantityError.value = t('wallet.emptyAmount'));
     quantityError.value = '';
@@ -184,7 +184,7 @@ const checkSubmit = () => {
                                     :precision="transfer.token.precision"
                                     :step="0.1"
                                     :max="targeMaxAmount"
-                                    :placeholder="transfer.amount + ' ' + transfer.token.symbol"
+                                    :placeholder="targeMaxAmount + ' ' + transfer.token.symbol"
                                 />
                                 <n-button
                                     @click="

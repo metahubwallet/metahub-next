@@ -253,15 +253,7 @@ const onSubmit = async () => {
             padding-bottom: 3px;
         }
     }
-    .dialog-foot {
-        padding: 15px 0;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        .n-button {
-            flex-flow: 1;
-        }
-    }
+
 
     .stakedDetail {
         position: fixed;

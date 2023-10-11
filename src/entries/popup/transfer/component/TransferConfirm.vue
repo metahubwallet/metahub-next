@@ -40,7 +40,7 @@ const handleSubmit = async () => {
             memo = props.transfer.receiver;
         }
 
-        props.transfer.amount = Number(props.transfer.amount.toFixed(props.transfer.token.precision));
+        props.transfer.amount = Number(props.transfer.amount!.toFixed(props.transfer.token.precision));
         let recent: TransferRecord = {
             account: props.transfer.receiver,
             time: Date.now(),
@@ -56,7 +56,7 @@ const handleSubmit = async () => {
             props.transfer.token.contract,
             walletStore.currentWallet.name,
             receiver,
-            props.transfer.amount.toFixed(props.transfer.token.precision) + ' ' + props.transfer.token.symbol,
+            props.transfer.amount!.toFixed(props.transfer.token.precision) + ' ' + props.transfer.token.symbol,
             memo,
         ];
 
@@ -76,13 +76,13 @@ const handleSubmit = async () => {
     <popup-bottom :isShow="props.isShow" :title="props.title" @close="$emit('close')">
         <div class="list-container">
             <div class="info-cell">
-                <span class="info-cell-key">{{ $t('wallet.paymentAccount') }}：</span>
+                <span class="info-cell-key">{{ $t('wallet.sender') }}：</span>
                 <span class="info-cell-value">
                     {{ transfer.sender }}
                 </span>
             </div>
             <div class="info-cell">
-                <span class="info-cell-key">{{ $t('wallet.receiverAccount') }}：</span>
+                <span class="info-cell-key">{{ $t('wallet.receiver') }}：</span>
                 <span class="info-cell-value" :title="transfer.receiver">
                     {{ receiver }}
                 </span>
@@ -90,7 +90,7 @@ const handleSubmit = async () => {
             <div class="info-cell">
                 <span class="info-cell-key">{{ $t('wallet.amount') }}：</span>
                 <span class="info-cell-value">
-                    {{ transfer.amount.toFixed(transfer.token.precision) + ' ' + transfer.token.symbol }}
+                    {{ (transfer.amount || 0).toFixed(transfer.token.precision) + ' ' + transfer.token.symbol }}
                 </span>
             </div>
             <div class="info-cell" v-show="isShowMemo">

@@ -130,6 +130,9 @@ export const getTransactionList = async (chain: string, data: any) => {
         const actions = res.data && res.data.actions ? res.data.actions : [];
         return actions.map((i: any) => {
             let action = {} as any;
+            action.trx_id = i.trx_id;
+            action.block_num = i.block_num;
+            action.timestamp = i.timestamp;
             action.receiver = i.act.data.to;
             action.sender = i.act.data.from;
             action.quantity = i.act.data.quantity;
