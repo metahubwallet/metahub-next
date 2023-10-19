@@ -6,13 +6,19 @@ interface ShownWallet extends Wallet {
 }
 
 const chainId = ref(useRoute().query.chainId);
+const walletStore = useWalletStore();
+const currentWallet = walletStore.currentWallet;
 const wallets = computed(() => {
-    return useWalletStore()
-        .wallets.filter((x) => x.chainId === chainId.value)
+    return [
+        currentWallet,
+        ...walletStore
+        .wallets.
+        filter((x) => x.chainId === chainId.value && x.name != currentWallet.name)
         .map((x) => {
             const symbol = useChainStore().findNetwork(x.chainId).token.symbol || '';
             return Object.assign(x, { symbol }) as ShownWallet;
-        });
+        })
+    ];
 });
 
 // 查看账号详情
@@ -20,7 +26,7 @@ const router = useRouter();
 const viewAccountDetail = (account: Wallet) => {
     router.push({
         name: 'account-detail',
-        query: { account: JSON.stringify(account), chainId: chainId.value },
+        query: { account: account.name, chainId: chainId.value },
     });
 };
 </script>

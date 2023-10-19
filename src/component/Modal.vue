@@ -2,9 +2,11 @@
 interface Props {
     isShow: boolean;
     title: string;
+    showCancel?: boolean;
     cusFooter?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
+    showCancel: true,
     cusFooter: false,
 });
 </script>
@@ -26,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
 
             <template #footer>
                 <div class="flex justify-end" v-if="!props.cusFooter">
-                    <n-button @click="$emit('close')" class="mr-2">
+                    <n-button @click="$emit('close')" class="mr-2" v-if="showCancel">
                         {{ $t('public.cancel') }}
                     </n-button>
                     <n-button type="primary" @click="$emit('submit')">

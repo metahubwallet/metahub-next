@@ -3,13 +3,13 @@ import { decrypt, md5 } from '@/common/util/crypto';
 import { ErrorCode } from '@/common/util/type';
 import { i18n } from '../plugin/lang';
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
-import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { Permission, PermissionLevel } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { signature } from './keyring';
 
-export default class Chain {
-    static apis: { [key: string]: EosApi } = {};
+export class Chain {
+    private apis: { [key: string]: EosApi } = {};
 
-    static getPrivateKeyByPublicKey(publicKey: string) {
+    getPrivateKeyByPublicKey(publicKey: string) {
         for (const wallet of useWalletStore().wallets) {
             for (const key of wallet.keys) {
                 if (key.publicKey === publicKey) {
@@ -20,7 +20,7 @@ export default class Chain {
         return '';
     }
 
-    static getPrivateKeyByAuthorization(chainId: string, auth: string) {
+    getPrivateKeyByAuthorization(chainId: string, auth: string) {
         let authorization: any = {};
         if (typeof auth == 'string') {
             const as = auth.split('@');
@@ -42,7 +42,7 @@ export default class Chain {
         return false;
     }
 
-    static getPublicKeyByPermission(chainId: string, actor: string, permission: string) {
+    getPublicKeyByPermission(chainId: string, actor: string, permission: string) {
         const wallet = useWalletStore().wallets.find((x) => x.chainId === chainId && x.name === actor);
 
         if (wallet) {
@@ -55,11 +55,11 @@ export default class Chain {
         return null;
     }
 
-    static currentAccount() {
+    currentAccount() {
         return useWalletStore().currentWallet;
     }
 
-    static getApi(chainId: string = '') {
+    getApi(chainId: string = '') {
         if (chainId == '') chainId = useChainStore().currentChainId;
         if (typeof this.apis[chainId] == 'undefined') {
             this.apis[chainId] = new EosApi(chainId, useChainStore().selectedRpc(chainId) as string, this);
@@ -67,26 +67,38 @@ export default class Chain {
         return this.apis[chainId];
     }
 
-    static getAuth() {
-        let permission = 'active';
-        for (let key of this.currentAccount().keys) {
-            if (key.permissions.indexOf('owner') > -1) {
-                permission = 'owner';
-                break;
-            }
-        }
+    getAuth() {
+        const currentAccount = this.currentAccount();
+        return this.getMaxPermission(currentAccount.name, currentAccount.chainId);
+    }
 
+    getMaxPermission(name: string, chainId: string, parent?: string) : PermissionLevel {
+        const wallet = useWalletStore().wallets.find(x => x.chainId == chainId && x.name == name);
+        if (!wallet) {
+            return {
+                actor: name,
+                permission: 'unkonwn',
+            };
+        }
+        const permissions = wallet.keys.flatMap(x => x.permissions)
+        let perm = '';
+        if (permissions.includes('owner')) {
+            perm = 'owner';
+        } else if (parent && permissions.includes(parent)) {
+            perm = parent;
+        } else if (permissions.includes('active')) {
+            perm = 'active';
+        } else {
+            perm = permissions[0];
+        }
         return {
-            actor: this.currentAccount().name,
-            permission,
+            actor: name,
+            permission: perm,
         };
     }
 
-    static getAuthByAccount(actor: string, permission: string) {
-        return { actor, permission };
-    }
 
-    static getErrorMsg(e: any) {
+    getErrorMsg(e: any) {
         if (e) {
             if (e.json && e.json.error) {
                 e = e.json.error;
@@ -119,7 +131,7 @@ export default class Chain {
     }
 
     // todo: 分离出来
-    static authorityProvider(chainId: string) {
+    authorityProvider(chainId: string) {
         return {
             getRequiredKeys: async ({
                 transaction,
@@ -147,16 +159,17 @@ export default class Chain {
         };
     }
 
-    static signatureProvider(chainId: string) {
+    signatureProvider(chainId: string) {
+
         return {
-            async getAvailableKeys() {
-                const keys = Chain.currentAccount().keys.map((x: any) => x.publicKey);
+            getAvailableKeys: async() => {
+                const keys = this.currentAccount().keys.map((x: any) => x.publicKey);
                 // console.log('availableKeys', keys);
                 return keys;
             },
 
             // { chainId, requiredKeys, serializedTransaction, serializedContextFreeData, abis }
-            async sign(transaction: any) {
+            sign: async (transaction: any) => {
                 // console.log(transaction.serializedContextFreeData);
                 const trxBuf =
                     typeof transaction.serializedTransaction == 'string'
@@ -173,7 +186,7 @@ export default class Chain {
 
 
                 const signatures = transaction.requiredKeys.map((pub: string) => {
-                    const privateKey = Chain.getPrivateKeyByPublicKey(pub);
+                    const privateKey = this.getPrivateKeyByPublicKey(pub);
                     return signature(buffer, privateKey);
                 });
 
@@ -197,7 +210,7 @@ export default class Chain {
      * @param {string} account 账户名称
      *
      */
-    static findLocalAccount(account: string, chainId: string) {
+    findLocalAccount(account: string, chainId: string) {
         let wallets = useWalletStore().wallets;
         for (let index = 0; index < wallets.length; index++) {
             let wallet = wallets[index];
@@ -212,7 +225,7 @@ export default class Chain {
      * @param {string} account 账户名称
      *
      */
-    static async fetchPermissions(account: string, chainId: string) {
+    async fetchPermissions(account: string, chainId: string) {
         let result = { code: ErrorCode.OK, permissions: [] as Permission[], msg: '' };
 
         const index = useWalletStore().wallets.findIndex((item) => {
@@ -221,7 +234,7 @@ export default class Chain {
         const wallet = useWalletStore().wallets[index];
 
         try {
-            const accinfo = await Chain.getApi(chainId).getAccount(account);
+            const accinfo = await this.getApi(chainId).getAccount(account);
             if (!accinfo) throw new Error('fetch account eror');
             result.permissions = accinfo.permissions;
 
@@ -243,3 +256,5 @@ export default class Chain {
         return result;
     }
 }
+
+export default new Chain();

@@ -1,17 +1,15 @@
 import { Api, JsonRpc } from 'eosjs';
 import { ErrorCode } from '../util/type';
 import { Transaction } from 'eosjs/dist/eosjs-api-interfaces';
-import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { Permission, PermissionLevel } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { Auth } from '@/types/account';
-import { Wallet } from '@/types/wallet';
 import { getContractAbi } from '../util/abi';
+import { Chain } from './chain';
 
-export default class EOS {
+export default class EOSApi {
     public rpc;
     public api;
-
-    constructor(private chainId: string, public endpoint: string, private chain?: any) {
-        this.endpoint = endpoint;
+    constructor(public chainId: string, public endpoint: string, private chain: Chain) {
         this.rpc = new JsonRpc(this.endpoint);
         this.api = this.initAPI();
     }
@@ -104,22 +102,22 @@ export default class EOS {
     /**
      * 根据实际需求更新 sourcePerms
      * @param {string} sourcePerms 账户权限说明
-     * @param {string} authType 操作类型: owner/active
      * @param {string} operateType 操作方式: add/modify/remove
+     * @param {string} operatePerm 操作类型: owner/active
      * @param {string} oldOperateKey 针对操作的 pubkey
      * @param {string} newOperateKey 需要新增的 pubkey
      *
      */
-    updateNewPermissions(
-        sourcePerms: any[],
-        authType: string,
+    makeNewPermissions(
+        sourcePerms: Permission[],
         operateType: string,
+        operatePerm: string,
         oldOperateKey: string,
         newOperateKey?: string
     ) {
-        let perms = JSON.parse(JSON.stringify(sourcePerms)); // clone-deep
+        let perms: Permission[] = JSON.parse(JSON.stringify(sourcePerms)); // clone-deep
         for (let i = 0; i < perms.length; i++) {
-            if (perms[i].perm_name == authType) {
+            if (perms[i].perm_name == operatePerm) {
                 switch (operateType) {
                     case 'add':
                         let item = {
@@ -154,14 +152,14 @@ export default class EOS {
     }
 
     // 权限更新操作
-    async updatePerms(operateUser: Wallet, perms: Permission[], auth: Auth) {
-        let accountName = operateUser.name;
+    async updatePerms(accountName: string, perms: Permission[]) {
         const actions = [];
+
         for (const perm of perms) {
             actions.push({
                 account: 'eosio',
                 name: 'updateauth',
-                authorization: [auth],
+                authorization: [ this.chain.getMaxPermission(accountName, this.chainId) ],
                 data: {
                     account: accountName,
                     permission: perm.perm_name,
@@ -170,6 +168,7 @@ export default class EOS {
                 },
             });
         }
+        console.log(actions);
         // 变更权限无法免CPU
         const result = await this.transact(
             { actions },
@@ -181,6 +180,28 @@ export default class EOS {
         );
 
         return result;
+    }
+
+    async deletePerm(accountName: string, perm: PermissionLevel) {
+       const actions = [{
+            account: 'eosio',
+            name: 'deleteauth',
+            authorization: [ this.chain.getMaxPermission(accountName, this.chainId) ],
+            data: perm,
+        }];
+
+        // 变更权限无法免CPU
+        const result = await this.transact(
+            { actions },
+            {
+                blocksBehind: 3,
+                expireSeconds: 30,
+            },
+            true
+        );
+
+        return result;
+
     }
 
     // EOS RAM价格

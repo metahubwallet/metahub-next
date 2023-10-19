@@ -1,141 +1,123 @@
 <script setup lang="ts">
 import chain from '@/common/lib/chain';
-import { Wallet } from '@/types/wallet';
-import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { isValidPublic } from '@/common/lib/keyring';
+import { Permission, KeyWeight } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { decrypt, md5 } from '@/common/util/crypto';
 
-interface Params {
-    account: Wallet;
+interface UpdateParams {
+    account: string;
     perms: Permission[];
-    authType: string;
+    operatePerm: string;
     operateType: string;
-    oldOperateKey: string;
+    oldOperateKey?: string;
 }
-let perms = ref([] as Permission[]);
+const allPerms = ref([] as Permission[]);
 
 const route = useRoute();
-const account = ref(JSON.parse(route.query.account + '') as Wallet);
-
-// 初始化
+const router = useRouter();
 const walletStore = useWalletStore();
-const permissions = ref([] as string[]);
 
-const currentKey = computed(() => walletStore.currentWallet.keys[0].publicKey );
-onBeforeMount(() => {
-    let perms = new Set();
-    for (const key of walletStore.currentWallet.keys) {
-        for (const perm of key.permissions) {
-            perms.add(perm);
-        }
-    }
-    permissions.value = Array.from(perms) as string[];
-});
+const account = route.query.account + '';
+const chainId = route.query.chainId + '';
+
+const currentIdx = ref(walletStore.wallets.findIndex(x => x.name == account && x.chainId == chainId));
+const currentWallet = computed(() => walletStore.wallets[currentIdx.value >= 0 ? currentIdx.value : 0] );
+const currentKeys = computed(() => currentWallet.value.keys.map(x => x.publicKey) );
+const currentPerms = computed(() => currentWallet.value.keys.flatMap(x => x.permissions) );
+
+const showPrivateKey = ref(0);
+const showKeyText = ref('');
 
 onMounted(async () => {
-    let result = await chain.fetchPermissions(walletStore.currentWallet.name, walletStore.currentWallet.chainId);
+    if (currentIdx.value == -1) {
+        router.back();
+        return;
+    }
 
-    if (result.code != 200) return window.msg.error(result.msg);
+    console.log('onMounted...');
 
-    perms.value = result.permissions;
+    const result = await chain.fetchPermissions(currentWallet.value.name, currentWallet.value.chainId);
+
+    if (result.code != 200) {
+        window.msg.error(result.msg);
+        router.back();
+    }
+
+    const owner = result.permissions.find(x => x.perm_name == 'owner')!;
+    const active = result.permissions.find(x => x.perm_name == 'active')!;
+    allPerms.value = [ owner, active, ...result.permissions.filter(x => x.perm_name != 'owner' && x.perm_name != 'active')];
 });
 
 // 跳转操作
-const router = useRouter();
-const chainId = ref(route.query.chainId + '');
-const viewAccountChange = (authType: string, operateType: string, oldOperateKey?: string) => {
-    let params = {} as Params;
-    params.account = account.value;
-    params.perms = perms.value;
-    params.authType = authType;
-    params.operateType = operateType;
-    if (oldOperateKey) params.oldOperateKey = oldOperateKey;
+const viewAccountChange = (operatePerm: string, operateType: string, oldOperateKey?: string) => {
+    let params: UpdateParams = {
+        account,
+        perms: allPerms.value,
+        operatePerm,
+        operateType,
+        oldOperateKey,
+    };
 
     router.push({
         name: 'account-change',
-        query: { params: JSON.stringify(params), chainId: chainId.value },
+        query: { params: JSON.stringify(params), chainId },
     });
 };
 
+const viewPrivateKey = (key: string) => {
+    showPrivateKey.value = 1;
+    showKeyText.value = key;
+}
+
+const confirmViewPrivateKey = (password: string) => {
+    if (isValidPublic(showKeyText.value)) {
+        const pk = currentWallet.value.keys.find(x => x.publicKey == showKeyText.value)!.privateKey;
+        showKeyText.value = decrypt(pk, md5(currentWallet.value.seed + password));
+    }
+    showPrivateKey.value = 2;
+}
+
 // 移除操作
 const { t } = useI18n();
-const handleRemove = async (
-    perms: any,
-    authType: string,
-    operateType: string,
-    oldOperateKey: string,
-    walletAuthType: string,
-    newOperateKey?: string
-) => {
+
+const doRemoveKey = async (operatePerm: string, key: string) => {
     let newPerms = await chain
-        .getApi(chainId.value)
-        .updateNewPermissions(perms, authType, operateType, oldOperateKey, newOperateKey);
+        .getApi(chainId)
+        .makeNewPermissions(allPerms.value, 'remove', operatePerm, key);
     try {
+        const updatePerms = newPerms.filter((x: any) => x.perm_name == operatePerm);
         await chain
-            .getApi(chainId.value)
-            .updatePerms(account.value, newPerms, chain.getAuthByAccount(account.value.name, walletAuthType));
-        perms = newPerms;
+            .getApi(chainId)
+            .updatePerms(account, updatePerms);
+        allPerms.value = newPerms;
         window.msg.success(t('public.executeSuccess'));
     } catch (e) {
         window.msg.error(chain.getErrorMsg(e));
     }
 };
 
-/** owner */
-const ownersArray = computed(() => {
-    if (perms) {
-        for (let i = 0; i < perms.value.length; i++) {
-            if (perms.value[i].perm_name == 'owner') return perms.value[i].required_auth.keys;
-        }
+const isCanModify = (_perm: string, perm_parent: string) => {
+    if (currentPerms.value.includes('owner') || currentPerms.value.includes(perm_parent)) {
+        return true;
     }
-    return [];
-});
-
-const hiddenRemoveOwnerBtn = computed(() => {
-    return ownersArray.value.length > 1 ? true : false;
-});
-
-// 移除所有者
-const handleOrderRemove = (oldOperateKey: string) => {
-    window.dialog.warning({
-        title: t('public.tip'),
-        content: t('setting.confirmRemove'),
-        positiveText: t('public.ok'),
-        negativeText: t('public.cancel'),
-        onPositiveClick: () => {
-            handleRemove(perms, 'owner', 'remove', oldOperateKey, 'owner');
-        },
-        onNegativeClick: () => {},
-    });
+    return false;
 };
 
-/** active */
-const activesArray = computed(() => {
-    if (perms) {
-        for (let i = 0; i < perms.value.length; i++) {
-            if (perms.value[i].perm_name == 'active') return perms.value[i].required_auth.keys;
-        }
-        return [];
-    } else return [];
-});
-const hiddenRemoveActiveBtn = computed(() => {
-    return activesArray.value.length > 1 ? true : false;
-});
+const isCanDelete = (perm: string) => {
+    const selPerm = allPerms.value.find(x => x.perm_name == perm)!;
+    return (perm == 'owner' || perm == 'active') && selPerm.required_auth.keys.length <= 1 ? false : true;
+};
 
-// 移除激活项
-const walleAuthType = computed(() => {
-    if (permissions.value.indexOf('owner') > -1) {
-        return 'owner';
-    } else {
-        return 'active';
-    }
-});
-const handleActiveRemove = (oldOperateKey: string) => {
+
+// 移除所有者
+const handleRemoveKey = (oldOperateKey: string) => {
     window.dialog.warning({
         title: t('public.tip'),
         content: t('setting.confirmRemove'),
         positiveText: t('public.ok'),
         negativeText: t('public.cancel'),
         onPositiveClick: () => {
-            handleRemove(perms, 'active', 'remove', oldOperateKey, walleAuthType.value);
+            doRemoveKey('owner', oldOperateKey);
         },
         onNegativeClick: () => {},
     });
@@ -143,9 +125,10 @@ const handleActiveRemove = (oldOperateKey: string) => {
 
 // 移除账号
 const showPasswordConfirm = ref(false);
-const removeAccountClicked = () => {
+
+const handleRemoveAccount = () => {
     const index = useWalletStore().wallets.findIndex((item) => {
-        return item.name === account.value.name && item.chainId === chainId.value;
+        return item.name === account && item.chainId === chainId;
     });
     walletStore.wallets.splice(index, 1);
     walletStore.setWallets(walletStore.wallets);
@@ -162,7 +145,7 @@ const removeAccountClicked = () => {
     let firstIndex = walletStore.wallets.indexOf(walletStore.wallets[0]);
     walletStore.setSelectedIndex(firstIndex >= 0 ? firstIndex : 0);
     // const network = useChainStore().networks.find((item) => {
-    //     return item.chainId === walletStore.currentWallet.chainId;
+    //     return item.chainId === currentWallet.value.chainId;
     // });
     // if (network) {
     //     useChainStore().setCurrentNetwork(network);
@@ -185,100 +168,67 @@ const removeAccountClicked = () => {
                             <!-- name -->
                             <div class="account-name">
                                 <div class="account-name-left">{{ $t('setting.accountName') }}</div>
-                                <div class="account-name-right">{{ account.name }}</div>
+                                <div class="account-name-right">{{ account }}</div>
                             </div>
 
-                            <!-- type -->
-                            <div class="account-type">
-                                <div class="account-type-left">Owner</div>
-                                <img
-                                    @click="viewAccountChange('owner', 'add')"
-                                    class="account-type-right"
-                                    src="@/assets/images/authority_manager_add@2x.png"
-                                    v-if="walleAuthType === 'owner'"
-                                />
-                            </div>
-
-                            <!-- owner list -->
-                            <div class="account-cell" v-for="(item, index) of ownersArray" :key="index">
-                                <!-- key -->
-                                <div class="account-cell-key">
-                                    <clip-button class="account-left-name" :value="item.key"></clip-button>
-                                </div>
-
-                                <!-- options -->
-                                <div class="account-cell-buttons items-center">
-                                    <div class="mt-[3px]">
-                                        <span class="account-current" v-if="item.key == currentKey">
-                                            {{ $t('setting.currentAccount') }}
-                                        </span>
-                                    </div>
-
-                                    <div class="bottom-buttons">
-                                        <!-- modify -->
-                                        <div
-                                            @click="viewAccountChange('owner', 'modify', item.key)"
-                                            class="account-change-btn"
-                                            v-if="permissions.indexOf('owner') > -1"
-                                        >
-                                            {{ $t('setting.modify') }}
-                                        </div>
-                                        <!-- remove -->
-                                        <div
-                                            @click="handleOrderRemove(item.key)"
-                                            class="account-change-btn"
-                                            v-if="hiddenRemoveOwnerBtn && permissions.indexOf('owner') > -1"
-                                        >
-                                            {{ $t('setting.remove') }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- active add -->
-                            <div class="account-type">
-                                <div class="account-type-left">Active</div>
-                                <div class="account-cell-right">
+                            <div v-for="perm of allPerms" :key="perm.perm_name">
+                                <!-- type -->
+                                <div class="account-type">
+                                    <div class="account-type-left">{{ perm.perm_name }}</div>
                                     <img
-                                        @click="viewAccountChange('active', 'add')"
+                                        @click="viewAccountChange(perm.perm_name, 'add')"
                                         class="account-type-right"
                                         src="@/assets/images/authority_manager_add@2x.png"
+                                        v-if="currentPerms.includes('owner')"
                                     />
                                 </div>
-                            </div>
 
-                            <!-- active list -->
-                            <div class="account-cell" :key="item.key" v-for="item in activesArray">
-                                <!-- key -->
-                                <div class="account-cell-key">
-                                    <clip-button class="account-left-name" :value="item.key"></clip-button>
-                                </div>
-
-                                <!-- optinos -->
-                                <div class="account-cell-buttons">
-                                    <div class="account-current" v-if="item.key == currentKey">
-                                        {{ $t('setting.currentAccount') }}
+                                <!-- owner list -->
+                                <div class="account-cell" v-for="(item, index) of perm.required_auth.keys" :key="index">
+                                    <!-- key -->
+                                    <div class="account-cell-key">
+                                        <clip-button class="account-left-name" :value="item.key"></clip-button>
                                     </div>
 
-                                    <div class="bottom-buttons">
-                                        <!-- modify -->
-                                        <div
-                                            @click="viewAccountChange('active', 'modify', item.key)"
-                                            class="account-change-btn"
-                                        >
-                                            {{ $t('setting.modify') }}
+                                    <!-- options -->
+                                    <div class="account-cell-buttons items-center">
+                                        <div class="mt-[3px]">
+                                            <span class="account-current" v-if="currentKeys.includes(item.key)">
+                                                {{ $t('setting.currentAccount') }}
+                                            </span>
                                         </div>
-                                        <!-- remove -->
-                                        <div
-                                            @click="handleActiveRemove(item.key)"
-                                            class="account-change-btn"
-                                            v-if="hiddenRemoveActiveBtn"
-                                        >
-                                            {{ $t('setting.remove') }}
+
+                                        <div class="bottom-buttons">
+                                            <!-- view key -->
+                                            <div
+                                                @click="viewPrivateKey(item.key)"
+                                                class="account-change-btn"
+                                            >
+                                                {{ $t('setting.showKey') }}
+                                            </div>
+
+                                            <!-- modify -->
+                                            <div
+                                                @click="viewAccountChange(perm.perm_name, 'modify', item.key)"
+                                                class="account-change-btn"
+                                                v-if="isCanModify(perm.perm_name, perm.parent)"
+                                            >
+                                                {{ $t('setting.modify') }}
+                                            </div>
+                                            <!-- remove -->
+                                            <div
+                                                @click="handleRemoveKey(item.key)"
+                                                class="account-change-btn"
+                                                v-if="isCanDelete(perm.perm_name) && currentPerms.includes(perm.perm_name)"
+                                            >
+                                                {{ $t('setting.remove') }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
+
                         </div>
 
                         <!-- remove account -->
@@ -290,7 +240,7 @@ const removeAccountClicked = () => {
                                 :is-show="showPasswordConfirm"
                                 :title="$t('setting.confirmDestroy')"
                                 @close="showPasswordConfirm = false"
-                                @confirm="removeAccountClicked"
+                                @confirm="handleRemoveAccount"
                             ></password-confirm>
                         </div>
 
@@ -304,6 +254,34 @@ const removeAccountClicked = () => {
                     </div>
                 </n-scrollbar>
             </div>
+
+            <password-confirm
+                :is-show="showPrivateKey == 1"
+                :title="$t('setting.confirmPassword')"
+                @close="showPrivateKey = 0"
+                @confirm="p => confirmViewPrivateKey(p)"
+            ></password-confirm>
+
+            <modal
+                :is-show="showPrivateKey == 2"
+                :show-cancel="false"
+                :title="$t('setting.showKey')"
+                @close="showPrivateKey=0;showKeyText='';"
+                @submit="showPrivateKey=0;showKeyText='';"
+            >
+                <!-- old password -->
+                <div class="dialog-title">
+                    {{ $t('public.privateKey') }}
+                </div>
+                <n-input
+                    class="mb-3"
+                    type="textarea"
+                    v-model:value="showKeyText"
+                    :placeholder="$t('public.privateKey')"
+                ></n-input>
+
+
+            </modal>
         </div>
     </div>
 </template>

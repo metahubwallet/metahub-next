@@ -3,58 +3,51 @@ import chain from '@/common/lib/chain';
 import { isValidPublic } from '@/common/lib/keyring';
 import { Permission } from 'eosjs/dist/eosjs-rpc-interfaces';
 
-const permissions = ref<Permission[]>([]);
-onBeforeMount(() => {
-    let perms = new Set();
-    for (const key of useWalletStore().currentWallet.keys) {
-        for (const perm of key.permissions) {
-            perms.add(perm);
-        }
-    }
-    permissions.value = Array.from(perms) as Permission[];
-});
+interface Params {
+    account: string;
+    perms: Permission[];
+    operatePerm: string;
+    operateType: string;
+    oldOperateKey: string;
+}
 
 const route = useRoute();
 const { t } = useI18n();
-const params = JSON.parse(route.query.params + '');
-const oldOperateKey = ref(params?.oldOperateKey);
+
+const params: Params = JSON.parse(route.query.params + '');
+const chainId = route.query.chainId + '';
+
 const newOperateKey = ref('');
 const showGeneratePublicKey = ref(false);
 
-const perms = ref(params?.perms);
-const account = ref(params?.account);
-const authType = ref(params?.authType);
-const operateType = ref(params?.operateType);
-const chainId = ref(route.query.chainId as string);
-const walleAuthType = computed(() => {
-    if (permissions.value.indexOf('owner' as never) > -1) return 'owner';
-    else return 'active';
-});
 const onSubmit = async () => {
     if (!isValidPublic(newOperateKey.value))
         return window.msg.error(t('setting.invalidPublicKey'));
-    let newPerms = chain.getApi(chainId.value).updateNewPermissions(
-        perms.value,
-        authType.value, // active or others
-        operateType.value, // modify or add
-        oldOperateKey.value, // pubkey
+    const newPerms = chain.getApi(chainId).makeNewPermissions(
+        params.perms,
+        params.operateType, // modify or add
+        params.operatePerm, // active or others
+        params.oldOperateKey, // pubkey
         newOperateKey.value // pubkey
-    );
-    newPerms = newPerms.filter((x: any) => x.perm_name == authType.value);
+    ).filter((x: any) => x.perm_name == params.operatePerm);
+    console.log(params.account);
+    console.log(newPerms);
+    
     try {
         await chain
-            .getApi(chainId.value)
+            .getApi(chainId)
             .updatePerms(
-                account.value,
-                newPerms,
-                chain.getAuthByAccount(account.value.name, walleAuthType.value)
+                params.account,
+                newPerms
             );
-        perms.value = newPerms;
+        params.perms = newPerms;
         window.msg.success(t('public.executeSuccess'));
     } catch (e) {
         window.msg.error(chain.getErrorMsg(e));
     }
 };
+
+
 </script>
 
 <template>
@@ -65,10 +58,10 @@ const onSubmit = async () => {
             <div class="cover-content _effect">
                 <div class="container">
                     <!-- old key -->
-                    <div class="account-cell-title" v-if="oldOperateKey">
+                    <div class="account-cell-title" v-if="params.oldOperateKey">
                         {{ $t('setting.currentPublicKey') }}
                     </div>
-                    <div class="account-cell-key" v-if="oldOperateKey">{{ oldOperateKey }}</div>
+                    <div class="account-cell-key" v-if="params.oldOperateKey">{{ params.oldOperateKey }}</div>
 
                     <!-- new key -->
                     <div class="account-cell-title">{{ $t('setting.newPublicKey') }}</div>
