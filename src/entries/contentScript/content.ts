@@ -66,7 +66,7 @@ class Dapp {
         } catch (e) {
             console.log(e);
         }
-        console.log('inited');
+        // console.log('inited');
         document.dispatchEvent(new CustomEvent("metahubLoaded"));
         document.dispatchEvent(new CustomEvent("scatterLoaded"));
     }
@@ -107,7 +107,7 @@ class Dapp {
     }
 
     public async getIdentityFromPermissions() : Promise<Identity | null> {
-        console.log('getIdentityFromPermissions');
+        // console.log('getIdentityFromPermissions');
         try {
             const result = (await this.signal<Payload>(MessageTypes.GET_IDENTITY_FROM_PERMISSIONS).request()) as Identity;
             return result;

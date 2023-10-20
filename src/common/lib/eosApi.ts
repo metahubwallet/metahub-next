@@ -109,43 +109,38 @@ export default class EOSApi {
      *
      */
     makeNewPermissions(
-        sourcePerms: Permission[],
+        perms: Permission[],
         operateType: string,
         operatePerm: string,
         oldOperateKey: string,
         newOperateKey?: string
     ) {
-        let perms: Permission[] = JSON.parse(JSON.stringify(sourcePerms)); // clone-deep
-        for (let i = 0; i < perms.length; i++) {
-            if (perms[i].perm_name == operatePerm) {
+        for (const perm of perms) {
+            if (perm.perm_name == operatePerm) {
+                const keys = perm.required_auth.keys.concat();
                 switch (operateType) {
                     case 'add':
                         let item = {
                             key: newOperateKey!,
                             weight: 1,
                         };
-                        perms[i].required_auth.keys.push(item);
+                        keys.push(item);
                         break;
                     case 'modify':
-                        for (let j = 0; j < perms[i].required_auth.keys.length; j++) {
-                            if (perms[i].required_auth.keys[j].key == oldOperateKey) {
-                                perms[i].required_auth.keys[j].key = newOperateKey!;
-                            }
-                        }
+                        const idx = keys.findIndex(x => x.key == oldOperateKey);
+                        keys[idx].key = newOperateKey!;
                         break;
                     case 'remove':
-                        for (let j = 0; j < perms[i].required_auth.keys.length; j++) {
-                            if (
-                                perms[i].required_auth.keys[j].key == oldOperateKey &&
-                                perms[i].required_auth.keys.length > 1
-                            ) {
-                                perms[i].required_auth.keys.splice(j, 1);
-                            }
-                        }
+                        const idx1 = keys.findIndex(x => x.key == oldOperateKey);
+                        keys.splice(idx1, 1);
                         break;
                     default:
                         break;
                 }
+                if (keys.length) {
+                    keys.sort((a, b) => a.key.localeCompare(b.key));
+                }
+                perm.required_auth.keys = keys;
             }
         }
         return perms;
@@ -168,7 +163,7 @@ export default class EOSApi {
                 },
             });
         }
-        console.log(actions);
+        console.log(JSON.stringify(actions[0].data));
         // 变更权限无法免CPU
         const result = await this.transact(
             { actions },

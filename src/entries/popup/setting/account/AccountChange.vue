@@ -12,6 +12,7 @@ interface Params {
 }
 
 const route = useRoute();
+const router = useRouter();
 const { t } = useI18n();
 
 const params: Params = JSON.parse(route.query.params + '');
@@ -19,10 +20,16 @@ const chainId = route.query.chainId + '';
 
 const newOperateKey = ref('');
 const showGeneratePublicKey = ref(false);
+const showConfirm = ref(false);
 
 const onSubmit = async () => {
-    if (!isValidPublic(newOperateKey.value))
+    if (!isValidPublic(newOperateKey.value)) {
         return window.msg.error(t('setting.invalidPublicKey'));
+    }
+    showConfirm.value = true;
+}
+
+const doUpdate = async () => {
     const newPerms = chain.getApi(chainId).makeNewPermissions(
         params.perms,
         params.operateType, // modify or add
@@ -30,18 +37,13 @@ const onSubmit = async () => {
         params.oldOperateKey, // pubkey
         newOperateKey.value // pubkey
     ).filter((x: any) => x.perm_name == params.operatePerm);
-    console.log(params.account);
-    console.log(newPerms);
     
     try {
-        await chain
-            .getApi(chainId)
-            .updatePerms(
-                params.account,
-                newPerms
-            );
+        await chain.getApi(chainId).updatePerms(params.account,newPerms);
         params.perms = newPerms;
         window.msg.success(t('public.executeSuccess'));
+        
+        router.back();
     } catch (e) {
         window.msg.error(chain.getErrorMsg(e));
     }
@@ -97,6 +99,13 @@ const onSubmit = async () => {
                 @close="showGeneratePublicKey = false"
                 @set-operate-key="newOperateKey = $event"
             ></generate-public-key>
+
+            <password-confirm
+                :is-show="showConfirm"
+                :title="$t('setting.confirmPassword')"
+                @close="showConfirm = false"
+                @confirm="showConfirm = false; doUpdate();"
+            ></password-confirm>
         </div>
     </div>
 </template>

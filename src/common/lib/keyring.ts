@@ -13,7 +13,7 @@ export function privateToPublic(privateKey: string) {
 
 // 获取新私钥公钥
 export async function getRandomKeyPair() {
-    const privateKey = await ecc.randomKey(0, { secureEnv: true });
+    const privateKey = await ecc.randomKey(void 0, { secureEnv: true });
     const publicKey = ecc.privateToPublic(privateKey);
     return { privateKey, publicKey };
 }

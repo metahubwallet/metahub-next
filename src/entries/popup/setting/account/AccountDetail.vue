@@ -27,26 +27,41 @@ const currentPerms = computed(() => currentWallet.value.keys.flatMap(x => x.perm
 
 const showPrivateKey = ref(0);
 const showKeyText = ref('');
+// 移除账号
+const showRemoveConfirm = ref(false);
+const showDestroyConfirm = ref(false);
+const removeKeyInfo:Ref<{key:string,perm:string}|null> = ref(null);
 
-onMounted(async () => {
+onMounted(async() => {
     if (currentIdx.value == -1) {
         router.back();
         return;
     }
 
-    console.log('onMounted...');
+    fetchPermissions();
+
+    if ((window as any).navigation && (window as any).navigation.canGoForward) {
+        // after two seconds, when updating from the next page
+        console.log('from the next page');
+        setTimeout(() => fetchPermissions(), 2000); 
+    }
+    
+});
+
+const fetchPermissions = async() => {
 
     const result = await chain.fetchPermissions(currentWallet.value.name, currentWallet.value.chainId);
 
     if (result.code != 200) {
         window.msg.error(result.msg);
         router.back();
+        return;
     }
 
     const owner = result.permissions.find(x => x.perm_name == 'owner')!;
     const active = result.permissions.find(x => x.perm_name == 'active')!;
     allPerms.value = [ owner, active, ...result.permissions.filter(x => x.perm_name != 'owner' && x.perm_name != 'active')];
-});
+};
 
 // 跳转操作
 const viewAccountChange = (operatePerm: string, operateType: string, oldOperateKey?: string) => {
@@ -86,11 +101,11 @@ const doRemoveKey = async (operatePerm: string, key: string) => {
         .makeNewPermissions(allPerms.value, 'remove', operatePerm, key);
     try {
         const updatePerms = newPerms.filter((x: any) => x.perm_name == operatePerm);
-        await chain
-            .getApi(chainId)
-            .updatePerms(account, updatePerms);
+        await chain.getApi(chainId).updatePerms(account, updatePerms);
         allPerms.value = newPerms;
         window.msg.success(t('public.executeSuccess'));
+
+        setTimeout(() => fetchPermissions(), 2000); // refresh after two seconds
     } catch (e) {
         window.msg.error(chain.getErrorMsg(e));
     }
@@ -110,21 +125,25 @@ const isCanDelete = (perm: string) => {
 
 
 // 移除所有者
-const handleRemoveKey = (oldOperateKey: string) => {
-    window.dialog.warning({
-        title: t('public.tip'),
-        content: t('setting.confirmRemove'),
-        positiveText: t('public.ok'),
-        negativeText: t('public.cancel'),
-        onPositiveClick: () => {
-            doRemoveKey('owner', oldOperateKey);
-        },
-        onNegativeClick: () => {},
-    });
+const handleRemoveKey = () => {
+    if (!removeKeyInfo.value) {
+        return;
+    }
+    doRemoveKey(removeKeyInfo.value.perm, removeKeyInfo.value.key);
+    removeKeyInfo.value = null;
+    // window.dialog.warning({
+    //     title: t('public.tip'),
+    //     content: t('setting.confirmRemove'),
+    //     positiveText: t('public.ok'),
+    //     negativeText: t('public.cancel'),
+    //     onPositiveClick: () => {
+    //         doRemoveKey(operatePerm, oldOperateKey);
+    //     },
+    //     onNegativeClick: () => {},
+    // });
 };
 
-// 移除账号
-const showPasswordConfirm = ref(false);
+
 
 const handleRemoveAccount = () => {
     const index = useWalletStore().wallets.findIndex((item) => {
@@ -141,15 +160,14 @@ const handleRemoveAccount = () => {
         return;
     }
 
-    // 存在其它账号
-    let firstIndex = walletStore.wallets.indexOf(walletStore.wallets[0]);
-    walletStore.setSelectedIndex(firstIndex >= 0 ? firstIndex : 0);
-    // const network = useChainStore().networks.find((item) => {
-    //     return item.chainId === currentWallet.value.chainId;
-    // });
-    // if (network) {
-    //     useChainStore().setCurrentNetwork(network);
-    // }
+    if (walletStore.selectedIndex >= walletStore.wallets.length) {
+        // 最后一个账号
+        walletStore.setSelectedIndex(walletStore.wallets.length - 1);
+    } else if (index <= walletStore.selectedIndex) {
+        // 之前账号
+        walletStore.setSelectedIndex(walletStore.selectedIndex - 1);
+    }
+
     window.msg.success(t('password.deleteSuccess'));
     router.go(-1);
 };
@@ -194,7 +212,7 @@ const handleRemoveAccount = () => {
                                     <div class="account-cell-buttons items-center">
                                         <div class="mt-[3px]">
                                             <span class="account-current" v-if="currentKeys.includes(item.key)">
-                                                {{ $t('setting.currentAccount') }}
+                                                {{ $t('setting.imported') }}
                                             </span>
                                         </div>
 
@@ -217,7 +235,7 @@ const handleRemoveAccount = () => {
                                             </div>
                                             <!-- remove -->
                                             <div
-                                                @click="handleRemoveKey(item.key)"
+                                                @click="removeKeyInfo = {perm:perm.perm_name, key:item.key}; showRemoveConfirm = true;"
                                                 class="account-change-btn"
                                                 v-if="isCanDelete(perm.perm_name) && currentPerms.includes(perm.perm_name)"
                                             >
@@ -233,15 +251,10 @@ const handleRemoveAccount = () => {
 
                         <!-- remove account -->
                         <div class="account-buttons">
-                            <n-button @click="showPasswordConfirm = true" class="account-delete-button">
+                            <n-button @click="showDestroyConfirm = true" class="account-delete-button">
                                 {{ $t('setting.removeWallet') }}
                             </n-button>
-                            <password-confirm
-                                :is-show="showPasswordConfirm"
-                                :title="$t('setting.confirmDestroy')"
-                                @close="showPasswordConfirm = false"
-                                @confirm="handleRemoveAccount"
-                            ></password-confirm>
+
                         </div>
 
                         <!-- tip -->
@@ -254,6 +267,20 @@ const handleRemoveAccount = () => {
                     </div>
                 </n-scrollbar>
             </div>
+
+            <password-confirm
+                :is-show="showRemoveConfirm"
+                :title="$t('setting.confirmRemoveKey')"
+                @close="showRemoveConfirm = false"
+                @confirm="handleRemoveKey"
+            ></password-confirm>
+
+            <password-confirm
+                :is-show="showDestroyConfirm"
+                :title="$t('setting.confirmRemoveAccount')"
+                @close="showDestroyConfirm = false"
+                @confirm="handleRemoveAccount"
+            ></password-confirm>
 
             <password-confirm
                 :is-show="showPrivateKey == 1"
@@ -269,7 +296,6 @@ const handleRemoveAccount = () => {
                 @close="showPrivateKey=0;showKeyText='';"
                 @submit="showPrivateKey=0;showKeyText='';"
             >
-                <!-- old password -->
                 <div class="dialog-title">
                     {{ $t('public.privateKey') }}
                 </div>

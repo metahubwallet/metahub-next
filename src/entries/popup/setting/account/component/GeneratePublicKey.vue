@@ -46,13 +46,13 @@ const handleUseKey = () => {
         <div class="dialog-box">
             <!-- public key -->
             <div class="dialog-cell py-3">
-                <div class="dialog-cell-left !w-[70px]">{{ $t('setting.newPublicKey') }}</div>
+                <div class="dialog-cell-left !w-[70px]">{{ $t('public.publicKey') }}</div>
                 <clip-button :value="publicKey" type="2" />
             </div>
 
             <!-- private key -->
             <div class="dialog-cell py-3">
-                <div class="dialog-cell-left !w-[70px]">{{ $t('setting.newPrivateKey') }}</div>
+                <div class="dialog-cell-left !w-[70px]">{{ $t('public.privateKey') }}</div>
                 <clip-button :value="privateKey" type="2" />
             </div>
 

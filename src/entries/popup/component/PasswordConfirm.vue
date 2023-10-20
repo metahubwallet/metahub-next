@@ -29,7 +29,7 @@ const handleSubmit = () => {
     <modal
         :is-show="props.isShow"
         :title="props.title"
-        @close="$emit('close')"
+        @close="password = '';$emit('close')"
         @submit="handleSubmit"
     >
         <n-input
