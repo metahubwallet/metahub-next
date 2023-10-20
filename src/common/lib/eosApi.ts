@@ -483,7 +483,7 @@ export default class EOSApi {
     }
 
     protected initAPI() {
-        const options = {
+        const options: any = {
             rpc: this.rpc,
             abiProvider: {
                 getRawAbi: async (accountName: string) => {
@@ -491,8 +491,6 @@ export default class EOSApi {
                 },
             },
             chainId: this.chainId,
-            authorityProvider: null,
-            signatureProvider: null,
         };
         if (this.chain) {
             options.authorityProvider = this.chain.authorityProvider(this.chainId);
