@@ -13,8 +13,8 @@ const showAddToken = ref(false);
 
 // 初始化Tokens
 const isLoading = ref(false);
-const tokens = ref<Balance[]>([]);
 const walletStore = useWalletStore();
+const { currentUserTokens } = storeToRefs(walletStore);
 const emit = defineEmits(['isLoading', 'setUnit', 'setAmount']);
 
 onMounted(async () => {
@@ -25,6 +25,14 @@ watch(
     () => walletStore.selectedIndex,
     async (v) => {
         console.log('change wallet index');
+        await loadTokens();
+    }
+);
+
+watch(
+    () => currentUserTokens.value,
+    async (v) => {
+        console.log('change current user tokens');
         await loadTokens();
     }
 );
@@ -47,9 +55,9 @@ const loadTokens = async () => {
             },
         ]);
     }
-    tokens.value = walletStore.currentUserTokens;
+    // tokens.value = walletStore.currentUserTokens;
 
-    getCoinsLogo(tokens.value);
+    getCoinsLogo(currentUserTokens.value);
     await getUserBalance();
     await handleGetEosPrice();
     await getWalletCache();
@@ -68,13 +76,13 @@ const getCoinsLogo = (coins: Coin[]) => {
 
 // 获取余额
 const getUserBalance = async () => {
-    let userCoins = tokens.value.map((x: Coin) => {
+    let userCoins = currentUserTokens.value.map((x: Coin) => {
         return { contract: x.contract, symbol: x.symbol };
     }) as Coin[];
 
     await getBalanceList(useWalletStore().currentWallet.name, userCoins, (coin: Balance) => {
         // console.log(coin);
-        const selectedToken = tokens.value.find((x) => x.contract === coin.contract && x.symbol == coin.symbol);
+        const selectedToken = currentUserTokens.value.find((x) => x.contract === coin.contract && x.symbol == coin.symbol);
 
         if (selectedToken) {
             selectedToken.amount = coin.amount;
@@ -85,7 +93,7 @@ const getUserBalance = async () => {
 
 // 获取价格
 const handleGetEosPrice = async () => {
-    const eosToken = tokens.value.find((i) => i.contract === 'eosio.token' && i.symbol === 'EOS');
+    const eosToken = currentUserTokens.value.find((i) => i.contract === 'eosio.token' && i.symbol === 'EOS');
 
     if (eosToken) {
         emit('setUnit', eosToken.symbol);
@@ -156,7 +164,7 @@ const handleViewCoin = (item: Coin) => {
 
         <!-- body -->
         <n-scrollbar style="max-height: 277px">
-            <div @click="handleViewCoin(item)" class="resource-item" v-for="(item, index) of tokens" :key="index">
+            <div @click="handleViewCoin(item)" class="resource-item" v-for="(item, index) of currentUserTokens" :key="index">
                 <div class="resource-item-left">
                     <img
                         :src="

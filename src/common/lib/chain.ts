@@ -170,7 +170,6 @@ export class Chain {
 
             // { chainId, requiredKeys, serializedTransaction, serializedContextFreeData, abis }
             sign: async (transaction: any) => {
-                // console.log(transaction.serializedContextFreeData);
                 const trxBuf =
                     typeof transaction.serializedTransaction == 'string'
                         ? Buffer.from(transaction.serializedTransaction, 'hex')
@@ -181,22 +180,12 @@ export class Chain {
                         Buffer.from(new Uint8Array(32)), // todo: serializedContextFreeData
                     ]);
 
-                // console.log(payload.buf.toString('hex'));
-                // console.log('requiredKeys');
-
 
                 const signatures = transaction.requiredKeys.map((pub: string) => {
                     const privateKey = this.getPrivateKeyByPublicKey(pub);
                     return signature(buffer, privateKey);
                 });
 
-                // console.log('');
-                //
-                // 30dacc64e4a9da5ead8400000000010000000000ea305500003f2a1ba6a24a010000000098669a690000000080ab26a7310000000098669a690000000098669a69000000000000000004454f5300000000e80300000000000004454f53000000000000
-                // SIG_K1_KjbR2tYkYEgxJoxWsjBaNwTy5K4zCWRK5EbCWZn3iU6Z2R8mZ5K74C1NmoG98m7wtwT3vUH58ym192QFwU7Joqpgek5KvU
-
-                // const api = new Api({chainId, rpc: new JsonRpc('http://office.gogo8899.com:8888')});
-                // const trx = api.deserializeTransaction(transaction.serializedTransaction);
                 return {
                     signatures,
                     serializedTransaction: transaction.serializedTransaction,

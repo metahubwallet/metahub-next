@@ -17,7 +17,6 @@ const tokenList = ref<Balance[]>([]);
 watch(
     () => props.isShow,
     (newValue, oldValue) => {
-        console.log(newValue, chainTokens.length);
         if (newValue && chainTokens.length == 0) {
             initTokens();
         }
@@ -38,7 +37,6 @@ const initTokens = () => {
     let tokens: Balance[] = [];
     chainTokens = [];
     for (const chainToken of walletStore.chainTokens) {
-        console.log(chainToken);
         if (chainToken.contract == 'eosio.token') {
             continue;
         }
@@ -62,13 +60,13 @@ const initTokens = () => {
     }
     chainTokens = tokens.sort((x, y) => (x.symbol > y.symbol ? 1 : -1));
 
-    searchTokens();
+    searchTokens(keywords.value);
 };
 
 // 搜索token
 const keywords = ref('');
-const searchTokens = () => {
-    keywords.value = keywords.value.toLowerCase();
+const searchTokens = (newWord: string) => {
+    keywords.value = newWord.toLowerCase();
     const tokens =
         (keywords.value == ''
             ? chainTokens.concat()
@@ -94,7 +92,9 @@ const handleAddToken = async (token: Balance) => {
         const index = walletStore.currentUserTokens.findIndex(
             (x: Coin) => x.contract == token.contract && x.symbol == token.symbol
         );
-        walletStore.currentUserTokens.splice(index, 1);
+        const currentUserTokens = [...walletStore.currentUserTokens];
+        currentUserTokens.splice(index, 1);
+        walletStore.setCurrentUserTokens(currentUserTokens);
         token.isShow = false;
     } else {
         const newToken = {
@@ -117,10 +117,10 @@ const handleAddToken = async (token: Balance) => {
         <div class="selector-searchWords">
             <n-input
                 class="searchWords-input"
-                v-model:value="keywords"
+                :value="keywords"
                 type="text"
                 :placeholder="$t('wallet.searchKeyWord')"
-                @change="searchTokens"
+                @input="text => searchTokens(text)"
             />
         </div>
 

@@ -47,6 +47,7 @@ export const useWalletStore = defineStore('wallet', {
             this.wallets = (await localCache.get('wallets', [])) as Wallet[];
             this.selectedIndex = (await localCache.get('selectedIndex', 0)) as number;
             this.recentTransfers = (await localCache.get('recentTransfers', [])) as TransferRecord[];
+            this.userTokens = (await localCache.get('userTokens', {}));
             this.allTokens = await initTokens();
             
         },
