@@ -37,7 +37,7 @@ const loading = ref(false);
 watch(checked, (nv, _ov) => {
     if (nv) {
       if (payload.actions.length > 1) {
-        console.log(payload.actions)
+        // console.log(payload.actions)
         // console.log(whitelist);
         window.msg.warning(t('auth.canNotAdd'));
         checked.value = false

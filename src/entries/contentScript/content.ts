@@ -250,11 +250,9 @@ class Dapp {
                 expireSeconds = 30;
             }
 
-            const { info } = (await this.signal<Payload>(MessageTypes.REQUEST_CHAIN_INFO, { chainId }).request()) as ChainInfoResult;
-
-            // console.log(info);
-            const ref_block_num = info.head_block_num;
-            const ref_block_prefix = parseInt(reverseHex(info.head_block_id.substr(16, 8)), 16);
+            const chainInfo = (await this.signal<Payload>(MessageTypes.REQUEST_CHAIN_INFO, { chainId }).request()) as ChainInfoResult;
+            const ref_block_num = chainInfo.head_block_num;
+            const ref_block_prefix = parseInt(reverseHex(chainInfo.head_block_id.substring(16, 16 + 8)), 16);
             return {
                 expiration: timePointSecToDate(Date.now() + expireSeconds * 1000),
                 ref_block_num: ref_block_num & 0xffff,

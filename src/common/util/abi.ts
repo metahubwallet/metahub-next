@@ -1,9 +1,6 @@
 import { base64ToBinary } from 'eosjs/dist/eosjs-numeric';
 import { CacheABI } from "@/types/settings";
 import { Api } from "eosjs";
-import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
-import eosioAbi from '@/assets/abi/eosio.abi.json';
-import eosioTokenAbi from '@/assets/abi/eosio.token.abi.json';
 
  // 读写CacheABI
  const getCachedABI =  async (chainId: string, contract: string) : Promise<CacheABI | null> => {
@@ -26,12 +23,6 @@ const setCacheABI = async (abi: CacheABI) => {
 };
 
 export const getContractAbi = async (api: Api, chainId: string, contract: string) => {
-    let abi: Abi;
-    if (contract == 'eosio' || contract == 'eosio.token') {
-        abi = contract == 'eosio' ? eosioAbi : eosioTokenAbi;
-        const rawAbi = api.jsonToRawAbi(abi);
-        return { abi, raw: rawAbi };
-    }
     const cachedABI = await getCachedABI(chainId, contract);
     const nowTime = new Date().getTime();
     
@@ -48,7 +39,7 @@ export const getContractAbi = async (api: Api, chainId: string, contract: string
     const rawAbi = await api.rpc.get_raw_abi(contract);
     const raw = base64ToBinary(rawAbi.abi);
     
-    abi = api.rawAbiToJson(raw); 
+    const abi = api.rawAbiToJson(raw); 
 
     const savableAbi: CacheABI = {
         chainId: chainId,
@@ -57,7 +48,7 @@ export const getContractAbi = async (api: Api, chainId: string, contract: string
         raw: Array.from(raw),
         // hash: rawAbi.abi_hash,
         updated: nowTime,
-        expire: nowTime + 86400000 * 7,
+        expire: nowTime + 86400 * 1000,
     };
     await setCacheABI(savableAbi);
     return { abi, raw };

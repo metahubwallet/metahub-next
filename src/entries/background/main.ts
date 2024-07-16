@@ -518,7 +518,8 @@ async function getEosInfo(chainId: string) {
     console.log('getEosInfo', chainId);
     const endpoint = await getEndPoint(chainId);
     const response = await fetch(endpoint + '/v1/chain/get_info');
-    return await response.json();
+    const result =  await response.json();
+    return result;
 }
 
 async function getPassword() {

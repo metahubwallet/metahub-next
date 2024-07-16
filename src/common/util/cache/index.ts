@@ -12,7 +12,7 @@ export const localCache = {
         if (liveSeconds) {
             data.expire = new Date().getTime() + liveSeconds * 1000;
         }
-        await chrome.storage.local.set({ [key]: data }, () => {});
+        await chrome.storage.local.set({ [key]: data });
     },
 
     async get(key: CacheKey, defaultValue: any = null): Promise<any> {
