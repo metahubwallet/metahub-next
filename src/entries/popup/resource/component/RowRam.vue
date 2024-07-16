@@ -137,7 +137,7 @@ const onSubmit = async () => {
                     clearable
                 >
                     <template #suffix>
-                        <span class="text-gray-400 text-sm">EOS</span>
+                        <span class="text-gray-400 text-sm">{{ action == 'sellRam' ? 'KB' : 'EOS' }}</span>
                     </template>
                 </n-input-number>
             </div>
