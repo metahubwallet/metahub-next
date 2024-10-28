@@ -31,12 +31,7 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
         page: 'src/entries/options/index.html',
         open_in_tab: true,
     },
-    // web_accessible_resources: [
-    //     {
-    //       resources: ['src/entries/contentScript/content.ts'],
-    //       matches: [ '*://*/*' ],
-    //     },
-    // ],
+    web_accessible_resources: [],
     permissions: [ 'storage', 'unlimitedStorage' ],
 };
 

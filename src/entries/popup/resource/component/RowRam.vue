@@ -31,15 +31,19 @@ const walletStore = useWalletStore();
 const receiver = ref(walletStore.currentWallet.name);
 
 // 提交表单
-const inputValue = ref(0);
+const inputValue:Ref<number|null> = ref(null);
 const submitLoading = ref(false);
 const { currentSymbol } = useChainStore();
 const emit = defineEmits(['loadData']);
 const onSubmit = async () => {
-    if (!receiver.value) return window.msg.warning(t('wallet.emptyReceiver'));
-    else if (receiver.value.length != 42 && receiver.value.length > 12)
+    if (!receiver.value) {
+        return window.msg.warning(t('wallet.emptyReceiver'));
+    } else if (receiver.value.length != 42 && receiver.value.length > 12) {
         return window.msg.warning(t('wallet.errorReceiver'));
-    if (!inputValue.value || inputValue.value == 0) return window.msg.warning(t('resource.valueError'));
+    }
+    if (!inputValue.value || inputValue.value == 0) {
+        return window.msg.warning(t('resource.valueError'));
+    }
 
     try {
         // 发起操作
@@ -64,7 +68,7 @@ const onSubmit = async () => {
         window.msg.success(t('resource.stakeSuccess'));
 
         // 清空输入框
-        inputValue.value = 0;
+        inputValue.value = null;
         //刷新数据
         emit('loadData');
     } catch (e) {
