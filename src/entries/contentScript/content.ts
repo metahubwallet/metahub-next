@@ -37,16 +37,16 @@ import { ErrorCodes } from '@/common/lib/sdkError';
 watchBackgroundMessages();
 
 
-class Dapp {
-    private _identity: Identity | null = null;
-    private chainId: string = '';
+class Metahub {
+    #identity: Identity | null = null;
+    private chainId: string = 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906';
 
     constructor() {
         this.init();
     }
 
     public get identity(): Identity | null {
-        return this._identity;
+        return this.#identity;
     }
 
     public set identity(_id: any) {
@@ -57,16 +57,19 @@ class Dapp {
         return await this.signal<Payload>(MessageTypes.REQUEST_GET_VERSION).request();
     }
 
+    public isMetahub() {
+        return true;
+    }
+
     public async init() {
         try {
             const identity = await this.getIdentityFromPermissions();
             if (identity) {
-                this._identity = identity;
+                this.#identity = identity;
             }
         } catch (e) {
             console.log(e);
         }
-        // console.log('inited');
         document.dispatchEvent(new CustomEvent("metahubLoaded"));
         document.dispatchEvent(new CustomEvent("scatterLoaded"));
     }
@@ -82,9 +85,9 @@ class Dapp {
     }
 
     public async getIdentity(params: Partial<LoginPayload>): Promise<Identity> {
-        this._identity = (await this.signal(MessageTypes.GET_IDENTITY, params).request()) as Identity;
+        this.#identity = (await this.signal(MessageTypes.GET_IDENTITY, params).request()) as Identity;
         console.log('getIdentity response');
-        return this._identity;
+        return this.#identity;
     }
 
     public async useIdentity(id: string) {
@@ -102,12 +105,12 @@ class Dapp {
         // console.log('payload', payload);
         const result = (await this.signal<AccountPayload>(MessageTypes.FORGET_IDENTITY, { account }).request()) as Identity;
         // console.log(result);
-        this._identity = result;
+        this.#identity = result;
         return this.identity;
     }
 
     public async getIdentityFromPermissions() : Promise<Identity | null> {
-        // console.log('getIdentityFromPermissions');
+        console.log('getIdentityFromPermissions');
         try {
             const result = (await this.signal<Payload>(MessageTypes.GET_IDENTITY_FROM_PERMISSIONS).request()) as Identity;
             return result;
@@ -117,10 +120,6 @@ class Dapp {
             }
             throw e;
         }
-    }
-
-    public async isMetahub() {
-        return true;
     }
 
     public async suggestNetwork() {
@@ -163,7 +162,7 @@ class Dapp {
         return this.signatureProvider(network.chainId, this);
     }
 
-    private signatureProvider(chainId: string, dapp: Dapp) {
+    private signatureProvider(chainId: string, dapp: Metahub) {
         return {
             async getAvailableKeys() : Promise<string[]> {
                 // console.log('getAvailableKeys');
@@ -368,24 +367,52 @@ class Dapp {
     }
 }
 
-const dapp = new Dapp();
-window.metahub = dapp;
-window.scatter = dapp;
+const metahub = new Metahub();
+window.metahub = metahub;
 
-let checkTime = 1000;
-function resetScatter() {
-    if (window && typeof window.scatter == 'object' && window.scatter != dapp && typeof window.scatter.getIdentity == 'function') {
-        window.scatter = dapp;
+try {
+    let _ScatterJS: any = {
+        scatter: metahub
+    };
+    Object.defineProperty(window, "ScatterJS", {
+        get: () => _ScatterJS,
+        set: (s) => {
+            if (s) {
+                s.scatter = metahub;
+                _ScatterJS = s;
+            }
+        },
+    });
+} catch {
+    // define ScatterJS error, so define ScatterJS.scatter
+    const defineScatterJSScatter = () => {
+        if (typeof window.ScatterJS != 'undefined') {
+            try {
+                Object.defineProperty(window.ScatterJS, "scatter", {
+                    get: () => metahub,
+                    set: (_s) => {
+                        // ignore..
+                    },
+                });
+            } catch {
+                console.log('define ScatterJS scatter error');
+            }
+            console.log('define success');
+        } else {
+            console.log('define faile, retry...');
+            setTimeout(defineScatterJSScatter, 10);
+        }
     }
-    checkTime += 1000;
-    setTimeout(resetScatter, checkTime);
+    defineScatterJSScatter();
 }
-setTimeout(resetScatter, checkTime);
 
-// const dapp = new Dapp();
-// window.scatter = new Proxy(dapp, {
-//   get: function get(target, name) {
-//     console.log('call:' + target, name);
-//     return dapp[name];
-//   }
-// });
+try {
+    Object.defineProperty(window, "scatter", {
+        get: () => metahub,
+        set: (_s) => {
+            // ignore..
+        },
+    });
+} catch {
+    console.log('define scatter error');
+}

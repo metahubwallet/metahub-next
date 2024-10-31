@@ -579,3 +579,22 @@ async function createWindow(type: string, width: number, height: number, params:
 
 // upgrade from v1
 localCache.upgrade();
+
+// inject inpage.js
+const registerInPageContentScript = async () => {
+    try {
+      await chrome.scripting.registerContentScripts([
+        {
+          id: 'inpage',
+          matches: ['file://*/*', 'http://*/*', 'https://*/*'],
+          js: ['inpage.js'],
+          runAt: 'document_start',
+          world: 'MAIN',
+        },
+      ]);
+    } catch (err) {
+      console.warn(`Dropped attempt to register inpage content script. ${err}`);
+    }
+  };
+  
+  registerInPageContentScript();

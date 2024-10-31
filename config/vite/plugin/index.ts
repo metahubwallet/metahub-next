@@ -7,14 +7,25 @@ import { autoImport } from './autoImport';
 import { setupComponent } from './component';
 import { setupManifest } from './manifest';
 
-export const setupPlugins = () => {
+export const setupMainPlugins = () => {
     const plugins: PluginOption[] = [];
     plugins.push(vue());
     plugins.push(setupManifest());
     plugins.push(autoImport());
     plugins.push(setupComponent());
     plugins.push(nodePolyfills());
-    console.log(process.env.npm_lifecycle_event);
+    console.log('npm_lifecycle_event', process.env.npm_lifecycle_event);
+    if (process.env.npm_lifecycle_event == 'build') {
+        plugins.push(removeConsole());
+    }
+
+    return plugins;
+};
+
+
+export const setupContentPlugins = () => {
+    const plugins: PluginOption[] = [];
+    // console.log('npm_lifecycle_event', process.env.npm_lifecycle_event);
     if (process.env.npm_lifecycle_event == 'build') {
         plugins.push(removeConsole());
     }

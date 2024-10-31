@@ -17,7 +17,7 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
         {
             js: ['src/entries/contentScript/main.ts'],
             matches: ['<all_urls>'],
-            // run_at: 'document_start',
+            run_at: 'document_start',
         },
     ],
     host_permissions: ['<all_urls>'],
@@ -31,8 +31,13 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
         page: 'src/entries/options/index.html',
         open_in_tab: true,
     },
-    web_accessible_resources: [],
-    permissions: [ 'storage', 'unlimitedStorage' ],
+    web_accessible_resources: [
+        {
+            resources: [ 'src/entries/contentScript/content.js' ],
+            matches: [ '<all_urls>' ],
+        }
+    ],
+    permissions: [ 'storage', 'unlimitedStorage', 'scripting' ],
 };
 
 export function getManifest(): chrome.runtime.ManifestV3 {
@@ -48,15 +53,15 @@ export function getManifest(): chrome.runtime.ManifestV3 {
 
 export function additionalInputs() : { [key: string]: AdditionalInput[] } {
     return {
-        scripts: [
-            {
-                fileName: 'src/entries/contentScript/content.ts',
-                webAccessible: {
-                    matches: ["<all_urls>"],
-                    isInject: true,
-                },
-            }
-        ],
+        // scripts: [
+        //     {
+        //         fileName: 'src/entries/contentScript/content.ts',
+        //         webAccessible: {
+        //             matches: ["<all_urls>"],
+        //             isInject: true,
+        //         },
+        //     }
+        // ],
         html: [
             {
                 fileName: 'src/entries/windows/index.html',
