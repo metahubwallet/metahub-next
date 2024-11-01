@@ -39,7 +39,9 @@ watchBackgroundMessages();
 
 class Metahub {
     #identity: Identity | null = null;
-    private chainId: string = 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906';
+    #chainId: string = '';
+    #appName: string = '';
+    public isExtension = true;
 
     constructor() {
         this.init();
@@ -74,7 +76,16 @@ class Metahub {
         document.dispatchEvent(new CustomEvent("scatterLoaded"));
     }
 
-    public async login(payload: LoginPayload): Promise<Identity> {
+    public async login(payload?: Partial<LoginPayload>): Promise<Identity> {
+        if (!payload) {
+            payload = {};
+        }
+        if (!payload.appName && this.#appName) {
+            payload.appName = this.#appName;
+        }
+        if (!payload.chainId && this.#chainId) {
+            payload.chainId = this.#chainId;
+        }
         console.log('login');
         return await this.getIdentity(payload);
     }
@@ -356,14 +367,25 @@ class Metahub {
         const m = new Message<T>();
         m.type = type; 
         if (typeof data != 'undefined') {
-            if (data.chainId) {
-                this.chainId = data.chainId;
-            } else if (this.chainId) {
-                data.chainId = this.chainId;
+            if (!data.chainId && this.#chainId) {
+                data.chainId = this.#chainId;
             }
             Object.assign(m.payload, data);
         }
         return m;
+    }
+
+    // Compatible with ScatterJS, reset ScatterJS::Index::connect
+    async connect(pluginName: string, options: any) {
+        if (pluginName) {
+            this.#appName = pluginName;
+        }
+        if (options && options.network && options.network.chainId) {
+            this.#chainId = options.network.chainId;
+        } else if (options && options.chainId) {
+            this.#chainId = options.chainId;
+        }
+        return true;
     }
 }
 
@@ -371,9 +393,9 @@ const metahub = new Metahub();
 window.metahub = metahub;
 
 try {
-    let _ScatterJS: any = {
-        scatter: metahub
-    };
+    console.log('reset ScatterJS');
+    // reset ScatterJS, so those ulgy plugins will not trigger
+    let _ScatterJS: any;
     Object.defineProperty(window, "ScatterJS", {
         get: () => _ScatterJS,
         set: (s) => {

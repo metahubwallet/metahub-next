@@ -66,6 +66,7 @@ export interface NetworkPayload extends Payload {
 export interface LoginPayload extends Payload {
     appName?: string;
     newLogin?: boolean;
+    network: ChainNetwork,
     accounts?: ChainNetwork[];
 }
 
