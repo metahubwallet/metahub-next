@@ -3,6 +3,7 @@ import * as MessageTypes from '../../common/lib/messages/types';
 import { API_URL } from '@/common/constants';
 import { ErrorCodes } from '@/common/lib/sdkError';
 
+
 /* eslint-disable */
 // todo: getIdentity, arbitrarySignature, transcation 要在页面显示一个加载符号？
 // disconnect
@@ -80,10 +81,10 @@ class Metahub {
         if (!payload) {
             payload = {};
         }
-        if (!payload.appName && this.#appName) {
+        if (typeof payload.appName == 'undefined' && this.#appName) {
             payload.appName = this.#appName;
         }
-        if (!payload.chainId && this.#chainId) {
+        if (typeof payload.chainId == 'undefined' && this.#chainId) {
             payload.chainId = this.#chainId;
         }
         console.log('login');
@@ -391,12 +392,12 @@ class Metahub {
 
 const metahub = new Metahub();
 window.metahub = metahub;
-
+let tryTimes = 0;
 try {
-    console.log('reset ScatterJS');
+    console.log('try reset ScatterJS...');
     // reset ScatterJS, so those ulgy plugins will not trigger
     let _ScatterJS: any;
-    Object.defineProperty(window, "ScatterJS", {
+    Object.defineProperty(window, 'ScatterJS', {
         get: () => _ScatterJS,
         set: (s) => {
             if (s) {
@@ -405,7 +406,9 @@ try {
             }
         },
     });
-} catch {
+    console.log('reset ScatterJS success');
+} catch(e)  {
+    console.log('reset ScatterJS failed, try reset ScatterJS.scatter...');
     // define ScatterJS error, so define ScatterJS.scatter
     const defineScatterJSScatter = () => {
         if (typeof window.ScatterJS != 'undefined') {
@@ -416,13 +419,20 @@ try {
                         // ignore..
                     },
                 });
-            } catch {
-                console.log('define ScatterJS scatter error');
+            } catch(e) {
+                console.log(e);
+                console.log('define ScatterJS.scatter error');
             }
-            console.log('define success');
+            console.log('define ScatterJS.scatter success');
         } else {
-            console.log('define faile, retry...');
-            setTimeout(defineScatterJSScatter, 10);
+            console.log('define ScatterJS.scatter failed, retry...');
+            tryTimes++;
+            let time = tryTimes * 1;
+            if (tryTimes > 50) {
+                console.log('No ScatterJS');
+                return;
+            }
+            setTimeout(() => { defineScatterJSScatter(); }, time);
         }
     }
     defineScatterJSScatter();
