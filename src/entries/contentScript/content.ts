@@ -3,7 +3,6 @@ import * as MessageTypes from '../../common/lib/messages/types';
 import { API_URL } from '@/common/constants';
 import { ErrorCodes } from '@/common/lib/sdkError';
 
-
 /* eslint-disable */
 // todo: getIdentity, arbitrarySignature, transcation 要在页面显示一个加载符号？
 // disconnect

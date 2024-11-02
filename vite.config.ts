@@ -41,6 +41,7 @@ const contentConfig = defineConfig({
                     return 'inpage.js';
                 },
                 inlineDynamicImports: true,
+                format: 'iife',
             }
         }
     },

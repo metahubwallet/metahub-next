@@ -1,6 +1,6 @@
 {
     "name": "metahub-wallet-web-extension",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "type": "module",
     "displayName": "Metahub Wallet",
     "author": "metahub",
