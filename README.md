@@ -2,7 +2,7 @@
 
 Metahub is a web plugin wallet, we have completely rewritten the code, using typescript and vue3, supporting EOS and EVM blockchains.
 
-Project website: https://metahub.cash  
+Project website: https://metahub.fun  
 Github link: https://github.com/metahubwallet/metahub-next  
 Chrome extension link: https://chrome.google.com/webstore/detail/metahub-easy-to-use-eos-w/nglnaekfdaelelcaokeemlnopjhekdkj
 

@@ -98,7 +98,7 @@ const aboutUsClick = () => {
 
                     <!-- about us -->
                     <div @click="aboutUsClick" class="setting-item">
-                        <a ref="link" href="https://metahub.cash/" target="_blank"></a>
+                        <a ref="link" href="https://metahub.fun/" target="_blank"></a>
                         <div class="setting-icon">
                             <img class="img-icon" src="@/assets/images/setting_about_me@2x.png" />
                         </div>
